@@ -1,0 +1,49 @@
+{
+  "name": "track-in",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate deploy",
+    "db:migrate:create": "prisma migrate dev --create-only",
+    "db:status": "prisma migrate status",
+    "db:studio": "prisma studio",
+    "db:seed:test": "node scripts/seed-test-campaign.mjs",
+    "providers:verify": "node scripts/verify-providers.mjs",
+    "test:unit": "vitest run --config vitest.config.ts",
+    "test:integration": "node scripts/assert-test-database.mjs && vitest run --config vitest.integration.config.ts",
+    "test:e2e": "playwright test",
+    "test": "npm run test:unit && npm run test:integration && npm run test:e2e",
+    "check": "npm run lint && npm run typecheck"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.2.0",
+    "@prisma/adapter-neon": "6.19.3",
+    "@prisma/client": "6.19.3",
+    "next": "16.3.8",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^22.20.5",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "dotenv": "^18.0.5",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.8",
+    "msw": "^2.15.0",
+    "prisma": "6.19.3",
+    "tailwindcss": "^4",
+    "testcontainers": "^12.2.0",
+    "typescript": "^5",
+    "vitest": "^5.0.3"
+  }
+}
