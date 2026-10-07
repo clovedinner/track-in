@@ -1009,7 +1009,7 @@ export type CampaignScalarFieldEnum = (typeof CampaignScalarFieldEnum)[keyof typ
 export const OfferScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  s2sPostbackUrl: 's2sPostbackUrl',
+  offerUrl: 'offerUrl',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

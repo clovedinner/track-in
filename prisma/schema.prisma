@@ -70,7 +70,7 @@ model Campaign {
 model Offer {
   id                String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name              String
-  s2sPostbackUrl    String?    @map("s2s_postback_url")
+  offerUrl          String?    @map("offer_url")
   createdAt         DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt         DateTime   @default(now()) @map("updated_at") @db.Timestamptz(6)
   campaigns         Campaign[]

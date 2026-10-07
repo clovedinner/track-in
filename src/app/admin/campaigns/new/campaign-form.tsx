@@ -4,7 +4,7 @@ import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 
 type TrafficSource = { id: string; name: string; type: string; enabled: boolean };
-type Offer = { id: string; name: string; s2sPostbackUrl: string | null };
+type Offer = { id: string; name: string; offerUrl: string | null };
 type CreatedCampaign = { id: string; name: string };
 
 const fieldClass = "mt-2 block w-full border border-[#bfc7d4] bg-white px-3 py-2.5 text-sm text-[#17202a] outline-none transition focus:border-[#314d8b] focus:ring-2 focus:ring-[#314d8b]/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#314d8b]";

@@ -27,7 +27,7 @@ export type AggregateOffer = {
 export type OfferMinAggregateOutputType = {
   id: string | null
   name: string | null
-  s2sPostbackUrl: string | null
+  offerUrl: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -35,7 +35,7 @@ export type OfferMinAggregateOutputType = {
 export type OfferMaxAggregateOutputType = {
   id: string | null
   name: string | null
-  s2sPostbackUrl: string | null
+  offerUrl: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -43,7 +43,7 @@ export type OfferMaxAggregateOutputType = {
 export type OfferCountAggregateOutputType = {
   id: number
   name: number
-  s2sPostbackUrl: number
+  offerUrl: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -53,7 +53,7 @@ export type OfferCountAggregateOutputType = {
 export type OfferMinAggregateInputType = {
   id?: true
   name?: true
-  s2sPostbackUrl?: true
+  offerUrl?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -61,7 +61,7 @@ export type OfferMinAggregateInputType = {
 export type OfferMaxAggregateInputType = {
   id?: true
   name?: true
-  s2sPostbackUrl?: true
+  offerUrl?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -69,7 +69,7 @@ export type OfferMaxAggregateInputType = {
 export type OfferCountAggregateInputType = {
   id?: true
   name?: true
-  s2sPostbackUrl?: true
+  offerUrl?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -150,7 +150,7 @@ export type OfferGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
 export type OfferGroupByOutputType = {
   id: string
   name: string
-  s2sPostbackUrl: string | null
+  offerUrl: string | null
   createdAt: Date
   updatedAt: Date
   _count: OfferCountAggregateOutputType | null
@@ -179,7 +179,7 @@ export type OfferWhereInput = {
   NOT?: Prisma.OfferWhereInput | Prisma.OfferWhereInput[]
   id?: Prisma.UuidFilter<"Offer"> | string
   name?: Prisma.StringFilter<"Offer"> | string
-  s2sPostbackUrl?: Prisma.StringNullableFilter<"Offer"> | string | null
+  offerUrl?: Prisma.StringNullableFilter<"Offer"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Offer"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Offer"> | Date | string
   campaigns?: Prisma.CampaignListRelationFilter
@@ -188,7 +188,7 @@ export type OfferWhereInput = {
 export type OfferOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  s2sPostbackUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  offerUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   campaigns?: Prisma.CampaignOrderByRelationAggregateInput
@@ -200,7 +200,7 @@ export type OfferWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.OfferWhereInput[]
   NOT?: Prisma.OfferWhereInput | Prisma.OfferWhereInput[]
   name?: Prisma.StringFilter<"Offer"> | string
-  s2sPostbackUrl?: Prisma.StringNullableFilter<"Offer"> | string | null
+  offerUrl?: Prisma.StringNullableFilter<"Offer"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Offer"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Offer"> | Date | string
   campaigns?: Prisma.CampaignListRelationFilter
@@ -209,7 +209,7 @@ export type OfferWhereUniqueInput = Prisma.AtLeast<{
 export type OfferOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  s2sPostbackUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  offerUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.OfferCountOrderByAggregateInput
@@ -223,7 +223,7 @@ export type OfferScalarWhereWithAggregatesInput = {
   NOT?: Prisma.OfferScalarWhereWithAggregatesInput | Prisma.OfferScalarWhereWithAggregatesInput[]
   id?: Prisma.UuidWithAggregatesFilter<"Offer"> | string
   name?: Prisma.StringWithAggregatesFilter<"Offer"> | string
-  s2sPostbackUrl?: Prisma.StringNullableWithAggregatesFilter<"Offer"> | string | null
+  offerUrl?: Prisma.StringNullableWithAggregatesFilter<"Offer"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Offer"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Offer"> | Date | string
 }
@@ -231,7 +231,7 @@ export type OfferScalarWhereWithAggregatesInput = {
 export type OfferCreateInput = {
   id?: string
   name: string
-  s2sPostbackUrl?: string | null
+  offerUrl?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   campaigns?: Prisma.CampaignCreateNestedManyWithoutOfferInput
@@ -240,7 +240,7 @@ export type OfferCreateInput = {
 export type OfferUncheckedCreateInput = {
   id?: string
   name: string
-  s2sPostbackUrl?: string | null
+  offerUrl?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   campaigns?: Prisma.CampaignUncheckedCreateNestedManyWithoutOfferInput
@@ -249,7 +249,7 @@ export type OfferUncheckedCreateInput = {
 export type OfferUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  s2sPostbackUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  offerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   campaigns?: Prisma.CampaignUpdateManyWithoutOfferNestedInput
@@ -258,7 +258,7 @@ export type OfferUpdateInput = {
 export type OfferUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  s2sPostbackUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  offerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   campaigns?: Prisma.CampaignUncheckedUpdateManyWithoutOfferNestedInput
@@ -267,7 +267,7 @@ export type OfferUncheckedUpdateInput = {
 export type OfferCreateManyInput = {
   id?: string
   name: string
-  s2sPostbackUrl?: string | null
+  offerUrl?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -275,7 +275,7 @@ export type OfferCreateManyInput = {
 export type OfferUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  s2sPostbackUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  offerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -283,7 +283,7 @@ export type OfferUpdateManyMutationInput = {
 export type OfferUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  s2sPostbackUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  offerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -296,7 +296,7 @@ export type OfferNullableScalarRelationFilter = {
 export type OfferCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  s2sPostbackUrl?: Prisma.SortOrder
+  offerUrl?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -304,7 +304,7 @@ export type OfferCountOrderByAggregateInput = {
 export type OfferMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  s2sPostbackUrl?: Prisma.SortOrder
+  offerUrl?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -312,7 +312,7 @@ export type OfferMaxOrderByAggregateInput = {
 export type OfferMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  s2sPostbackUrl?: Prisma.SortOrder
+  offerUrl?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -336,7 +336,7 @@ export type OfferUpdateOneWithoutCampaignsNestedInput = {
 export type OfferCreateWithoutCampaignsInput = {
   id?: string
   name: string
-  s2sPostbackUrl?: string | null
+  offerUrl?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -344,7 +344,7 @@ export type OfferCreateWithoutCampaignsInput = {
 export type OfferUncheckedCreateWithoutCampaignsInput = {
   id?: string
   name: string
-  s2sPostbackUrl?: string | null
+  offerUrl?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -368,7 +368,7 @@ export type OfferUpdateToOneWithWhereWithoutCampaignsInput = {
 export type OfferUpdateWithoutCampaignsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  s2sPostbackUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  offerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -376,7 +376,7 @@ export type OfferUpdateWithoutCampaignsInput = {
 export type OfferUncheckedUpdateWithoutCampaignsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  s2sPostbackUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  offerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -415,7 +415,7 @@ export type OfferCountOutputTypeCountCampaignsArgs<ExtArgs extends runtime.Types
 export type OfferSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
-  s2sPostbackUrl?: boolean
+  offerUrl?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   campaigns?: boolean | Prisma.Offer$campaignsArgs<ExtArgs>
@@ -425,7 +425,7 @@ export type OfferSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
 export type OfferSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
-  s2sPostbackUrl?: boolean
+  offerUrl?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["offer"]>
@@ -433,7 +433,7 @@ export type OfferSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 export type OfferSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
-  s2sPostbackUrl?: boolean
+  offerUrl?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["offer"]>
@@ -441,12 +441,12 @@ export type OfferSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 export type OfferSelectScalar = {
   id?: boolean
   name?: boolean
-  s2sPostbackUrl?: boolean
+  offerUrl?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type OfferOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "s2sPostbackUrl" | "createdAt" | "updatedAt", ExtArgs["result"]["offer"]>
+export type OfferOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "offerUrl" | "createdAt" | "updatedAt", ExtArgs["result"]["offer"]>
 export type OfferInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   campaigns?: boolean | Prisma.Offer$campaignsArgs<ExtArgs>
   _count?: boolean | Prisma.OfferCountOutputTypeDefaultArgs<ExtArgs>
@@ -462,7 +462,7 @@ export type $OfferPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     name: string
-    s2sPostbackUrl: string | null
+    offerUrl: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["offer"]>
@@ -891,7 +891,7 @@ export interface Prisma__OfferClient<T, Null = never, ExtArgs extends runtime.Ty
 export interface OfferFieldRefs {
   readonly id: Prisma.FieldRef<"Offer", 'String'>
   readonly name: Prisma.FieldRef<"Offer", 'String'>
-  readonly s2sPostbackUrl: Prisma.FieldRef<"Offer", 'String'>
+  readonly offerUrl: Prisma.FieldRef<"Offer", 'String'>
   readonly createdAt: Prisma.FieldRef<"Offer", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Offer", 'DateTime'>
 }
