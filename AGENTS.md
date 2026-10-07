@@ -71,6 +71,15 @@ A named tracking configuration, not an ad-platform campaign mirror.
 - `destination_url` or a destination reference
 - `traffic_source_id` (optional)
 - `default_currency`, `created_at`, `updated_at`, `archived_at`
+- An optional primary `offer_id` may associate the campaign with a reusable offer configuration.
+
+### Offer
+
+A reusable money-site offer configuration used by one or more campaigns.
+
+- `id`, `name`, optional HTTPS S2S postback URL, `created_at`, `updated_at`
+- Offer-level visits, conversions, registration, and FTD totals are derived from persisted campaign clicks and conversions.
+- Keep offer selection intentionally small in the MVP; path rotation and multi-offer routing remain future work.
 
 ### TrafficSource
 
@@ -200,6 +209,8 @@ MVP views:
 
 - Overview: clicks, unique click IDs, conversions, conversion rate, revenue, cost when available, profit, and ROI when cost is available.
 - Campaign table: the same metrics by campaign, sortable and drillable.
+- Offers table: visits, conversions, unknown-click error status, registration, FTD, and configured S2S postback.
+- Traffic-source table: visits, conversions, unknown-click error status, registration, FTD, and provider configuration status.
 - Campaign detail: daily trend plus recent clicks, conversions, and delivery failures.
 - Delivery health: pending, retrying, and permanently failed outbound postbacks, with reason and manual retry.
 - Configuration: campaigns, destinations, money-site authentication, and traffic-source adapter settings.
