@@ -17,6 +17,9 @@ export type TrafficStarsProviderConfiguration = {
   key?: string;
   allowDuplicates?: boolean;
   goalId?: string;
+  parameters?: Array<{ name: string; token: string }>;
+  costCurrency?: "USD";
+  postbackByEventType?: Record<string, string>;
 };
 
 export type PropellerProviderConfiguration = {
@@ -25,11 +28,17 @@ export type PropellerProviderConfiguration = {
   pid?: string;
   tid?: string;
   goalByEventType?: Record<string, number | undefined>;
+  parameters?: Array<{ name: string; token: string }>;
+  costCurrency?: "USD";
+  postbackByEventType?: Record<string, string>;
 };
 
 export type TrafficJunkyProviderConfiguration = {
   postbackUrl: string;
   descriptionByEventType?: Record<string, string | undefined>;
+  parameters?: Array<{ name: string; token: string }>;
+  costCurrency?: "USD";
+  postbackByEventType?: Record<string, string>;
 };
 
 export type ProviderConfiguration =
@@ -110,6 +119,37 @@ function optionalStringRecord(record: Record<string, unknown>, key: string): Rec
   return result;
 }
 
+function optionalEventPostbacks(record: Record<string, unknown>): Record<string, string> | undefined {
+  const value = record.postbackByEventType;
+  if (value === undefined) return undefined;
+  if (!isRecord(value)) throw new Error("postbackByEventType must be an object.");
+  const result: Record<string, string> = {};
+  for (const [eventType, url] of Object.entries(value)) {
+    if (!/^[a-z0-9_-]{1,50}$/i.test(eventType)) throw new Error("postbackByEventType contains an invalid event type.");
+    result[eventType] = validateUrl(requiredString({ url }, "url"), `postbackByEventType.${eventType}`);
+  }
+  return result;
+}
+
+function optionalParameters(record: Record<string, unknown>): Array<{ name: string; token: string }> | undefined {
+  const value = record.parameters;
+  if (value === undefined) return undefined;
+  if (!Array.isArray(value) || value.length > 10) throw new Error("parameters must contain at most 10 entries.");
+  return value.map((entry, index) => {
+    if (!isRecord(entry)) throw new Error(`parameters[${index}] must be an object.`);
+    const name = requiredString(entry, "name");
+    const token = requiredString(entry, "token");
+    if (!/^[A-Za-z][A-Za-z0-9_]{0,49}$/.test(name)) throw new Error(`parameters[${index}].name is invalid.`);
+    return { name, token };
+  });
+}
+
+function optionalCommonConfiguration(record: Record<string, unknown>) {
+  const costCurrency = record.costCurrency === undefined ? undefined : record.costCurrency;
+  if (costCurrency !== undefined && costCurrency !== "USD") throw new Error("costCurrency must be USD.");
+  return { parameters: optionalParameters(record), costCurrency: costCurrency as "USD" | undefined, postbackByEventType: optionalEventPostbacks(record) };
+}
+
 function validateTrafficStarsConfiguration(value: unknown): TrafficStarsProviderConfiguration {
   if (!isRecord(value)) throw new Error("TrafficStars configuration must be an object.");
   const postbackUrl = optionalString(value, "postbackUrl");
@@ -125,7 +165,7 @@ function validateTrafficStarsConfiguration(value: unknown): TrafficStarsProvider
   if (allowDuplicates !== undefined && typeof allowDuplicates !== "boolean") {
     throw new Error("allowDuplicates must be a boolean.");
   }
-  return { postbackUrl, endpoint, key, goalId, allowDuplicates };
+  return { postbackUrl, endpoint, key, goalId, allowDuplicates, ...optionalCommonConfiguration(value) };
 }
 
 function validatePropellerConfiguration(value: unknown): PropellerProviderConfiguration {
@@ -146,7 +186,7 @@ function validatePropellerConfiguration(value: unknown): PropellerProviderConfig
       goalByEventType[eventType] = goal;
     }
   }
-  return { postbackUrl, aid, pid, tid, goalByEventType };
+  return { postbackUrl, aid, pid, tid, goalByEventType, ...optionalCommonConfiguration(value) };
 }
 
 function validateTrafficJunkyConfiguration(value: unknown): TrafficJunkyProviderConfiguration {
@@ -155,6 +195,7 @@ function validateTrafficJunkyConfiguration(value: unknown): TrafficJunkyProvider
   return {
     postbackUrl,
     descriptionByEventType: optionalStringRecord(value, "descriptionByEventType"),
+    ...optionalCommonConfiguration(value),
   };
 }
 
