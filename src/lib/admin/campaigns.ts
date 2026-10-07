@@ -12,6 +12,7 @@ export type CreateCampaignInput = {
   status: CampaignStatus;
   defaultCurrency: string;
   trafficSourceId?: string;
+  offerId?: string;
   allowedTrackingParameters: string[];
 };
 
@@ -112,6 +113,12 @@ export function parseCreateCampaignInput(body: unknown): CreateCampaignInput {
     }
   }
 
+  let offerId: string | undefined;
+  if (input.offerId !== undefined && input.offerId !== null && input.offerId !== "") {
+    offerId = requireString(input.offerId, "offerId", 36);
+    if (!uuidPattern.test(offerId)) throw new CampaignInputError("offerId", "offerId must be a valid UUID.");
+  }
+
   return {
     slug,
     name,
@@ -119,6 +126,7 @@ export function parseCreateCampaignInput(body: unknown): CreateCampaignInput {
     status: statusValue as CampaignStatus,
     defaultCurrency,
     trafficSourceId,
+    offerId,
     allowedTrackingParameters: parseAllowedTrackingParameters(input.allowedTrackingParameters ?? []),
   };
 }

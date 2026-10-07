@@ -9,10 +9,6 @@ export const dynamic = "force-dynamic";
 
 const dateFormatter = new Intl.DateTimeFormat("en", { dateStyle: "medium", timeZone: "UTC" });
 
-function formatMinor(value: number, currency: string) {
-  return `${value.toLocaleString()} ${currency}`;
-}
-
 function statusClass(status: string) {
   return status === "active" ? "bg-[#dcebdc] text-[#285b38]" : status === "paused" ? "bg-[#ebe7dc] text-[#6c5a2f]" : "bg-[#e8e3e0] text-[#68605c]";
 }
@@ -70,9 +66,9 @@ export default async function CampaignsPage({ searchParams }: { searchParams: Pr
 
         {rows === null ? <ErrorPanel /> : rows.length === 0 ? <EmptyPanel /> : (
           <section className="mt-8 overflow-x-auto border border-[#c8c3b8] bg-[#faf8f3]" aria-label="Campaign performance">
-            <table className="w-full min-w-[760px] border-collapse text-left text-sm">
+            <table className="w-full min-w-[1060px] border-collapse text-left text-sm">
               <thead className="bg-[#e8e3d9] text-xs uppercase tracking-[0.1em] text-[#59636c]"><tr>
-                {[["Campaign", "name"], ["Status", undefined], ["Clicks", "clicks"], ["Conversions", "conversions"], ["Revenue", undefined], ["Created", "createdAt"]].map(([label, sort]) => <th key={label} className="px-4 py-3 font-semibold">{sort ? <Link href={queryFor(params, { sort, direction: filters.sort === sort && filters.direction === "desc" ? "asc" : "desc" })} className="hover:text-[#a34f2d]">{label} ↕</Link> : label}</th>)}
+                {[["Campaign", "name"], ["Status", undefined], ["Visits", "clicks"], ["Conversions", "conversions"], ["Error", undefined], ["Registration / FTD", undefined], ["Created", "createdAt"]].map(([label, sort]) => <th key={label} className="px-4 py-3 font-semibold">{sort ? <Link href={queryFor(params, { sort, direction: filters.sort === sort && filters.direction === "desc" ? "asc" : "desc" })} className="hover:text-[#a34f2d]">{label} ↕</Link> : label}</th>)}
               </tr></thead>
               <tbody>{rows.map((row) => <CampaignRow key={row.id} row={row} />)}</tbody>
             </table>
@@ -89,7 +85,8 @@ function CampaignRow({ row }: { row: CampaignListRow }) {
     <td className="px-4 py-4"><span className={`inline-flex px-2 py-1 text-xs font-semibold capitalize ${statusClass(row.status)}`}>{row.status}</span></td>
     <td className="px-4 py-4 font-mono">{row.clicks.toLocaleString()}</td>
     <td className="px-4 py-4 font-mono">{row.conversions.toLocaleString()}</td>
-    <td className="px-4 py-4 font-mono">{formatMinor(row.revenueMinor, row.defaultCurrency)}</td>
+    <td className="px-4 py-4 font-mono text-[#59636c]" title="Unknown-click conversion errors are not persisted yet">—</td>
+    <td className="px-4 py-4 font-mono">{row.registrations.toLocaleString()} / {row.ftds.toLocaleString()}</td>
     <td className="whitespace-nowrap px-4 py-4 text-xs text-[#59636c]">{dateFormatter.format(row.createdAt)} UTC</td>
   </tr>;
 }

@@ -76,6 +76,11 @@ export async function POST(request: Request): Promise<NextResponse> {
       }
     }
 
+    if (input.offerId) {
+      const offer = await prisma.offer.findUnique({ where: { id: input.offerId }, select: { id: true } });
+      if (!offer) return apiErrorResponse(new ApiError("not_found", 404, "Offer not found."), correlationId);
+    }
+
     const campaign = await prisma.campaign.create({
       data: {
         slug: input.slug,
@@ -83,6 +88,7 @@ export async function POST(request: Request): Promise<NextResponse> {
         status: input.status,
         destinationUrl: input.destinationUrl,
         trafficSourceId: input.trafficSourceId,
+        offerId: input.offerId,
         defaultCurrency: input.defaultCurrency,
         allowedTrackingParameters: input.allowedTrackingParameters,
       },

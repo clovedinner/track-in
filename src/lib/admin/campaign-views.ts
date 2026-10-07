@@ -24,6 +24,8 @@ export type CampaignListRow = {
   clicks: number;
   conversions: number;
   revenueMinor: number;
+  registrations: number;
+  ftds: number;
 };
 
 export type CampaignDetail = {
@@ -102,7 +104,7 @@ export async function getCampaignList(filters: CampaignListFilters = {}): Promis
       defaultCurrency: true,
       createdAt: true,
       trafficSource: { select: { name: true } },
-      clicks: { select: { conversions: { select: { valueMinor: true } } } },
+      clicks: { select: { conversions: { select: { valueMinor: true, eventType: true } } } },
     },
   });
 
@@ -120,6 +122,8 @@ export async function getCampaignList(filters: CampaignListFilters = {}): Promis
       clicks: campaign.clicks.length,
       conversions: conversions.length,
       revenueMinor: conversions.reduce((total, conversion) => total + bigintToNumber(conversion.valueMinor), 0),
+      registrations: conversions.filter((conversion) => conversion.eventType.toLowerCase() === "registration").length,
+      ftds: conversions.filter((conversion) => ["ftd", "first_deposit", "first-deposit"].includes(conversion.eventType.toLowerCase())).length,
     } satisfies CampaignListRow;
   });
 
