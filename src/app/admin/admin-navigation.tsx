@@ -25,6 +25,13 @@ export default function AdminNavigation({ pathname }: { pathname: string }) {
             </Link>
           );
         })}
+        <Link
+          href="/admin/profile"
+          aria-current={pathname === "/admin/profile" ? "page" : undefined}
+          className={`ml-auto min-h-11 border-2 px-4 py-2 text-sm font-bold shadow-[3px_3px_0_#121212] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#D02020] ${pathname === "/admin/profile" ? "border-[#121212] bg-[#F0C020] text-[#121212]" : "border-[#121212] bg-[#FFFFFF] text-[#121212] hover:bg-[#F0C020]"}`}
+        >
+          Profile
+        </Link>
       </div>
     </nav>
   );
