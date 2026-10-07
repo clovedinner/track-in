@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { getVerificationSnapshot } from "@/lib/admin/verification";
+import { logger } from "@/lib/observability/logger";
 
 export const metadata: Metadata = {
   title: "Verification | Track.in",
@@ -37,7 +38,11 @@ function statusLabel(status: string) {
 async function loadSnapshot() {
   try {
     return await getVerificationSnapshot();
-  } catch {
+  } catch (error) {
+    logger.error("admin.verification_snapshot_failed", {
+      error: error instanceof Error ? error.message : "unknown",
+      errorName: error instanceof Error ? error.name : "UnknownError",
+    });
     return null;
   }
 }

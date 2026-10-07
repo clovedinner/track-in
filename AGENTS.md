@@ -13,7 +13,7 @@ This is intentionally not a full Voluum clone. Build the smallest reliable syste
 - Redirect the visitor to the selected money-site destination while passing the click ID.
 - Accept authenticated conversion events from the money site and Voluum-compatible browser/postback events, attributing each event to its original click.
 - Send an idempotent outbound postback or conversion-API request to the configured ad platform when a conversion is accepted.
-- Show useful campaign, click, conversion, revenue, cost, and profit data in a private dashboard.
+- Show useful campaign, click, conversion in a private dashboard.
 - Be easy for one operator to deploy, inspect, and repair.
 
 ### Non-goals
