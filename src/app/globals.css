@@ -1,19 +1,51 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #0f172a;
+  --background: #F0F0F0;
+  --foreground: #121212;
+  --bauhaus-red: #D02020;
+  --bauhaus-blue: #1040C0;
+  --bauhaus-yellow: #F0C020;
+  --bauhaus-muted: #E0E0E0;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-outfit);
   --font-mono: var(--font-geist-mono);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-outfit), Arial, Helvetica, sans-serif;
+  font-weight: 500;
+}
+
+button,
+input,
+select,
+textarea {
+  border-radius: 0;
+}
+
+button {
+  transition: transform 160ms ease-out, box-shadow 160ms ease-out, opacity 160ms ease-out;
+}
+
+button:active:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: none !important;
+}
+
+button:not([role="switch"]):not([aria-label*="Close"]):not([aria-label*="Delete"]):not(:disabled) {
+  border: 2px solid #121212;
+  box-shadow: 4px 4px 0 #121212;
+  font-weight: 700;
+}
+
+::selection {
+  background: #F0C020;
+  color: #121212;
 }
