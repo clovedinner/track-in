@@ -129,7 +129,7 @@ export default function DeliveryHealthClient() {
             <h1 className="mt-3 text-4xl font-semibold tracking-[-0.04em] sm:text-5xl">Delivery health.</h1>
             <p className="mt-3 max-w-xl text-sm leading-6 text-[#121212]">See what reached an ad platform, what is waiting, and which deliveries need an operator retry.</p>
           </div>
-          <a className="text-sm font-semibold text-[#D02020] underline underline-offset-4" href="/admin">Back to verification</a>
+          <a className="text-sm font-semibold text-[#D02020] underline underline-offset-4" href="/admin/verification">Back to verification</a>
         </header>
 
         <section aria-label="Delivery totals" className="mt-8 grid gap-px border-x-2 border-b-2 border-[#121212] bg-[#121212] sm:grid-cols-4">

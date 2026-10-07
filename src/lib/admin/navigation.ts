@@ -1,5 +1,5 @@
 export const adminNavigation = [
-  { href: "/admin", label: "Verification" },
+  { href: "/admin/verification", label: "Verification" },
   { href: "/admin/dashboard", label: "Overview" },
   { href: "/admin/campaigns", label: "Campaigns" },
   { href: "/admin/offers", label: "Offers" },
@@ -8,5 +8,5 @@ export const adminNavigation = [
 ] as const;
 
 export function isAdminNavigationActive(href: string, pathname: string) {
-  return href === "/admin" ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
+  return pathname === href || pathname.startsWith(`${href}/`);
 }

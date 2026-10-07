@@ -9,6 +9,12 @@ export function proxy(request: NextRequest): NextResponse {
   const correlationId = getCorrelationId(request);
 
   if (isAdminRequestAuthorized(request)) {
+    if (request.nextUrl.pathname === "/admin") {
+      return NextResponse.redirect(new URL("/admin/dashboard", request.url), {
+        headers: { "x-request-id": correlationId },
+      });
+    }
+
     return NextResponse.next({ headers: { "x-request-id": correlationId } });
   }
 

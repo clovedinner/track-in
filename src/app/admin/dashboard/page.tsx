@@ -77,7 +77,7 @@ export default async function AdminDashboardPage({
       <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:px-12 lg:py-12">
         <header className="flex flex-col gap-6 border-b-2 border-[#121212] pb-8 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <a className="text-xs font-semibold uppercase tracking-[0.2em] text-[#D02020] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#D02020]" href="/admin">Track.in / private</a>
+            <a className="text-xs font-semibold uppercase tracking-[0.2em] text-[#D02020] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#D02020]" href="/admin/dashboard">Track.in / private</a>
             <h1 className="mt-3 max-w-3xl text-4xl font-semibold tracking-[-0.04em] sm:text-5xl">Performance overview.</h1>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-[#121212]">The numbers that answer whether tracked traffic is converting and whether outbound delivery is healthy.</p>
           </div>

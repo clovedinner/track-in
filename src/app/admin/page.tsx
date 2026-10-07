@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import AdminNavigation from "@/app/admin/admin-navigation";
 import { getVerificationSnapshot } from "@/lib/admin/verification";
 import { logger } from "@/lib/observability/logger";
 
@@ -53,6 +54,7 @@ export default async function AdminVerificationPage() {
   if (snapshot === null) {
     return (
       <main className="min-h-screen bg-[#F0F0F0] px-5 py-8 text-[#121212] sm:px-8 lg:px-12 lg:py-12">
+        <AdminNavigation pathname="/admin/verification" />
         <section className="mx-auto max-w-2xl border-2 border-[#D02020] bg-[#FFFFFF] px-6 py-8">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#D02020]">Verification unavailable</p>
           <h1 className="mt-3 text-2xl font-semibold">The database snapshot could not be loaded.</h1>
@@ -68,6 +70,7 @@ export default async function AdminVerificationPage() {
 
   return (
       <main className="min-h-screen bg-[#F0F0F0] text-[#121212]">
+        <AdminNavigation pathname="/admin/verification" />
         <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:px-12 lg:py-12">
           <header className="flex flex-col gap-6 border-b-2 border-[#121212] pb-8 sm:flex-row sm:items-end sm:justify-between">
             <div>
