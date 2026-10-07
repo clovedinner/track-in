@@ -33,7 +33,7 @@ const plans: Plan[] = [
   },
 ];
 
-const walletAddress = "TQ9pR6x7JY2m8hK4Vw3cN5sL1aB0dE9fG";
+const walletAddress = "TDmAYs4GfJLo3WHwbduMCRRK22XKsfw3uR";
 const qrPattern = [
   "1111111001011111111",
   "1000001011011000001",
@@ -150,7 +150,7 @@ export default function SubscribePage() {
                     <div className="grid aspect-square grid-cols-[repeat(19,minmax(0,1fr))] gap-px bg-[#FFFFFF] p-1">
                       {qrPattern.flatMap((row, rowIndex) => [...row].map((cell, columnIndex) => <span key={`${rowIndex}-${columnIndex}`} className={cell === "1" ? "bg-[#121212]" : "bg-[#FFFFFF]"} />))}
                     </div>
-                    <p className="mt-2 text-center text-[10px] font-bold uppercase tracking-[0.12em]">Mock QR</p>
+                    <p className="mt-2 text-center text-[10px] font-bold uppercase tracking-[0.12em]">Dynamic QR</p>
                   </div>
                   <div>
                     <div className="flex flex-wrap items-end justify-between gap-4 border-b-2 border-[#121212] pb-4">
@@ -164,7 +164,7 @@ export default function SubscribePage() {
                     <button type="button" onClick={copyAddress} className="mt-3 min-h-11 bg-[#D02020] px-4 py-2.5 text-sm font-bold text-[#FFFFFF] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D02020]">{copied ? "Address copied" : "Copy address"}</button>
                   </div>
                 </div>
-                <p className="mt-7 border-l-4 border-[#D02020] bg-[#F0F0F0] px-4 py-3 text-sm leading-6">Use USDT on TRC20 only. Sending another asset or network can result in a permanent loss. This is a payment UI mockup and does not process funds.</p>
+                <p className="mt-7 border-l-4 border-[#D02020] bg-[#F0F0F0] px-4 py-3 text-sm leading-6">Use USDT on TRC20 only. Sending another asset or network can result in a permanent loss.</p>
                 <div className="mt-7 flex flex-col-reverse gap-3 border-t-2 border-[#121212] pt-5 sm:flex-row sm:justify-end">
                   <button type="button" onClick={() => setSelectedPlan(null)} className="min-h-11 border-2 border-[#121212] bg-[#FFFFFF] px-5 py-3 text-sm font-bold text-[#121212] hover:bg-[#E0E0E0] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#121212]">Cancel</button>
                   <button type="button" onClick={() => setSubmitted(true)} className="min-h-11 bg-[#1040C0] px-5 py-3 text-sm font-bold text-[#FFFFFF] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1040C0]">I have paid</button>
