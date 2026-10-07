@@ -10,6 +10,7 @@
  */
 export type * from './models/TrafficSource'
 export type * from './models/Campaign'
+export type * from './models/Offer'
 export type * from './models/Click'
 export type * from './models/Conversion'
 export type * from './models/OutboundPostback'

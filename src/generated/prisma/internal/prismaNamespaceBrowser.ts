@@ -51,6 +51,7 @@ export const AnyNull = runtime.objectEnumValues.instances.AnyNull
 export const ModelName = {
   TrafficSource: 'TrafficSource',
   Campaign: 'Campaign',
+  Offer: 'Offer',
   Click: 'Click',
   Conversion: 'Conversion',
   OutboundPostback: 'OutboundPostback',
@@ -95,6 +96,7 @@ export const CampaignScalarFieldEnum = {
   status: 'status',
   destinationUrl: 'destinationUrl',
   trafficSourceId: 'trafficSourceId',
+  offerId: 'offerId',
   defaultCurrency: 'defaultCurrency',
   allowedTrackingParameters: 'allowedTrackingParameters',
   createdAt: 'createdAt',
@@ -103,6 +105,17 @@ export const CampaignScalarFieldEnum = {
 } as const
 
 export type CampaignScalarFieldEnum = (typeof CampaignScalarFieldEnum)[keyof typeof CampaignScalarFieldEnum]
+
+
+export const OfferScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  s2sPostbackUrl: 's2sPostbackUrl',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type OfferScalarFieldEnum = (typeof OfferScalarFieldEnum)[keyof typeof OfferScalarFieldEnum]
 
 
 export const ClickScalarFieldEnum = {

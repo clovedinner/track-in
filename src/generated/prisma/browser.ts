@@ -28,6 +28,11 @@ export type TrafficSource = Prisma.TrafficSourceModel
  */
 export type Campaign = Prisma.CampaignModel
 /**
+ * Model Offer
+ * 
+ */
+export type Offer = Prisma.OfferModel
+/**
  * Model Click
  * 
  */

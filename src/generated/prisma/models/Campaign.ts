@@ -31,6 +31,7 @@ export type CampaignMinAggregateOutputType = {
   status: $Enums.CampaignStatus | null
   destinationUrl: string | null
   trafficSourceId: string | null
+  offerId: string | null
   defaultCurrency: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -44,6 +45,7 @@ export type CampaignMaxAggregateOutputType = {
   status: $Enums.CampaignStatus | null
   destinationUrl: string | null
   trafficSourceId: string | null
+  offerId: string | null
   defaultCurrency: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -57,6 +59,7 @@ export type CampaignCountAggregateOutputType = {
   status: number
   destinationUrl: number
   trafficSourceId: number
+  offerId: number
   defaultCurrency: number
   allowedTrackingParameters: number
   createdAt: number
@@ -73,6 +76,7 @@ export type CampaignMinAggregateInputType = {
   status?: true
   destinationUrl?: true
   trafficSourceId?: true
+  offerId?: true
   defaultCurrency?: true
   createdAt?: true
   updatedAt?: true
@@ -86,6 +90,7 @@ export type CampaignMaxAggregateInputType = {
   status?: true
   destinationUrl?: true
   trafficSourceId?: true
+  offerId?: true
   defaultCurrency?: true
   createdAt?: true
   updatedAt?: true
@@ -99,6 +104,7 @@ export type CampaignCountAggregateInputType = {
   status?: true
   destinationUrl?: true
   trafficSourceId?: true
+  offerId?: true
   defaultCurrency?: true
   allowedTrackingParameters?: true
   createdAt?: true
@@ -186,6 +192,7 @@ export type CampaignGroupByOutputType = {
   status: $Enums.CampaignStatus
   destinationUrl: string
   trafficSourceId: string | null
+  offerId: string | null
   defaultCurrency: string
   allowedTrackingParameters: runtime.JsonValue
   createdAt: Date
@@ -221,12 +228,14 @@ export type CampaignWhereInput = {
   status?: Prisma.EnumCampaignStatusFilter<"Campaign"> | $Enums.CampaignStatus
   destinationUrl?: Prisma.StringFilter<"Campaign"> | string
   trafficSourceId?: Prisma.UuidNullableFilter<"Campaign"> | string | null
+  offerId?: Prisma.UuidNullableFilter<"Campaign"> | string | null
   defaultCurrency?: Prisma.StringFilter<"Campaign"> | string
   allowedTrackingParameters?: Prisma.JsonFilter<"Campaign">
   createdAt?: Prisma.DateTimeFilter<"Campaign"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Campaign"> | Date | string
   archivedAt?: Prisma.DateTimeNullableFilter<"Campaign"> | Date | string | null
   trafficSource?: Prisma.XOR<Prisma.TrafficSourceNullableScalarRelationFilter, Prisma.TrafficSourceWhereInput> | null
+  offer?: Prisma.XOR<Prisma.OfferNullableScalarRelationFilter, Prisma.OfferWhereInput> | null
   clicks?: Prisma.ClickListRelationFilter
 }
 
@@ -237,12 +246,14 @@ export type CampaignOrderByWithRelationInput = {
   status?: Prisma.SortOrder
   destinationUrl?: Prisma.SortOrder
   trafficSourceId?: Prisma.SortOrderInput | Prisma.SortOrder
+  offerId?: Prisma.SortOrderInput | Prisma.SortOrder
   defaultCurrency?: Prisma.SortOrder
   allowedTrackingParameters?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   archivedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   trafficSource?: Prisma.TrafficSourceOrderByWithRelationInput
+  offer?: Prisma.OfferOrderByWithRelationInput
   clicks?: Prisma.ClickOrderByRelationAggregateInput
 }
 
@@ -256,12 +267,14 @@ export type CampaignWhereUniqueInput = Prisma.AtLeast<{
   status?: Prisma.EnumCampaignStatusFilter<"Campaign"> | $Enums.CampaignStatus
   destinationUrl?: Prisma.StringFilter<"Campaign"> | string
   trafficSourceId?: Prisma.UuidNullableFilter<"Campaign"> | string | null
+  offerId?: Prisma.UuidNullableFilter<"Campaign"> | string | null
   defaultCurrency?: Prisma.StringFilter<"Campaign"> | string
   allowedTrackingParameters?: Prisma.JsonFilter<"Campaign">
   createdAt?: Prisma.DateTimeFilter<"Campaign"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Campaign"> | Date | string
   archivedAt?: Prisma.DateTimeNullableFilter<"Campaign"> | Date | string | null
   trafficSource?: Prisma.XOR<Prisma.TrafficSourceNullableScalarRelationFilter, Prisma.TrafficSourceWhereInput> | null
+  offer?: Prisma.XOR<Prisma.OfferNullableScalarRelationFilter, Prisma.OfferWhereInput> | null
   clicks?: Prisma.ClickListRelationFilter
 }, "id">
 
@@ -272,6 +285,7 @@ export type CampaignOrderByWithAggregationInput = {
   status?: Prisma.SortOrder
   destinationUrl?: Prisma.SortOrder
   trafficSourceId?: Prisma.SortOrderInput | Prisma.SortOrder
+  offerId?: Prisma.SortOrderInput | Prisma.SortOrder
   defaultCurrency?: Prisma.SortOrder
   allowedTrackingParameters?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -292,6 +306,7 @@ export type CampaignScalarWhereWithAggregatesInput = {
   status?: Prisma.EnumCampaignStatusWithAggregatesFilter<"Campaign"> | $Enums.CampaignStatus
   destinationUrl?: Prisma.StringWithAggregatesFilter<"Campaign"> | string
   trafficSourceId?: Prisma.UuidNullableWithAggregatesFilter<"Campaign"> | string | null
+  offerId?: Prisma.UuidNullableWithAggregatesFilter<"Campaign"> | string | null
   defaultCurrency?: Prisma.StringWithAggregatesFilter<"Campaign"> | string
   allowedTrackingParameters?: Prisma.JsonWithAggregatesFilter<"Campaign">
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Campaign"> | Date | string
@@ -311,6 +326,7 @@ export type CampaignCreateInput = {
   updatedAt?: Date | string
   archivedAt?: Date | string | null
   trafficSource?: Prisma.TrafficSourceCreateNestedOneWithoutCampaignsInput
+  offer?: Prisma.OfferCreateNestedOneWithoutCampaignsInput
   clicks?: Prisma.ClickCreateNestedManyWithoutCampaignInput
 }
 
@@ -321,6 +337,7 @@ export type CampaignUncheckedCreateInput = {
   status?: $Enums.CampaignStatus
   destinationUrl: string
   trafficSourceId?: string | null
+  offerId?: string | null
   defaultCurrency: string
   allowedTrackingParameters?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
@@ -341,6 +358,7 @@ export type CampaignUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   trafficSource?: Prisma.TrafficSourceUpdateOneWithoutCampaignsNestedInput
+  offer?: Prisma.OfferUpdateOneWithoutCampaignsNestedInput
   clicks?: Prisma.ClickUpdateManyWithoutCampaignNestedInput
 }
 
@@ -351,6 +369,7 @@ export type CampaignUncheckedUpdateInput = {
   status?: Prisma.EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
   destinationUrl?: Prisma.StringFieldUpdateOperationsInput | string
   trafficSourceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  offerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultCurrency?: Prisma.StringFieldUpdateOperationsInput | string
   allowedTrackingParameters?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -366,6 +385,7 @@ export type CampaignCreateManyInput = {
   status?: $Enums.CampaignStatus
   destinationUrl: string
   trafficSourceId?: string | null
+  offerId?: string | null
   defaultCurrency: string
   allowedTrackingParameters?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
@@ -393,6 +413,7 @@ export type CampaignUncheckedUpdateManyInput = {
   status?: Prisma.EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
   destinationUrl?: Prisma.StringFieldUpdateOperationsInput | string
   trafficSourceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  offerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultCurrency?: Prisma.StringFieldUpdateOperationsInput | string
   allowedTrackingParameters?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -417,6 +438,7 @@ export type CampaignCountOrderByAggregateInput = {
   status?: Prisma.SortOrder
   destinationUrl?: Prisma.SortOrder
   trafficSourceId?: Prisma.SortOrder
+  offerId?: Prisma.SortOrder
   defaultCurrency?: Prisma.SortOrder
   allowedTrackingParameters?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -431,6 +453,7 @@ export type CampaignMaxOrderByAggregateInput = {
   status?: Prisma.SortOrder
   destinationUrl?: Prisma.SortOrder
   trafficSourceId?: Prisma.SortOrder
+  offerId?: Prisma.SortOrder
   defaultCurrency?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -444,6 +467,7 @@ export type CampaignMinOrderByAggregateInput = {
   status?: Prisma.SortOrder
   destinationUrl?: Prisma.SortOrder
   trafficSourceId?: Prisma.SortOrder
+  offerId?: Prisma.SortOrder
   defaultCurrency?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -505,6 +529,48 @@ export type NullableDateTimeFieldUpdateOperationsInput = {
   set?: Date | string | null
 }
 
+export type CampaignCreateNestedManyWithoutOfferInput = {
+  create?: Prisma.XOR<Prisma.CampaignCreateWithoutOfferInput, Prisma.CampaignUncheckedCreateWithoutOfferInput> | Prisma.CampaignCreateWithoutOfferInput[] | Prisma.CampaignUncheckedCreateWithoutOfferInput[]
+  connectOrCreate?: Prisma.CampaignCreateOrConnectWithoutOfferInput | Prisma.CampaignCreateOrConnectWithoutOfferInput[]
+  createMany?: Prisma.CampaignCreateManyOfferInputEnvelope
+  connect?: Prisma.CampaignWhereUniqueInput | Prisma.CampaignWhereUniqueInput[]
+}
+
+export type CampaignUncheckedCreateNestedManyWithoutOfferInput = {
+  create?: Prisma.XOR<Prisma.CampaignCreateWithoutOfferInput, Prisma.CampaignUncheckedCreateWithoutOfferInput> | Prisma.CampaignCreateWithoutOfferInput[] | Prisma.CampaignUncheckedCreateWithoutOfferInput[]
+  connectOrCreate?: Prisma.CampaignCreateOrConnectWithoutOfferInput | Prisma.CampaignCreateOrConnectWithoutOfferInput[]
+  createMany?: Prisma.CampaignCreateManyOfferInputEnvelope
+  connect?: Prisma.CampaignWhereUniqueInput | Prisma.CampaignWhereUniqueInput[]
+}
+
+export type CampaignUpdateManyWithoutOfferNestedInput = {
+  create?: Prisma.XOR<Prisma.CampaignCreateWithoutOfferInput, Prisma.CampaignUncheckedCreateWithoutOfferInput> | Prisma.CampaignCreateWithoutOfferInput[] | Prisma.CampaignUncheckedCreateWithoutOfferInput[]
+  connectOrCreate?: Prisma.CampaignCreateOrConnectWithoutOfferInput | Prisma.CampaignCreateOrConnectWithoutOfferInput[]
+  upsert?: Prisma.CampaignUpsertWithWhereUniqueWithoutOfferInput | Prisma.CampaignUpsertWithWhereUniqueWithoutOfferInput[]
+  createMany?: Prisma.CampaignCreateManyOfferInputEnvelope
+  set?: Prisma.CampaignWhereUniqueInput | Prisma.CampaignWhereUniqueInput[]
+  disconnect?: Prisma.CampaignWhereUniqueInput | Prisma.CampaignWhereUniqueInput[]
+  delete?: Prisma.CampaignWhereUniqueInput | Prisma.CampaignWhereUniqueInput[]
+  connect?: Prisma.CampaignWhereUniqueInput | Prisma.CampaignWhereUniqueInput[]
+  update?: Prisma.CampaignUpdateWithWhereUniqueWithoutOfferInput | Prisma.CampaignUpdateWithWhereUniqueWithoutOfferInput[]
+  updateMany?: Prisma.CampaignUpdateManyWithWhereWithoutOfferInput | Prisma.CampaignUpdateManyWithWhereWithoutOfferInput[]
+  deleteMany?: Prisma.CampaignScalarWhereInput | Prisma.CampaignScalarWhereInput[]
+}
+
+export type CampaignUncheckedUpdateManyWithoutOfferNestedInput = {
+  create?: Prisma.XOR<Prisma.CampaignCreateWithoutOfferInput, Prisma.CampaignUncheckedCreateWithoutOfferInput> | Prisma.CampaignCreateWithoutOfferInput[] | Prisma.CampaignUncheckedCreateWithoutOfferInput[]
+  connectOrCreate?: Prisma.CampaignCreateOrConnectWithoutOfferInput | Prisma.CampaignCreateOrConnectWithoutOfferInput[]
+  upsert?: Prisma.CampaignUpsertWithWhereUniqueWithoutOfferInput | Prisma.CampaignUpsertWithWhereUniqueWithoutOfferInput[]
+  createMany?: Prisma.CampaignCreateManyOfferInputEnvelope
+  set?: Prisma.CampaignWhereUniqueInput | Prisma.CampaignWhereUniqueInput[]
+  disconnect?: Prisma.CampaignWhereUniqueInput | Prisma.CampaignWhereUniqueInput[]
+  delete?: Prisma.CampaignWhereUniqueInput | Prisma.CampaignWhereUniqueInput[]
+  connect?: Prisma.CampaignWhereUniqueInput | Prisma.CampaignWhereUniqueInput[]
+  update?: Prisma.CampaignUpdateWithWhereUniqueWithoutOfferInput | Prisma.CampaignUpdateWithWhereUniqueWithoutOfferInput[]
+  updateMany?: Prisma.CampaignUpdateManyWithWhereWithoutOfferInput | Prisma.CampaignUpdateManyWithWhereWithoutOfferInput[]
+  deleteMany?: Prisma.CampaignScalarWhereInput | Prisma.CampaignScalarWhereInput[]
+}
+
 export type CampaignCreateNestedOneWithoutClicksInput = {
   create?: Prisma.XOR<Prisma.CampaignCreateWithoutClicksInput, Prisma.CampaignUncheckedCreateWithoutClicksInput>
   connectOrCreate?: Prisma.CampaignCreateOrConnectWithoutClicksInput
@@ -530,6 +596,7 @@ export type CampaignCreateWithoutTrafficSourceInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   archivedAt?: Date | string | null
+  offer?: Prisma.OfferCreateNestedOneWithoutCampaignsInput
   clicks?: Prisma.ClickCreateNestedManyWithoutCampaignInput
 }
 
@@ -539,6 +606,7 @@ export type CampaignUncheckedCreateWithoutTrafficSourceInput = {
   name: string
   status?: $Enums.CampaignStatus
   destinationUrl: string
+  offerId?: string | null
   defaultCurrency: string
   allowedTrackingParameters?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
@@ -583,11 +651,68 @@ export type CampaignScalarWhereInput = {
   status?: Prisma.EnumCampaignStatusFilter<"Campaign"> | $Enums.CampaignStatus
   destinationUrl?: Prisma.StringFilter<"Campaign"> | string
   trafficSourceId?: Prisma.UuidNullableFilter<"Campaign"> | string | null
+  offerId?: Prisma.UuidNullableFilter<"Campaign"> | string | null
   defaultCurrency?: Prisma.StringFilter<"Campaign"> | string
   allowedTrackingParameters?: Prisma.JsonFilter<"Campaign">
   createdAt?: Prisma.DateTimeFilter<"Campaign"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Campaign"> | Date | string
   archivedAt?: Prisma.DateTimeNullableFilter<"Campaign"> | Date | string | null
+}
+
+export type CampaignCreateWithoutOfferInput = {
+  id?: string
+  slug: string
+  name: string
+  status?: $Enums.CampaignStatus
+  destinationUrl: string
+  defaultCurrency: string
+  allowedTrackingParameters?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  archivedAt?: Date | string | null
+  trafficSource?: Prisma.TrafficSourceCreateNestedOneWithoutCampaignsInput
+  clicks?: Prisma.ClickCreateNestedManyWithoutCampaignInput
+}
+
+export type CampaignUncheckedCreateWithoutOfferInput = {
+  id?: string
+  slug: string
+  name: string
+  status?: $Enums.CampaignStatus
+  destinationUrl: string
+  trafficSourceId?: string | null
+  defaultCurrency: string
+  allowedTrackingParameters?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  archivedAt?: Date | string | null
+  clicks?: Prisma.ClickUncheckedCreateNestedManyWithoutCampaignInput
+}
+
+export type CampaignCreateOrConnectWithoutOfferInput = {
+  where: Prisma.CampaignWhereUniqueInput
+  create: Prisma.XOR<Prisma.CampaignCreateWithoutOfferInput, Prisma.CampaignUncheckedCreateWithoutOfferInput>
+}
+
+export type CampaignCreateManyOfferInputEnvelope = {
+  data: Prisma.CampaignCreateManyOfferInput | Prisma.CampaignCreateManyOfferInput[]
+  skipDuplicates?: boolean
+}
+
+export type CampaignUpsertWithWhereUniqueWithoutOfferInput = {
+  where: Prisma.CampaignWhereUniqueInput
+  update: Prisma.XOR<Prisma.CampaignUpdateWithoutOfferInput, Prisma.CampaignUncheckedUpdateWithoutOfferInput>
+  create: Prisma.XOR<Prisma.CampaignCreateWithoutOfferInput, Prisma.CampaignUncheckedCreateWithoutOfferInput>
+}
+
+export type CampaignUpdateWithWhereUniqueWithoutOfferInput = {
+  where: Prisma.CampaignWhereUniqueInput
+  data: Prisma.XOR<Prisma.CampaignUpdateWithoutOfferInput, Prisma.CampaignUncheckedUpdateWithoutOfferInput>
+}
+
+export type CampaignUpdateManyWithWhereWithoutOfferInput = {
+  where: Prisma.CampaignScalarWhereInput
+  data: Prisma.XOR<Prisma.CampaignUpdateManyMutationInput, Prisma.CampaignUncheckedUpdateManyWithoutOfferInput>
 }
 
 export type CampaignCreateWithoutClicksInput = {
@@ -602,6 +727,7 @@ export type CampaignCreateWithoutClicksInput = {
   updatedAt?: Date | string
   archivedAt?: Date | string | null
   trafficSource?: Prisma.TrafficSourceCreateNestedOneWithoutCampaignsInput
+  offer?: Prisma.OfferCreateNestedOneWithoutCampaignsInput
 }
 
 export type CampaignUncheckedCreateWithoutClicksInput = {
@@ -611,6 +737,7 @@ export type CampaignUncheckedCreateWithoutClicksInput = {
   status?: $Enums.CampaignStatus
   destinationUrl: string
   trafficSourceId?: string | null
+  offerId?: string | null
   defaultCurrency: string
   allowedTrackingParameters?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
@@ -646,6 +773,7 @@ export type CampaignUpdateWithoutClicksInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   trafficSource?: Prisma.TrafficSourceUpdateOneWithoutCampaignsNestedInput
+  offer?: Prisma.OfferUpdateOneWithoutCampaignsNestedInput
 }
 
 export type CampaignUncheckedUpdateWithoutClicksInput = {
@@ -655,6 +783,7 @@ export type CampaignUncheckedUpdateWithoutClicksInput = {
   status?: Prisma.EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
   destinationUrl?: Prisma.StringFieldUpdateOperationsInput | string
   trafficSourceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  offerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultCurrency?: Prisma.StringFieldUpdateOperationsInput | string
   allowedTrackingParameters?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -668,6 +797,7 @@ export type CampaignCreateManyTrafficSourceInput = {
   name: string
   status?: $Enums.CampaignStatus
   destinationUrl: string
+  offerId?: string | null
   defaultCurrency: string
   allowedTrackingParameters?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
@@ -686,6 +816,7 @@ export type CampaignUpdateWithoutTrafficSourceInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  offer?: Prisma.OfferUpdateOneWithoutCampaignsNestedInput
   clicks?: Prisma.ClickUpdateManyWithoutCampaignNestedInput
 }
 
@@ -695,6 +826,7 @@ export type CampaignUncheckedUpdateWithoutTrafficSourceInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
   destinationUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  offerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultCurrency?: Prisma.StringFieldUpdateOperationsInput | string
   allowedTrackingParameters?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -709,6 +841,65 @@ export type CampaignUncheckedUpdateManyWithoutTrafficSourceInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
   destinationUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  offerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultCurrency?: Prisma.StringFieldUpdateOperationsInput | string
+  allowedTrackingParameters?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+export type CampaignCreateManyOfferInput = {
+  id?: string
+  slug: string
+  name: string
+  status?: $Enums.CampaignStatus
+  destinationUrl: string
+  trafficSourceId?: string | null
+  defaultCurrency: string
+  allowedTrackingParameters?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  archivedAt?: Date | string | null
+}
+
+export type CampaignUpdateWithoutOfferInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
+  destinationUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultCurrency?: Prisma.StringFieldUpdateOperationsInput | string
+  allowedTrackingParameters?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trafficSource?: Prisma.TrafficSourceUpdateOneWithoutCampaignsNestedInput
+  clicks?: Prisma.ClickUpdateManyWithoutCampaignNestedInput
+}
+
+export type CampaignUncheckedUpdateWithoutOfferInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
+  destinationUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  trafficSourceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultCurrency?: Prisma.StringFieldUpdateOperationsInput | string
+  allowedTrackingParameters?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  clicks?: Prisma.ClickUncheckedUpdateManyWithoutCampaignNestedInput
+}
+
+export type CampaignUncheckedUpdateManyWithoutOfferInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
+  destinationUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  trafficSourceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultCurrency?: Prisma.StringFieldUpdateOperationsInput | string
   allowedTrackingParameters?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -754,12 +945,14 @@ export type CampaignSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   status?: boolean
   destinationUrl?: boolean
   trafficSourceId?: boolean
+  offerId?: boolean
   defaultCurrency?: boolean
   allowedTrackingParameters?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   archivedAt?: boolean
   trafficSource?: boolean | Prisma.Campaign$trafficSourceArgs<ExtArgs>
+  offer?: boolean | Prisma.Campaign$offerArgs<ExtArgs>
   clicks?: boolean | Prisma.Campaign$clicksArgs<ExtArgs>
   _count?: boolean | Prisma.CampaignCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["campaign"]>
@@ -771,12 +964,14 @@ export type CampaignSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   status?: boolean
   destinationUrl?: boolean
   trafficSourceId?: boolean
+  offerId?: boolean
   defaultCurrency?: boolean
   allowedTrackingParameters?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   archivedAt?: boolean
   trafficSource?: boolean | Prisma.Campaign$trafficSourceArgs<ExtArgs>
+  offer?: boolean | Prisma.Campaign$offerArgs<ExtArgs>
 }, ExtArgs["result"]["campaign"]>
 
 export type CampaignSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -786,12 +981,14 @@ export type CampaignSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   status?: boolean
   destinationUrl?: boolean
   trafficSourceId?: boolean
+  offerId?: boolean
   defaultCurrency?: boolean
   allowedTrackingParameters?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   archivedAt?: boolean
   trafficSource?: boolean | Prisma.Campaign$trafficSourceArgs<ExtArgs>
+  offer?: boolean | Prisma.Campaign$offerArgs<ExtArgs>
 }, ExtArgs["result"]["campaign"]>
 
 export type CampaignSelectScalar = {
@@ -801,6 +998,7 @@ export type CampaignSelectScalar = {
   status?: boolean
   destinationUrl?: boolean
   trafficSourceId?: boolean
+  offerId?: boolean
   defaultCurrency?: boolean
   allowedTrackingParameters?: boolean
   createdAt?: boolean
@@ -808,23 +1006,27 @@ export type CampaignSelectScalar = {
   archivedAt?: boolean
 }
 
-export type CampaignOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "slug" | "name" | "status" | "destinationUrl" | "trafficSourceId" | "defaultCurrency" | "allowedTrackingParameters" | "createdAt" | "updatedAt" | "archivedAt", ExtArgs["result"]["campaign"]>
+export type CampaignOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "slug" | "name" | "status" | "destinationUrl" | "trafficSourceId" | "offerId" | "defaultCurrency" | "allowedTrackingParameters" | "createdAt" | "updatedAt" | "archivedAt", ExtArgs["result"]["campaign"]>
 export type CampaignInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   trafficSource?: boolean | Prisma.Campaign$trafficSourceArgs<ExtArgs>
+  offer?: boolean | Prisma.Campaign$offerArgs<ExtArgs>
   clicks?: boolean | Prisma.Campaign$clicksArgs<ExtArgs>
   _count?: boolean | Prisma.CampaignCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type CampaignIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   trafficSource?: boolean | Prisma.Campaign$trafficSourceArgs<ExtArgs>
+  offer?: boolean | Prisma.Campaign$offerArgs<ExtArgs>
 }
 export type CampaignIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   trafficSource?: boolean | Prisma.Campaign$trafficSourceArgs<ExtArgs>
+  offer?: boolean | Prisma.Campaign$offerArgs<ExtArgs>
 }
 
 export type $CampaignPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Campaign"
   objects: {
     trafficSource: Prisma.$TrafficSourcePayload<ExtArgs> | null
+    offer: Prisma.$OfferPayload<ExtArgs> | null
     clicks: Prisma.$ClickPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -834,6 +1036,7 @@ export type $CampaignPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     status: $Enums.CampaignStatus
     destinationUrl: string
     trafficSourceId: string | null
+    offerId: string | null
     defaultCurrency: string
     allowedTrackingParameters: runtime.JsonValue
     createdAt: Date
@@ -1234,6 +1437,7 @@ readonly fields: CampaignFieldRefs;
 export interface Prisma__CampaignClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   trafficSource<T extends Prisma.Campaign$trafficSourceArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Campaign$trafficSourceArgs<ExtArgs>>): Prisma.Prisma__TrafficSourceClient<runtime.Types.Result.GetResult<Prisma.$TrafficSourcePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  offer<T extends Prisma.Campaign$offerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Campaign$offerArgs<ExtArgs>>): Prisma.Prisma__OfferClient<runtime.Types.Result.GetResult<Prisma.$OfferPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   clicks<T extends Prisma.Campaign$clicksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Campaign$clicksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClickPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1270,6 +1474,7 @@ export interface CampaignFieldRefs {
   readonly status: Prisma.FieldRef<"Campaign", 'CampaignStatus'>
   readonly destinationUrl: Prisma.FieldRef<"Campaign", 'String'>
   readonly trafficSourceId: Prisma.FieldRef<"Campaign", 'String'>
+  readonly offerId: Prisma.FieldRef<"Campaign", 'String'>
   readonly defaultCurrency: Prisma.FieldRef<"Campaign", 'String'>
   readonly allowedTrackingParameters: Prisma.FieldRef<"Campaign", 'Json'>
   readonly createdAt: Prisma.FieldRef<"Campaign", 'DateTime'>
@@ -1687,6 +1892,25 @@ export type Campaign$trafficSourceArgs<ExtArgs extends runtime.Types.Extensions.
    */
   include?: Prisma.TrafficSourceInclude<ExtArgs> | null
   where?: Prisma.TrafficSourceWhereInput
+}
+
+/**
+ * Campaign.offer
+ */
+export type Campaign$offerArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Offer
+   */
+  select?: Prisma.OfferSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Offer
+   */
+  omit?: Prisma.OfferOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.OfferInclude<ExtArgs> | null
+  where?: Prisma.OfferWhereInput
 }
 
 /**
