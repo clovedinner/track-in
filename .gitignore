@@ -45,3 +45,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Prisma generates platform-specific Linux engines during deployment.
+/src/generated/prisma/libquery_engine-*.so.node
