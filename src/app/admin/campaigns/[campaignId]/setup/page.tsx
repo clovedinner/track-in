@@ -9,7 +9,7 @@ import { getRuntimeEnvironment } from "@/lib/config/environment";
 import { buildCampaignSetupReport } from "@/lib/setup/campaign-setup";
 import { buildCampaignTrackingScript } from "@/lib/setup/campaign-tracking-script";
 
-export const metadata: Metadata = { title: "Campaign setup | Track.in", description: "Private campaign tracking and GTM setup." };
+export const metadata: Metadata = { title: "Campaign setup | Trakio", description: "Private campaign tracking and GTM setup." };
 export const dynamic = "force-dynamic";
 
 export default async function CampaignSetupPage({ params }: { params: Promise<{ campaignId: string }> }) {

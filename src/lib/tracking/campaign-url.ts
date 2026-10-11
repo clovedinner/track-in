@@ -2,7 +2,7 @@ import type { ProviderId } from "@/lib/providers/config";
 
 /**
  * The macros are the values the traffic source expands before the click
- * reaches Track.in. They are deliberately kept separate from Track.in's
+ * reaches Trakio. They are deliberately kept separate from Trakio's
  * internal `cid`, which is created by the redirect endpoint.
  */
 export type TrackingUrlDefinition = {

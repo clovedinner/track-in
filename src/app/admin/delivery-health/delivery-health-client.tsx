@@ -125,7 +125,7 @@ export default function DeliveryHealthClient() {
       <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:px-12 lg:py-12">
         <header className="flex flex-col gap-5 border-b-2 border-[#121212] pb-8 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#D02020]">Track.in / private</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#D02020]">Trakio / private</p>
             <h1 className="mt-3 text-4xl font-semibold tracking-[-0.04em] sm:text-5xl">Delivery health.</h1>
             <p className="mt-3 max-w-xl text-sm leading-6 text-[#121212]">See what reached an ad platform, what is waiting, and which deliveries need an operator retry.</p>
           </div>

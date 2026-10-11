@@ -1,6 +1,6 @@
-# Track.in
+# Trakio
 
-Track.in is a self-hosted, personal conversion tracker. It records ad clicks, passes an opaque `cid` to a money site, accepts server-to-server conversions, and reports accepted conversions to configured ad platforms.
+Trakio is a self-hosted, personal conversion tracker. It records ad clicks, passes an opaque `cid` to a money site, accepts server-to-server conversions, and reports accepted conversions to configured ad platforms.
 
 The product scope and engineering rules live in [AGENTS.md](AGENTS.md). The implementation checklist lives in [PLAN.md](PLAN.md).
 

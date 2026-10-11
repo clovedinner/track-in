@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { getCampaignList, parseCampaignListFilters, type CampaignListRow } from "@/lib/admin/campaign-views";
 import AdminNavigation from "@/app/admin/admin-navigation";
 
-export const metadata: Metadata = { title: "Campaigns | Track.in", description: "Private campaign performance." };
+export const metadata: Metadata = { title: "Campaigns | Trakio", description: "Private campaign performance." };
 export const dynamic = "force-dynamic";
 
 const dateFormatter = new Intl.DateTimeFormat("en", { dateStyle: "medium", timeZone: "UTC" });
@@ -37,7 +37,7 @@ export default async function CampaignsPage({ searchParams }: { searchParams: Pr
       <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:px-12 lg:py-12">
         <header className="flex flex-col gap-5 border-b-2 border-[#121212] pb-8 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <Link href="/admin" className="text-xs font-semibold uppercase tracking-[0.18em] text-[#D02020] hover:underline">Track.in / private</Link>
+            <Link href="/admin" className="text-xs font-semibold uppercase tracking-[0.18em] text-[#D02020] hover:underline">Trakio / private</Link>
             <h1 className="mt-3 text-4xl font-semibold tracking-[-0.04em] sm:text-5xl">Campaigns</h1>
             <p className="mt-3 max-w-xl text-sm leading-6 text-[#121212]">Performance by campaign, derived from persisted clicks and conversions.</p>
           </div>

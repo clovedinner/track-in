@@ -309,7 +309,7 @@ Add this after each implementation session when useful:
 
 - Completed: Added TrafficStars, PropellerAds, and TrafficJunky outbound postback adapters with original click-token mappings, event/value handling, response classification, retry signaling, and provider configuration validation. Added `/postback` integration coverage for registration, FTD, unique `txid`, duplicate suppression, and outbound record creation.
 - Verified: `npm run check` and `npm run test:unit -- --run` pass with 11 test files and 51 tests.
-- Decisions: Preserve each platform's original click token; never substitute Track.in's internal `cid` for a source-specific identifier such as TrafficJunky `ACLID` or Propeller `visitor_id`.
+- Decisions: Preserve each platform's original click token; never substitute Trakio's internal `cid` for a source-specific identifier such as TrafficJunky `ACLID` or Propeller `visitor_id`.
 - Blockers: The adapters are isolated modules pending worker/registry wiring; the full integration suite must be rerun from the configured test shell with `TEST_DATABASE_URL`.
 - Next task: connect provider selection to the outbox worker, run `npm run test:integration`, and add delivery-health controls.
 

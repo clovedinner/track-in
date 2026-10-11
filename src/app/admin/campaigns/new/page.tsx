@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import AdminNavigation from "@/app/admin/admin-navigation";
 import CampaignForm from "@/app/admin/campaigns/new/campaign-form";
 
-export const metadata: Metadata = { title: "New campaign | Track.in", description: "Create a private tracking campaign." };
+export const metadata: Metadata = { title: "New campaign | Trakio", description: "Create a private tracking campaign." };
 
 export default function NewCampaignPage() {
   return (

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import AdminVerificationPage from "@/app/admin/page";
 
 export const metadata: Metadata = {
-  title: "Verification | Track.in",
+  title: "Verification | Trakio",
   description: "Private click and conversion verification.",
 };
 

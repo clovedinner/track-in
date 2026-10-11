@@ -5,7 +5,7 @@ import { getVerificationSnapshot } from "@/lib/admin/verification";
 import { logger } from "@/lib/observability/logger";
 
 export const metadata: Metadata = {
-  title: "Verification | Track.in",
+  title: "Verification | Trakio",
   description: "Private click and conversion verification.",
 };
 
@@ -74,7 +74,7 @@ export default async function AdminVerificationPage() {
         <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:px-12 lg:py-12">
           <header className="flex flex-col gap-6 border-b-2 border-[#121212] pb-8 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#D02020]">Track.in / private</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#D02020]">Trakio / private</p>
               <h1 className="mt-3 max-w-2xl text-4xl font-semibold tracking-[-0.04em] text-[#121212] sm:text-5xl">
                 Verify the handoff.
               </h1>

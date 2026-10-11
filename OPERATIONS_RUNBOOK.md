@@ -1,4 +1,4 @@
-# Track.in operations runbook
+# Trakio operations runbook
 
 This runbook covers the minimum recovery procedure for the Neon PostgreSQL
 database. It is intentionally written for a single operator and uses a

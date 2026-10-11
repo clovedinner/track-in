@@ -49,7 +49,7 @@ function originalTrafficStarsToken(job: OutboxJob): string {
 /**
  * Turns provider-specific adapters into the generic outbox delivery function.
  * Configuration and original click tokens come from the persisted records; the
- * internal Track.in cid is never substituted for a provider token.
+ * internal Trakio cid is never substituted for a provider token.
  */
 export function createProviderOutboxDelivery(fetchImpl: FetchLike = fetch): OutboxDelivery {
   return async (job) => {

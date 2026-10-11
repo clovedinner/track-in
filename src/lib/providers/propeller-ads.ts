@@ -4,7 +4,7 @@
  * PropellerAds' standard advertiser URL is a GET request to
  * `conversion.php` with the original click identifier in `visitor_id`.
  * The adapter deliberately accepts the token map captured on the click
- * instead of treating Track.in's internal click ID as a Propeller ID.
+ * instead of treating Trakio's internal click ID as a Propeller ID.
  */
 
 export type PropellerConversion = {

@@ -4,8 +4,8 @@ import AdminNavigation from "@/app/admin/admin-navigation";
 import SubscribePage from "./subscribe-page";
 
 export const metadata: Metadata = {
-  title: "Subscribe | Track.in",
-  description: "Choose a Track.in subscription plan.",
+  title: "Subscribe | Trakio",
+  description: "Choose a Trakio subscription plan.",
 };
 
 export default function SubscribeRoute() {

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 
 import { campaignDetailFilters, getCampaignDetail } from "@/lib/admin/campaign-views";
 
-export const metadata: Metadata = { title: "Campaign detail | Track.in", description: "Private campaign detail." };
+export const metadata: Metadata = { title: "Campaign detail | Trakio", description: "Private campaign detail." };
 export const dynamic = "force-dynamic";
 
 const dateFormatter = new Intl.DateTimeFormat("en", { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" });

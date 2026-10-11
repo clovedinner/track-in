@@ -25,7 +25,7 @@ export function proxy(request: NextRequest): NextResponse {
 
   return new NextResponse("Authentication required.", {
     headers: {
-      "www-authenticate": 'Basic realm="Track.in administration", charset="UTF-8"',
+      "www-authenticate": 'Basic realm="Trakio administration", charset="UTF-8"',
       "x-request-id": correlationId,
     },
     status: 401,

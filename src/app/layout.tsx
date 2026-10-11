@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Track.in",
+  title: "Trakio",
   description: "Self-hosted conversion tracking.",
 };
 

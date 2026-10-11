@@ -4,7 +4,7 @@ import Link from "next/link";
 import AdminNavigation from "@/app/admin/admin-navigation";
 
 export const metadata: Metadata = {
-  title: "Profile | Track.in",
+  title: "Profile | Trakio",
   description: "Private operator profile and subscription status.",
 };
 
@@ -14,7 +14,7 @@ export default function ProfilePage() {
       <AdminNavigation pathname="/admin/profile" />
       <div className="mx-auto max-w-5xl px-5 py-8 sm:px-8 lg:px-12 lg:py-12">
         <header className="border-b-2 border-[#121212] pb-8">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#D02020]">Track.in / account</p>
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#D02020]">Trakio / account</p>
           <h1 className="mt-3 text-4xl font-black tracking-[-0.05em] sm:text-6xl">Your profile.</h1>
           <p className="mt-4 max-w-2xl text-sm leading-6 text-[#121212]">
             Manage the private operator account and choose the plan that matches the tracking work you actually use.
