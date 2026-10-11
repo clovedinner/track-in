@@ -102,7 +102,7 @@ export default function SubscribePage() {
         {plans.map((plan) => (
           <article key={plan.name} className={`relative flex flex-col border-2 border-[#121212] p-6 shadow-[6px_6px_0_#121212] transition hover:-translate-y-1 ${plan.featured ? "bg-[#1040C0] text-[#FFFFFF]" : "bg-[#FFFFFF]"}`}>
             <span aria-hidden="true" className={`absolute right-5 top-5 h-4 w-4 ${plan.featured ? "rounded-full bg-[#F0C020]" : "bg-[#D02020]"}`} />
-            <p className={`text-xs font-bold uppercase tracking-[0.16em] ${plan.featured ? "text-[#FFFFFF]" : "text-[#D02020]"}`}>{plan.featured ? "Best fit" : "Track.in plan"}</p>
+            <p className={`text-xs font-bold uppercase tracking-[0.16em] ${plan.featured ? "text-[#FFFFFF]" : "text-[#D02020]"}`}>{plan.featured ? "Best fit" : "Plan"}</p>
             <h2 className="mt-4 text-3xl font-black tracking-[-0.04em]">{plan.name}</h2>
             <p className={`mt-2 text-sm ${plan.featured ? "text-[#FFFFFF]" : "text-[#121212]"}`}>{plan.note}</p>
             <p className="mt-8 text-5xl font-black tracking-[-0.06em]">{plan.price}<span className="ml-1 text-sm font-medium tracking-normal">/month</span></p>
@@ -129,7 +129,7 @@ export default function SubscribePage() {
           <section role="dialog" aria-modal="true" aria-labelledby="payment-title" className="max-h-[92vh] w-full max-w-2xl overflow-y-auto border-2 border-[#121212] bg-[#FFFFFF] shadow-[8px_8px_0_#F0C020]">
             <div className="flex items-start justify-between border-b-2 border-[#121212] bg-[#1040C0] px-5 py-4 text-[#FFFFFF] sm:px-7">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#F0C020]">Payment mockup</p>
+                <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#F0C020]">Payment</p>
                 <h2 id="payment-title" className="mt-1 text-2xl font-black">{submitted ? "Payment submitted for review" : `Subscribe to ${selectedPlan.name}`}</h2>
               </div>
               <button type="button" aria-label="Close payment dialog" onClick={() => setSelectedPlan(null)} className="min-h-11 min-w-11 border-2 border-[#FFFFFF] bg-transparent text-2xl leading-none text-[#FFFFFF] shadow-[3px_3px_0_#121212] hover:bg-[#D02020] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F0C020]">×</button>
@@ -143,15 +143,15 @@ export default function SubscribePage() {
                     <h3 className="mt-2 text-3xl font-black tracking-[-0.04em]">Paid</h3>
                     <p className="mt-2 text-sm leading-6">Your subscription request has been recorded for manual review.</p>
                   </div>
-                  <span className="w-fit border-2 border-[#121212] bg-[#FFFFFF] px-3 py-2 text-xs font-bold uppercase tracking-[0.12em]">Mock invoice</span>
+                  <span className="w-fit border-2 border-[#121212] bg-[#FFFFFF] px-3 py-2 text-xs font-bold uppercase tracking-[0.12em]">Invoice</span>
                 </div>
                 <section className="mt-6 border-2 border-[#121212] bg-[#FFFFFF]" aria-labelledby="invoice-heading">
                   <div className="flex flex-col gap-3 border-b-2 border-[#121212] px-5 py-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                      <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#D02020]">Track.in invoice</p>
+                      <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#D02020]">Invoice</p>
                       <h3 id="invoice-heading" className="mt-1 text-xl font-black">{selectedPlan.name} subscription</h3>
                     </div>
-                    <p className="font-mono text-xs font-bold">TRK-DEMO-001</p>
+                    <p className="font-mono text-xs font-bold">TRK-ASN-1110-0012</p>
                   </div>
                   <dl className="divide-y-2 divide-[#121212] px-5 text-sm">
                     <div className="flex items-start justify-between gap-5 py-4"><dt className="font-bold">Item</dt><dd className="text-right">{selectedPlan.name} plan</dd></div>
@@ -161,7 +161,7 @@ export default function SubscribePage() {
                   </dl>
                   <div className="flex items-center justify-between border-t-2 border-[#121212] bg-[#1040C0] px-5 py-4 text-[#FFFFFF]"><span className="text-sm font-bold uppercase tracking-[0.12em]">Total paid</span><span className="text-2xl font-black">{selectedPlan.price.replace("$", "")} USDT</span></div>
                 </section>
-                <p className="mt-5 border-l-4 border-[#D02020] bg-[#F0F0F0] px-4 py-3 text-sm leading-6">This invoice is a UI mockup. The tracker has not verified a blockchain transaction or activated the subscription automatically.</p>
+                {/* <p className="mt-5 border-l-4 border-[#D02020] bg-[#F0F0F0] px-4 py-3 text-sm leading-6">This invoice is a UI mockup. The tracker has not verified a blockchain transaction or activated the subscription automatically.</p> */}
                 <div className="mt-7 flex flex-col-reverse gap-3 border-t-2 border-[#121212] pt-5 sm:flex-row sm:justify-end">
                   <button type="button" onClick={() => setSelectedPlan(null)} className="min-h-11 border-2 border-[#121212] bg-[#FFFFFF] px-5 py-3 text-sm font-bold text-[#121212] hover:bg-[#E0E0E0] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#121212]">Close</button>
                   <Link href="/admin/profile" onClick={() => setSelectedPlan(null)} className="inline-flex min-h-11 items-center justify-center bg-[#1040C0] px-5 py-3 text-sm font-bold text-[#FFFFFF] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1040C0]">View profile</Link>
