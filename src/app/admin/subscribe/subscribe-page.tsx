@@ -14,20 +14,20 @@ type Plan = {
 const plans: Plan[] = [
   {
     name: "Starter",
-    price: "$100",
+    price: "$300",
     note: "A focused first setup",
-    features: ["Click and conversion tracking", "One campaign workspace", "Essential metrics"],
+    features: ["Click and conversion tracking", "One campaign workspace", "Essential metrics", "S2S conversion postbacks"],
   },
   {
-    name: "Operator",
-    price: "$300",
+    name: "Operator", 
+    price: "$500",
     note: "The complete daily tracking loop",
     features: ["Campaign, offer, and source setup", "S2S conversion postbacks", "Delivery health and retries"],
     featured: true,
   },
   {
     name: "Expanded",
-    price: "$500",
+    price: "$1000",
     note: "A broader active setup",
     features: ["Everything in Operator", "More campaign configurations", "More source connections"],
   },
@@ -137,11 +137,35 @@ export default function SubscribePage() {
 
             {submitted ? (
               <div className="px-5 py-8 sm:px-7 sm:py-10">
-                <div className="border-2 border-[#121212] bg-[#F0C020] p-5">
-                  <p className="text-sm font-bold uppercase tracking-[0.13em]">Manual review required</p>
-                  <p className="mt-3 text-sm leading-6">Your selected plan is {selectedPlan.name}. This mockup does not verify a blockchain transaction yet. An operator would confirm the transfer and activate the subscription.</p>
+                <div className="flex flex-col gap-4 border-2 border-[#121212] bg-[#F0C020] p-5 sm:flex-row sm:items-start sm:justify-between">
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-[0.16em]">Payment status</p>
+                    <h3 className="mt-2 text-3xl font-black tracking-[-0.04em]">Paid</h3>
+                    <p className="mt-2 text-sm leading-6">Your subscription request has been recorded for manual review.</p>
+                  </div>
+                  <span className="w-fit border-2 border-[#121212] bg-[#FFFFFF] px-3 py-2 text-xs font-bold uppercase tracking-[0.12em]">Mock invoice</span>
                 </div>
-                <button type="button" onClick={() => setSelectedPlan(null)} className="mt-7 min-h-11 bg-[#1040C0] px-5 py-3 text-sm font-bold text-[#FFFFFF] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1040C0]">Close</button>
+                <section className="mt-6 border-2 border-[#121212] bg-[#FFFFFF]" aria-labelledby="invoice-heading">
+                  <div className="flex flex-col gap-3 border-b-2 border-[#121212] px-5 py-4 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#D02020]">Track.in invoice</p>
+                      <h3 id="invoice-heading" className="mt-1 text-xl font-black">{selectedPlan.name} subscription</h3>
+                    </div>
+                    <p className="font-mono text-xs font-bold">TRK-DEMO-001</p>
+                  </div>
+                  <dl className="divide-y-2 divide-[#121212] px-5 text-sm">
+                    <div className="flex items-start justify-between gap-5 py-4"><dt className="font-bold">Item</dt><dd className="text-right">{selectedPlan.name} plan</dd></div>
+                    <div className="flex items-start justify-between gap-5 py-4"><dt className="font-bold">Billing period</dt><dd className="text-right">Monthly</dd></div>
+                    <div className="flex items-start justify-between gap-5 py-4"><dt className="font-bold">Payment method</dt><dd className="text-right">USDT on TRC20</dd></div>
+                    <div className="flex items-start justify-between gap-5 py-4"><dt className="font-bold">Wallet destination</dt><dd className="max-w-[220px] break-all text-right font-mono text-xs">{walletAddress}</dd></div>
+                  </dl>
+                  <div className="flex items-center justify-between border-t-2 border-[#121212] bg-[#1040C0] px-5 py-4 text-[#FFFFFF]"><span className="text-sm font-bold uppercase tracking-[0.12em]">Total paid</span><span className="text-2xl font-black">{selectedPlan.price.replace("$", "")} USDT</span></div>
+                </section>
+                <p className="mt-5 border-l-4 border-[#D02020] bg-[#F0F0F0] px-4 py-3 text-sm leading-6">This invoice is a UI mockup. The tracker has not verified a blockchain transaction or activated the subscription automatically.</p>
+                <div className="mt-7 flex flex-col-reverse gap-3 border-t-2 border-[#121212] pt-5 sm:flex-row sm:justify-end">
+                  <button type="button" onClick={() => setSelectedPlan(null)} className="min-h-11 border-2 border-[#121212] bg-[#FFFFFF] px-5 py-3 text-sm font-bold text-[#121212] hover:bg-[#E0E0E0] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#121212]">Close</button>
+                  <Link href="/admin/profile" onClick={() => setSelectedPlan(null)} className="inline-flex min-h-11 items-center justify-center bg-[#1040C0] px-5 py-3 text-sm font-bold text-[#FFFFFF] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1040C0]">View profile</Link>
+                </div>
               </div>
             ) : (
               <div className="px-5 py-6 sm:px-7 sm:py-8">
