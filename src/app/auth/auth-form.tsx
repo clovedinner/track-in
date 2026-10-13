@@ -48,7 +48,7 @@ export default function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
       <div className="mx-auto max-w-md">
         <Link href="/" className="inline-flex items-center gap-1 border-2 border-[#121212] bg-[#FFFFFF] px-2 py-1 text-lg font-black shadow-[3px_3px_0_#121212] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D02020]"><span aria-hidden="true" className="h-3 w-3 rounded-full bg-[#D02020]" /><span aria-hidden="true" className="h-3 w-3 bg-[#1040C0]" /><span aria-hidden="true" className="h-0 w-0 border-x-[6px] border-b-[10px] border-x-transparent border-b-[#F0C020]" /><span className="ml-1">Trakio</span></Link>
         <section className="mt-10 border-2 border-[#121212] bg-[#FFFFFF] p-6 shadow-[6px_6px_0_#121212] sm:p-8">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#D02020]">Start your trackingg</p>
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#D02020]">Start your tracking</p>
           <h1 className="mt-3 text-4xl font-black tracking-[-0.05em]">{isSignUp ? "Create your account." : "Welcome back."}</h1>
           <p className="mt-3 text-sm leading-6">{isSignUp ? "Create an email and password account for the Trakio dashboard." : "Sign in to manage campaigns, sources, offers, and delivery health."}</p>
           <form className="mt-7 space-y-5" onSubmit={submit}>

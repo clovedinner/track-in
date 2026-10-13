@@ -41,11 +41,11 @@ export default async function CampaignSetupPage({ params }: { params: Promise<{ 
         <section className="mt-10" aria-labelledby="install-heading">
           <h2 id="install-heading" className="text-2xl font-black tracking-[-0.03em]">Install campaign tracking script</h2>
           <p className="mt-2 max-w-3xl text-sm leading-6">Paste this Voluum-compatible loader into a GTM Custom HTML tag on the offer page. Place it at the bottom of the page head or use the client’s existing page-view trigger.</p>
-          <div className="mt-4 border-2 border-[#121212] bg-[#F0C020] px-4 py-4 text-sm leading-6">
+          {/* <div className="mt-4 border-2 border-[#121212] bg-[#F0C020] px-4 py-4 text-sm leading-6">
             <p className="font-bold">Tracker domain</p>
             <code className="mt-1 block break-all text-xs">{report.trackerBaseUrl}/g/.js</code>
             <p className="mt-3 text-xs">The domain comes from NEXT_PUBLIC_TRACKER_URL. If it is empty, Trakio falls back to NEXT_PUBLIC_APP_URL.</p>
-          </div>
+          </div> */}
           <CopyableSnippet value={installScript} />
         </section>
 
