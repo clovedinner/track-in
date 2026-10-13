@@ -39,4 +39,26 @@ describe("campaign setup report", () => {
     expect(report.checks.campaignActive).toBe(false);
     expect(report.gtm.postbackPath).toBe("/postback");
   });
+
+  it("includes campaign and offer identifiers in direct URLs", () => {
+    const report = buildCampaignSetupReport({
+      ...campaign,
+      id: "35a1009f-15e3-40ff-a359-7ed6326d7e19",
+      offerId: "f7fc0d84-3b1c-4568-a6a4-18d412309b68",
+      trackingMode: "direct",
+      trafficSource: {
+        ...campaign.trafficSource,
+        configuration: {
+          postbackUrl: "https://provider.example.test/postback",
+          externalId: { parameter: "ACLID", token: "{ACLID}", enabled: true },
+          parameters: [{ parameter: "CampaignID", token: "{CampaignID}", enabled: true }],
+        },
+      },
+    }, "https://tracker.example.test");
+
+    expect(report.trackingUrls.propeller).toContain("cpid=35a1009f-15e3-40ff-a359-7ed6326d7e19");
+    expect(report.trackingUrls.propeller).toContain("oid=f7fc0d84-3b1c-4568-a6a4-18d412309b68");
+    expect(report.trackingUrls.propeller).toContain("ACLID=%7BACLID%7D");
+    expect(report.trackingUrls.propeller).toContain("CampaignID=%7BCampaignID%7D");
+  });
 });

@@ -137,10 +137,14 @@ export function buildAllCampaignTrackingUrls(
 
 export function buildDirectCampaignUrl(input: {
   offerUrl: string;
+  campaignId?: string;
+  offerId?: string;
   externalId?: { parameter?: string; token?: string; enabled?: boolean };
   parameters?: ReadonlyArray<{ parameter?: string; token?: string; enabled?: boolean }>;
 }): string {
   const destination = new URL(input.offerUrl);
+  if (input.campaignId) destination.searchParams.set("cpid", input.campaignId);
+  if (input.offerId) destination.searchParams.set("oid", input.offerId);
   const entries = [input.externalId, ...(input.parameters ?? [])];
   for (const entry of entries) {
     if (!entry?.enabled || !entry.parameter || !entry.token) continue;

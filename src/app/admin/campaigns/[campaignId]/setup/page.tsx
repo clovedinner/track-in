@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 
 export default async function CampaignSetupPage({ params }: { params: Promise<{ campaignId: string }> }) {
   const { campaignId } = await params;
-  const campaign = await prisma.campaign.findUnique({ where: { id: campaignId }, select: { id: true, slug: true, name: true, status: true, trackingMode: true, destinationUrl: true, defaultCurrency: true, allowedTrackingParameters: true, trafficSource: { select: { type: true, enabled: true, configuration: true } } } });
+  const campaign = await prisma.campaign.findUnique({ where: { id: campaignId }, select: { id: true, slug: true, name: true, status: true, trackingMode: true, destinationUrl: true, offerId: true, defaultCurrency: true, allowedTrackingParameters: true, trafficSource: { select: { type: true, enabled: true, configuration: true } } } });
   if (!campaign) return <main className="min-h-screen bg-[#F0F0F0] px-5 py-10 text-[#121212]"><Link href="/admin/campaigns" className="text-sm text-[#D02020] hover:underline">Back to campaigns</Link><h1 className="mt-5 text-2xl font-semibold">Campaign not found.</h1></main>;
 
   const environment = getRuntimeEnvironment();
@@ -38,7 +38,7 @@ export default async function CampaignSetupPage({ params }: { params: Promise<{ 
         </section>
         {report.providerError ? <p className="mt-4 border-2 border-[#D02020] bg-[#FFFFFF] px-4 py-3 text-sm text-[#D02020]">{report.providerError}</p> : null}
 
-        <section className="mt-10" aria-labelledby="install-heading">
+        {report.trackingMode === "direct" ? <section className="mt-10" aria-labelledby="install-heading">
           <h2 id="install-heading" className="text-2xl font-black tracking-[-0.03em]">Install campaign tracking script</h2>
           {/* <p className="mt-2 max-w-3xl text-sm leading-6">Paste this Voluum-compatible loader into a GTM Custom HTML tag on the offer page. Place it at the bottom of the page head or use the client’s existing page-view trigger.</p> */}
           <div className="mt-4 border-2 border-[#121212] bg-[#F0C020] px-4 py-4 text-sm leading-6">
@@ -47,7 +47,7 @@ export default async function CampaignSetupPage({ params }: { params: Promise<{ 
             {/* <p className="mt-3 text-xs">The domain comes from NEXT_PUBLIC_TRACKER_URL. If it is empty, Trakio falls back to NEXT_PUBLIC_APP_URL.</p> */}
           </div>
           <CopyableSnippet value={installScript} />
-        </section>
+        </section> : null}
 
         <section className="mt-10" aria-labelledby="tracking-url-heading">
           <h2 id="tracking-url-heading" className="text-xl font-bold">Tracking URL</h2>

@@ -9,6 +9,7 @@ export type CampaignSetupInput = {
   status: string;
   trackingMode?: string;
   destinationUrl: string;
+  offerId?: string | null;
   defaultCurrency: string;
   allowedTrackingParameters: unknown;
   trafficSource: {
@@ -74,7 +75,7 @@ export function buildCampaignSetupReport(input: CampaignSetupInput, trackerBaseU
         const record = configuration && typeof configuration === "object" && !Array.isArray(configuration) ? configuration as Record<string, unknown> : {};
         const externalId = record.externalId && typeof record.externalId === "object" && !Array.isArray(record.externalId) ? record.externalId as { parameter?: string; token?: string; enabled?: boolean } : undefined;
         const parameters = Array.isArray(record.parameters) ? record.parameters as Array<{ parameter?: string; token?: string; enabled?: boolean }> : [];
-        trackingUrls = { [provider]: buildDirectCampaignUrl({ offerUrl, externalId, parameters }) };
+        trackingUrls = { [provider]: buildDirectCampaignUrl({ offerUrl, campaignId: input.id, offerId: input.offerId ?? undefined, externalId, parameters }) };
       } else {
         trackingUrls = { [provider]: buildCampaignTrackingUrl({ trackerBaseUrl: baseUrl, campaignSlug: input.slug, provider, allowedTrackingParameters }) };
       }
