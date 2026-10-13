@@ -44,10 +44,11 @@ jobs:
         run: |
           set -eu
           ssh -p "$VPS_PORT" "$VPS_USER@$VPS_HOST" \
-            "cd '$VPS_APP_DIR' && export NODE_ENV=production && \
+            "cd '$VPS_APP_DIR' && unset NODE_ENV && \
              git fetch origin main && \
              git reset --hard origin/main && \
              npm install --no-audit --no-fund && \
+             export NODE_ENV=production && \
              npm run db:generate && \
              npm run db:migrate && \
              npm run build && \
