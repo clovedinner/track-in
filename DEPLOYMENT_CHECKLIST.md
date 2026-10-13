@@ -12,6 +12,14 @@ This checklist is host-neutral. Complete it before sending paid traffic to a pro
 - [ ] Set a unique `CONVERSION_WEBHOOK_SECRET` and share it only with the money-site backend.
 - [ ] Confirm no `.env.local`, deployment export, build log, or error report contains credentials.
 
+## Automated VPS deployment
+
+- [ ] Add GitHub Actions secrets `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`, and `VPS_KNOWN_HOSTS`.
+- [ ] Optionally add `VPS_PORT` and `VPS_APP_DIR` (the defaults are `22` and `/root/app`).
+- [ ] Confirm the VPS user can update the application directory, run npm, run Prisma migrations, and restart the `trakio` PM2 process.
+- [ ] Run the workflow manually once, then verify that a push to `main` creates one successful deployment.
+- [ ] Keep production environment files only on the VPS; the workflow never copies `.env.production` from GitHub.
+
 ## Database and application
 
 - [ ] Run `npm ci` from the lockfile.

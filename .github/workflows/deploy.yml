@@ -1,0 +1,59 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build and restart Trakio
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      VPS_HOST: ${{ secrets.VPS_HOST }}
+      VPS_USER: ${{ secrets.VPS_USER }}
+      VPS_PORT: ${{ secrets.VPS_PORT || '22' }}
+      VPS_APP_DIR: ${{ secrets.VPS_APP_DIR || '/root/app' }}
+
+    steps:
+      - name: Configure SSH
+        env:
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
+        run: |
+          set -eu
+          test -n "$VPS_HOST"
+          test -n "$VPS_USER"
+          test -n "$VPS_SSH_KEY"
+          test -n "$VPS_KNOWN_HOSTS"
+          install -d -m 700 "$HOME/.ssh"
+          printf '%s\n' "$VPS_SSH_KEY" > "$HOME/.ssh/id_ed25519"
+          printf '%s\n' "$VPS_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/id_ed25519" "$HOME/.ssh/known_hosts"
+
+      - name: Deploy current main branch
+        run: |
+          set -eu
+          ssh -p "$VPS_PORT" "$VPS_USER@$VPS_HOST" \
+            "cd '$VPS_APP_DIR' && \
+             git fetch origin main && \
+             git reset --hard origin/main && \
+             npm ci && \
+             npm run db:generate && \
+             npm run db:migrate && \
+             npm run build && \
+             pm2 restart trakio --update-env"
+
+      - name: Verify deployed process
+        run: |
+          set -eu
+          ssh -p "$VPS_PORT" "$VPS_USER@$VPS_HOST" \
+            "cd '$VPS_APP_DIR' && pm2 describe trakio >/dev/null && curl --fail --silent --show-error http://127.0.0.1:3000/api/health"
