@@ -36,6 +36,8 @@ export function normalizeEmail(value: unknown): string | undefined {
 }
 
 export function validatePassword(value: unknown): string | undefined {
-  if (typeof value !== "string" || value.length < 12 || value.length > 128) return "Password must be between 12 and 128 characters.";
+  if (typeof value !== "string" || value.length < 8 || value.length > 128) return "Password must be between 8 and 128 characters.";
+  if (!/[A-Z]/.test(value)) return "Password must include at least one uppercase letter.";
+  if (!/[^A-Za-z0-9]/.test(value)) return "Password must include at least one symbol.";
   return undefined;
 }

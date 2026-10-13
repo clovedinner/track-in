@@ -9,8 +9,10 @@ describe("password authentication helpers", () => {
   });
 
   it("requires a strong enough password", () => {
-    expect(validatePassword("short")).toMatch(/12 and 128 characters/);
-    expect(validatePassword("a".repeat(12))).toBeUndefined();
+    expect(validatePassword("short")).toMatch(/8 and 128 characters/);
+    expect(validatePassword("a".repeat(8))).toMatch(/uppercase/);
+    expect(validatePassword("Abcdefgh")).toMatch(/symbol/);
+    expect(validatePassword("Abcdefg!")).toBeUndefined();
     expect(validatePassword("a".repeat(129))).toMatch(/128 characters/);
   });
 

@@ -8,10 +8,17 @@ import type { FormEvent } from "react";
 export default function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [working, setWorking] = useState(false);
   const router = useRouter();
   const isSignUp = mode === "sign-up";
+  const passwordRequirements = [
+    { label: "8–128 characters", met: password.length >= 8 && password.length <= 128 },
+    { label: "one uppercase letter", met: /[A-Z]/.test(password) },
+    { label: "one symbol", met: /[^A-Za-z0-9]/.test(password) },
+  ];
+  const passwordComplete = passwordRequirements.every((requirement) => requirement.met);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -45,7 +52,13 @@ export default function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
           <p className="mt-3 text-sm leading-6">{isSignUp ? "Create an email and password account for the Trakio dashboard." : "Sign in to manage campaigns, sources, offers, and delivery health."}</p>
           <form className="mt-7 space-y-5" onSubmit={submit}>
             <label className="block text-sm font-bold">Email<input required autoComplete="email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} className="mt-2 block min-h-11 w-full border-2 border-[#121212] bg-[#FFFFFF] px-3 py-2.5 text-sm font-normal focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D02020]" /></label>
-            <label className="block text-sm font-bold">Password<input required minLength={12} autoComplete={isSignUp ? "new-password" : "current-password"} type="password" value={password} onChange={(event) => setPassword(event.target.value)} className="mt-2 block min-h-11 w-full border-2 border-[#121212] bg-[#FFFFFF] px-3 py-2.5 text-sm font-normal focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D02020]" />{isSignUp ? <span className="mt-2 block text-xs font-normal">Use at least 12 characters.</span> : null}</label>
+            <label className="block text-sm font-bold">Password
+              <span className="relative mt-2 block">
+                <input required minLength={isSignUp ? 8 : undefined} autoComplete={isSignUp ? "new-password" : "current-password"} type={showPassword ? "text" : "password"} value={password} onChange={(event) => setPassword(event.target.value)} className="block min-h-11 w-full border-2 border-[#121212] bg-[#FFFFFF] px-3 py-2.5 pr-16 text-sm font-normal focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D02020]" />
+                <button type="button" aria-label={showPassword ? "Hide password" : "Show password"} aria-pressed={showPassword} onClick={() => setShowPassword((visible) => !visible)} className="absolute right-1 top-1/2 min-h-9 -translate-y-1/2 border-2 border-[#121212] bg-[#F0F0F0] px-2 text-xs font-bold hover:bg-[#F0C020] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D02020]">{showPassword ? "Hide" : "Show"}</button>
+              </span>
+              {isSignUp && password.length > 0 && !passwordComplete ? <span role="alert" className="mt-2 block border-2 border-[#D02020] bg-[#FFF4F0] px-3 py-2 text-xs font-normal text-[#D02020]">Password needs {passwordRequirements.filter((requirement) => !requirement.met).map((requirement) => requirement.label).join(", ")}.</span> : null}
+            </label>
             {error ? <p role="alert" className="border-2 border-[#D02020] bg-[#F0F0F0] px-3 py-3 text-sm text-[#D02020]">{error}</p> : null}
             <button type="submit" disabled={working} className="min-h-11 w-full bg-[#1040C0] px-5 py-3 text-sm font-bold text-[#FFFFFF] hover:bg-[#D02020] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1040C0]">{working ? "Please wait" : isSignUp ? "Create account" : "Sign in"}</button>
           </form>
