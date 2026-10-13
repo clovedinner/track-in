@@ -76,9 +76,17 @@ export async function POST(request: Request): Promise<NextResponse> {
       }
     }
 
+    let destinationUrl = input.destinationUrl;
     if (input.offerId) {
-      const offer = await prisma.offer.findUnique({ where: { id: input.offerId }, select: { id: true } });
+      const offer = await prisma.offer.findUnique({ where: { id: input.offerId }, select: { id: true, offerUrl: true } });
       if (!offer) return apiErrorResponse(new ApiError("not_found", 404, "Offer not found."), correlationId);
+      if (!offer.offerUrl || !offer.offerUrl.startsWith("https://")) {
+        return apiErrorResponse(
+          new ApiError("invalid_request", 400, "Selected offer does not have an HTTPS offer URL."),
+          correlationId,
+        );
+      }
+      destinationUrl = offer.offerUrl;
     }
 
     const campaign = await prisma.campaign.create({
@@ -86,7 +94,7 @@ export async function POST(request: Request): Promise<NextResponse> {
         slug: input.slug,
         name: input.name,
         status: input.status,
-        destinationUrl: input.destinationUrl,
+        destinationUrl,
         trafficSourceId: input.trafficSourceId,
         offerId: input.offerId,
         defaultCurrency: input.defaultCurrency,
