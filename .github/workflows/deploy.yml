@@ -43,7 +43,7 @@ jobs:
         run: |
           set -eu
           ssh -p "$VPS_PORT" "$VPS_USER@$VPS_HOST" \
-            "cd '$VPS_APP_DIR' && \
+            "cd '$VPS_APP_DIR' && export NODE_ENV=production && \
              git fetch origin main && \
              git reset --hard origin/main && \
              npm ci && \
