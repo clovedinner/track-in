@@ -18,7 +18,7 @@ export default async function CampaignSetupPage({ params }: { params: Promise<{ 
   if (!campaign) return <main className="min-h-screen bg-[#F0F0F0] px-5 py-10 text-[#121212]"><Link href="/admin/campaigns" className="text-sm text-[#D02020] hover:underline">Back to campaigns</Link><h1 className="mt-5 text-2xl font-semibold">Campaign not found.</h1></main>;
 
   const environment = getRuntimeEnvironment();
-  const report = buildCampaignSetupReport(campaign, environment.appUrl ?? "http://localhost:3000");
+  const report = buildCampaignSetupReport(campaign, environment.trackerUrl ?? environment.appUrl ?? "http://localhost:3000");
   const installScript = buildCampaignTrackingScript(report.trackerBaseUrl);
   const setupEnabled = process.env.TRACK_IN_ALLOW_TEST_SETUP === "1";
 
@@ -44,7 +44,7 @@ export default async function CampaignSetupPage({ params }: { params: Promise<{ 
           <div className="mt-4 border-2 border-[#121212] bg-[#F0C020] px-4 py-4 text-sm leading-6">
             <p className="font-bold">Tracker domain</p>
             <code className="mt-1 block break-all text-xs">{report.trackerBaseUrl}/g/.js</code>
-            <p className="mt-3 text-xs">The domain comes from NEXT_PUBLIC_APP_URL. Replace that environment value later when the dedicated tracking subdomain is ready.</p>
+            <p className="mt-3 text-xs">The domain comes from NEXT_PUBLIC_TRACKER_URL. If it is empty, Trakio falls back to NEXT_PUBLIC_APP_URL.</p>
           </div>
           <CopyableSnippet value={installScript} />
         </section>

@@ -8,6 +8,7 @@ import {
 
 const productionEnvironment: RuntimeEnvironment = {
   appUrl: "https://tracker.example.com",
+  trackerUrl: "https://tracker.example.com",
   adminPassword: "test-admin-password",
   adminUsername: "test-admin",
   conversionWebhookSecret: "test-conversion-secret",
@@ -62,5 +63,11 @@ describe("validateRuntimeEnvironment", () => {
     expect(() =>
       validateRuntimeEnvironment({ ...productionEnvironment, appUrl: "http://tracker.example.com" }),
     ).toThrow(/https/);
+  });
+
+  it("rejects a non-HTTPS production tracker origin", () => {
+    expect(() =>
+      validateRuntimeEnvironment({ ...productionEnvironment, trackerUrl: "http://go.tracker.example.com" }),
+    ).toThrow(/NEXT_PUBLIC_TRACKER_URL/);
   });
 });

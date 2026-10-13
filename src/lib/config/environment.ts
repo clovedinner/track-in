@@ -1,5 +1,6 @@
 export type RuntimeEnvironment = {
   appUrl: string | undefined;
+  trackerUrl: string | undefined;
   adminPassword: string | undefined;
   adminUsername: string | undefined;
   conversionWebhookSecret: string | undefined;
@@ -24,6 +25,7 @@ export function getRuntimeEnvironment(): RuntimeEnvironment {
 
   return {
     appUrl: readTrimmedVariable("NEXT_PUBLIC_APP_URL"),
+    trackerUrl: readTrimmedVariable("NEXT_PUBLIC_TRACKER_URL"),
     adminPassword: readTrimmedVariable("ADMIN_PASSWORD"),
     adminUsername: readTrimmedVariable("ADMIN_USERNAME"),
     conversionWebhookSecret: readTrimmedVariable("CONVERSION_WEBHOOK_SECRET"),
@@ -65,6 +67,10 @@ export function validateRuntimeEnvironment(
 
   if (!environment.appUrl?.startsWith("https://")) {
     throw new EnvironmentValidationError(["NEXT_PUBLIC_APP_URL (must use https in production)"]);
+  }
+
+  if (environment.trackerUrl && !environment.trackerUrl.startsWith("https://")) {
+    throw new EnvironmentValidationError(["NEXT_PUBLIC_TRACKER_URL (must use https in production)"]);
   }
 
   return environment;

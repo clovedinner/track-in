@@ -6,6 +6,7 @@ This checklist is host-neutral. Complete it before sending paid traffic to a pro
 
 - [ ] Set `NODE_ENV=production`.
 - [ ] Set `NEXT_PUBLIC_APP_URL` to the canonical public origin using `https://`.
+- [ ] If using a dedicated tracking subdomain, set `NEXT_PUBLIC_TRACKER_URL` to its canonical `https://` origin and route it to the same application.
 - [ ] Set the pooled runtime `DATABASE_URL` and direct migration `DIRECT_URL` for the same PostgreSQL database.
 - [ ] Set a unique `AUTH_SESSION_SECRET` with at least 32 random characters. Do not use the example value.
 - [ ] Open `/auth/sign-up` once to create the first operator account, then verify sign-in and sign-out. Keep account creation restricted at the deployment layer if public signup is not desired.

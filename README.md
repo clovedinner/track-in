@@ -72,6 +72,7 @@ Use `npm run db:migrate:create` only on a non-production Neon branch when a sche
 ## Environment values
 
 - `NEXT_PUBLIC_APP_URL`: the browser-visible application origin. Use `http://localhost:3000` locally.
+- `NEXT_PUBLIC_TRACKER_URL`: optional dedicated tracking origin, such as `https://go.trakio.org`. Generated tracking URLs use this value while the dashboard remains on `NEXT_PUBLIC_APP_URL`.
 - `DATABASE_URL`: Neon pooled PostgreSQL connection string for runtime queries. Do not commit a real connection string.
 - `DIRECT_URL`: Neon direct PostgreSQL connection string used only by Prisma migration and Studio commands.
 - `AUTH_SESSION_SECRET`: at least 32 random characters used to sign dashboard sessions. It is required in production. Generate one with `openssl rand -base64 32`.
