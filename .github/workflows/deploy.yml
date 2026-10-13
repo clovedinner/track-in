@@ -42,7 +42,11 @@ jobs:
 
       - name: Deploy current main branch
         run: |
-          set -eu
+          set -e
+          VPS_PORT="${VPS_PORT:-22}"
+          VPS_APP_DIR="${VPS_APP_DIR:-/root/app}"
+          test -n "${VPS_HOST:-}"
+          test -n "${VPS_USER:-}"
           ssh -p "$VPS_PORT" "$VPS_USER@$VPS_HOST" \
             "cd '$VPS_APP_DIR' && unset NODE_ENV && \
              git fetch origin main && \
