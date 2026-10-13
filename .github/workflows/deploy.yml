@@ -47,7 +47,7 @@ jobs:
             "cd '$VPS_APP_DIR' && export NODE_ENV=production && \
              git fetch origin main && \
              git reset --hard origin/main && \
-             npm ci && \
+             npm install --no-audit --no-fund && \
              npm run db:generate && \
              npm run db:migrate && \
              npm run build && \
