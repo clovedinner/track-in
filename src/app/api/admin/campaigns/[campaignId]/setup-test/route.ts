@@ -7,7 +7,7 @@ import { getCorrelationId } from "@/lib/observability/correlation-id";
 import { logger } from "@/lib/observability/logger";
 
 function testSetupEnabled(): boolean {
-  return process.env.TRACK_IN_ALLOW_TEST_SETUP === "1" && process.env.NODE_ENV !== "production";
+  return process.env.TRACK_IN_ALLOW_TEST_SETUP === "1";
 }
 
 export async function POST(request: Request, context: { params: Promise<{ campaignId: string }> }): Promise<NextResponse> {

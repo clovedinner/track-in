@@ -349,6 +349,6 @@ Add this after each implementation session when useful:
 
 - Completed: Added private campaign creation, provider-specific tracking URL generation, GTM registration/FTD snippet generation, outbound postback template generation, and a guarded campaign setup verification page with a test-click action.
 - Verified: `npm run check`, `npm run test:unit -- --run` (24 test files, 99 tests), and `npm run build` pass.
-- Decisions: Setup-test clicks require `TRACK_IN_ALLOW_TEST_SETUP=1` and are refused in production; generated artifacts redact credentials and never make live provider calls.
+- Decisions: Setup-test clicks require the explicit `TRACK_IN_ALLOW_TEST_SETUP=1` flag in any environment; generated artifacts are marked as setup data, redact credentials, and never make live provider calls.
 - Blockers: The operator still needs to run a controlled client-like setup with real provider macros and complete the backup/restore rehearsal before production traffic.
 - Next task: use the setup workflow with a real test campaign, then finalize deployment and live-provider verification.

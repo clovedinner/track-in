@@ -20,7 +20,7 @@ export default async function CampaignSetupPage({ params }: { params: Promise<{ 
   const environment = getRuntimeEnvironment();
   const report = buildCampaignSetupReport(campaign, environment.appUrl ?? "http://localhost:3000");
   const installScript = buildCampaignTrackingScript(report.trackerBaseUrl);
-  const setupEnabled = process.env.TRACK_IN_ALLOW_TEST_SETUP === "1" && environment.nodeEnv !== "production";
+  const setupEnabled = process.env.TRACK_IN_ALLOW_TEST_SETUP === "1";
 
   return (
     <main className="min-h-screen bg-[#F0F0F0] text-[#121212]">
