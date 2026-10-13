@@ -33,7 +33,7 @@ export default function ProfilePage() {
             <dl className="mt-5 space-y-4 text-sm">
               <div className="border-b-2 border-[#E0E0E0] pb-3">
                 <dt className="text-xs font-bold uppercase tracking-[0.14em] text-[#121212]">Access</dt>
-                <dd className="mt-1 font-semibold">Basic Auth protected</dd>
+                <dd className="mt-1 font-semibold">Email and password protected</dd>
               </div>
               <div>
                 <dt className="text-xs font-bold uppercase tracking-[0.14em] text-[#121212]">Workspace</dt>

@@ -74,7 +74,8 @@ Use `npm run db:migrate:create` only on a non-production Neon branch when a sche
 - `NEXT_PUBLIC_APP_URL`: the browser-visible application origin. Use `http://localhost:3000` locally.
 - `DATABASE_URL`: Neon pooled PostgreSQL connection string for runtime queries. Do not commit a real connection string.
 - `DIRECT_URL`: Neon direct PostgreSQL connection string used only by Prisma migration and Studio commands.
-- `ADMIN_USERNAME` and `ADMIN_PASSWORD`: private administration credentials. They are required in production.
+- `AUTH_SESSION_SECRET`: at least 32 random characters used to sign dashboard sessions. It is required in production. Generate one with `openssl rand -base64 32`.
+- `ADMIN_USERNAME` and `ADMIN_PASSWORD`: optional legacy Basic Auth fallback while migrating existing deployments. Email/password sessions are the normal dashboard login.
 - `CONVERSION_WEBHOOK_SECRET`: server-to-server conversion authentication secret. It is required in production.
 
 Never commit `.env.local` or credentials. Do not route tracking traffic to this application until Phase 4 production-readiness checks are complete.

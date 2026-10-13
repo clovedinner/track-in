@@ -3,6 +3,7 @@ export type RuntimeEnvironment = {
   adminPassword: string | undefined;
   adminUsername: string | undefined;
   conversionWebhookSecret: string | undefined;
+  authSessionSecret: string | undefined;
   databaseUrl: string | undefined;
   directDatabaseUrl: string | undefined;
   nodeEnv: "development" | "production" | "test";
@@ -26,6 +27,7 @@ export function getRuntimeEnvironment(): RuntimeEnvironment {
     adminPassword: readTrimmedVariable("ADMIN_PASSWORD"),
     adminUsername: readTrimmedVariable("ADMIN_USERNAME"),
     conversionWebhookSecret: readTrimmedVariable("CONVERSION_WEBHOOK_SECRET"),
+    authSessionSecret: readTrimmedVariable("AUTH_SESSION_SECRET"),
     databaseUrl: readTrimmedVariable("DATABASE_URL"),
     directDatabaseUrl: readTrimmedVariable("DIRECT_URL"),
     nodeEnv,
@@ -48,9 +50,8 @@ export function validateRuntimeEnvironment(
 
   const requiredVariables = [
     ["NEXT_PUBLIC_APP_URL", environment.appUrl],
-    ["ADMIN_USERNAME", environment.adminUsername],
-    ["ADMIN_PASSWORD", environment.adminPassword],
     ["CONVERSION_WEBHOOK_SECRET", environment.conversionWebhookSecret],
+    ["AUTH_SESSION_SECRET", environment.authSessionSecret],
     ["DATABASE_URL", environment.databaseUrl],
     ["DIRECT_URL", environment.directDatabaseUrl],
   ] as const;

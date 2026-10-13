@@ -28,6 +28,16 @@ enum OutboundPostbackStatus {
   @@map("outbound_postback_status")
 }
 
+model User {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@map("users")
+}
+
 model TrafficSource {
   id                  String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name                String

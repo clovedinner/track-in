@@ -11,6 +11,7 @@ const productionEnvironment: RuntimeEnvironment = {
   adminPassword: "test-admin-password",
   adminUsername: "test-admin",
   conversionWebhookSecret: "test-conversion-secret",
+  authSessionSecret: "test-auth-session-secret-0123456789",
   databaseUrl: "postgresql://test:test@localhost:5432/test",
   directDatabaseUrl: "postgresql://test:test@localhost:5433/test",
   nodeEnv: "production",
@@ -25,8 +26,8 @@ describe("validateRuntimeEnvironment", () => {
     expect(() =>
       validateRuntimeEnvironment({
         ...productionEnvironment,
-        adminPassword: undefined,
         conversionWebhookSecret: undefined,
+        authSessionSecret: undefined,
       }),
     ).toThrow(EnvironmentValidationError);
 
@@ -35,12 +36,13 @@ describe("validateRuntimeEnvironment", () => {
         ...productionEnvironment,
         adminPassword: undefined,
         conversionWebhookSecret: undefined,
+        authSessionSecret: undefined,
       });
     } catch (error) {
       expect(error).toBeInstanceOf(EnvironmentValidationError);
       expect((error as EnvironmentValidationError).missingVariables).toEqual([
-        "ADMIN_PASSWORD",
         "CONVERSION_WEBHOOK_SECRET",
+        "AUTH_SESSION_SECRET",
       ]);
     }
   });

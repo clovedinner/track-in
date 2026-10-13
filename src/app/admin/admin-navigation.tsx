@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { adminNavigation, isAdminNavigationActive } from "@/lib/admin/navigation";
+import SignOutButton from "@/app/admin/sign-out-button";
 
 export default function AdminNavigation({ pathname }: { pathname: string }) {
   return (
@@ -32,6 +33,7 @@ export default function AdminNavigation({ pathname }: { pathname: string }) {
         >
           Profile
         </Link>
+        <SignOutButton />
       </div>
     </nav>
   );

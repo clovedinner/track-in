@@ -7,7 +7,8 @@ This checklist is host-neutral. Complete it before sending paid traffic to a pro
 - [ ] Set `NODE_ENV=production`.
 - [ ] Set `NEXT_PUBLIC_APP_URL` to the canonical public origin using `https://`.
 - [ ] Set the pooled runtime `DATABASE_URL` and direct migration `DIRECT_URL` for the same PostgreSQL database.
-- [ ] Set unique, long `ADMIN_USERNAME` and `ADMIN_PASSWORD` values. Do not use the example values.
+- [ ] Set a unique `AUTH_SESSION_SECRET` with at least 32 random characters. Do not use the example value.
+- [ ] Open `/auth/sign-up` once to create the first operator account, then verify sign-in and sign-out. Keep account creation restricted at the deployment layer if public signup is not desired.
 - [ ] Set a unique `CONVERSION_WEBHOOK_SECRET` and share it only with the money-site backend.
 - [ ] Confirm no `.env.local`, deployment export, build log, or error report contains credentials.
 
@@ -27,7 +28,9 @@ This checklist is host-neutral. Complete it before sending paid traffic to a pro
 - [ ] Terminate TLS at the host or reverse proxy and redirect HTTP to HTTPS.
 - [ ] Confirm the application is reachable only through the intended public origin.
 - [ ] Confirm production responses include `Strict-Transport-Security`, `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, and `Permissions-Policy`.
-- [ ] Confirm an unauthenticated `/admin` request returns `401` and does not reveal dashboard data.
+- [ ] Confirm an unauthenticated `/admin` request redirects to `/auth/sign-in` and does not reveal dashboard data.
+- [ ] Confirm invalid email/password credentials are rejected and a successful sign-in reaches `/admin/dashboard`.
+- [ ] Confirm sign-out clears the session and protected pages require sign-in again.
 - [ ] Confirm `/api/conversions` rejects missing or invalid bearer credentials.
 - [ ] Confirm `/postback` rejects unknown `cid` values and does not redirect or create unattributed conversions.
 
