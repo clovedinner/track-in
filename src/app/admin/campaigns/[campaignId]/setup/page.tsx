@@ -51,6 +51,7 @@ export default async function CampaignSetupPage({ params }: { params: Promise<{ 
 
         <section className="mt-10" aria-labelledby="tracking-url-heading">
           <h2 id="tracking-url-heading" className="text-xl font-bold">Tracking URL</h2>
+          <p className="mt-1 text-xs font-semibold uppercase tracking-[0.12em] text-[#D02020]">Mode: {report.trackingMode}</p>
           <p className="mt-1 text-sm text-[#121212]">Use the URL for the configured traffic source. Provider macros are preserved for expansion by the ad platform.</p>
           {Object.entries(report.trackingUrls).map(([provider, url]) => <div key={provider} className="mt-4 border-2 border-[#121212] bg-[#FFFFFF] p-4"><p className="text-xs font-bold uppercase tracking-[0.1em] text-[#121212]">{provider}</p><code className="mt-2 block break-all text-xs">{url}</code></div>)}
           {Object.keys(report.trackingUrls).length === 0 ? <p className="mt-4 text-sm text-[#D02020]">Add a supported traffic source before generating a provider URL.</p> : null}
