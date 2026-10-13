@@ -13,12 +13,10 @@ type TrafficSourceFormProps = { onCreated?: () => void; source?: TrafficSourceFo
 export default function TrafficSourceForm({ onCreated, source, duplicate = false }: TrafficSourceFormProps) {
   const sourceConfiguration = source?.configuration ?? {};
   const sourceParameters = Array.isArray(sourceConfiguration.parameters) ? sourceConfiguration.parameters as Array<Record<string, unknown>> : [];
-  const externalId = sourceConfiguration.externalId && typeof sourceConfiguration.externalId === "object" && !Array.isArray(sourceConfiguration.externalId) ? sourceConfiguration.externalId as Record<string, unknown> : {};
-  const postbackUrl = typeof sourceConfiguration.postbackUrl === "string" ? sourceConfiguration.postbackUrl : "";
+  const savedRows = sourceParameters.map((parameter) => ({ name: typeof parameter.name === "string" ? parameter.name : "", parameter: typeof parameter.parameter === "string" ? parameter.parameter : "", token: typeof parameter.token === "string" ? parameter.token : "", enabled: parameter.enabled !== false })).slice(0, 10);
   const [rows, setRows] = useState<ParameterRow[]>([
-    ...sourceParameters.map((parameter) => ({ name: typeof parameter.name === "string" ? parameter.name : "", parameter: typeof parameter.parameter === "string" ? parameter.parameter : "", token: typeof parameter.token === "string" ? parameter.token : "", enabled: parameter.enabled !== false })).slice(0, 8),
-    { name: "", parameter: "", token: "", enabled: true },
-    { name: "", parameter: "", token: "", enabled: true },
+    ...savedRows,
+    ...Array.from({ length: Math.max(0, 2 - savedRows.length) }, () => ({ name: "", parameter: "", token: "", enabled: true })),
   ].slice(0, 10));
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
