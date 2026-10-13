@@ -22,6 +22,7 @@ export function buildCampaignTrackingScript(trackerBaseUrl: string): string {
   function publish(cid){
     w.trackIn.cid=cid||null;
     if(cid){
+      try{d.cookie="trackin_cid="+encode(cid)+"; Max-Age=2592000; Path=/; SameSite=Lax"+(w.location.protocol==="https:"?"; Secure":"");}catch(_e){}
       try{
         var visibleUrl=new URL(w.location.href);
         visibleUrl.searchParams.set("cid",cid);

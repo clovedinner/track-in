@@ -8,6 +8,7 @@ describe("campaign tracking install script", () => {
     expect(script).toContain("https://tracker.example.test/g/.js");
     expect(script).toContain("/g/click?cpid=");
     expect(script).toContain("trackin_cid_ready");
+    expect(script).toContain("trackin_cid=");
     expect(script).toContain("replaceState");
     expect(script).toContain("<meta http-equiv=\"delegate-ch\"");
     expect(script).toContain("<noscript>");
