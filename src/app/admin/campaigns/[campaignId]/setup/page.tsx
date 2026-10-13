@@ -60,6 +60,7 @@ export default async function CampaignSetupPage({ params }: { params: Promise<{ 
         <section className="mt-10" aria-labelledby="postback-heading">
           <h2 id="postback-heading" className="text-xl font-bold">GTM conversion tags</h2>
           <p className="mt-1 text-sm text-[#121212]">These image tags target the Voluum-compatible /postback endpoint and contain no credentials.</p>
+          {report.trackingMode === "direct" ? <p className="mt-2 text-xs text-[#3e4855]">For Direct campaigns, trigger these tags on the <code>trackin_cid_ready</code> custom event so the generated click ID is available before the postback fires.</p> : null}
           {report.gtm.snippets.map((snippet) => <CopyableSnippet key={snippet.eventType} value={snippet.html} />)}
         </section>
 

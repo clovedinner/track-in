@@ -18,6 +18,46 @@ export function buildCampaignTrackingScript(trackerBaseUrl: string): string {
   var callbackName="dtpCallback";
   if (w[callbackName]) return;
   w[callbackName]={state:{callbackQueue:[]},loaderVersion:"1.0",registerConversion:function(event){this.state.callbackQueue.push(event)}};
+  w.trackIn=w.trackIn||{};
+  function publish(cid){
+    w.trackIn.cid=cid||null;
+    if(cid){
+      try{
+        var visibleUrl=new URL(w.location.href);
+        visibleUrl.searchParams.set("cid",cid);
+        w.history.replaceState(w.history.state,"",visibleUrl.toString());
+      }catch(_e){}
+      w.dataLayer=w.dataLayer||[];
+      w.dataLayer.push({event:"trackin_cid_ready",clickId:cid});
+    }
+  }
+  var pageParams=new URLSearchParams(w.location.search);
+  var existingCid=pageParams.get("cid")||w.localStorage.getItem("trackin_cid");
+  if(existingCid){
+    w.localStorage.setItem("trackin_cid",existingCid);
+    publish(existingCid);
+  } else {
+    var scriptOrigin="";
+    try{scriptOrigin=new URL(loaderUrl).origin;}catch(_e){}
+    var currentScript=d.currentScript;
+    if(!scriptOrigin&&currentScript){try{scriptOrigin=new URL(currentScript.src).origin;}catch(_e){}}
+    var campaignId=pageParams.get("cpid");
+    var offerId=pageParams.get("oid");
+    if(scriptOrigin&&campaignId){
+      var clickUrl=scriptOrigin+"/g/click?cpid="+encode(campaignId)+(offerId?"&oid="+encode(offerId):"");
+      pageParams.forEach(function(value,key){
+        if(key!=="cpid"&&key!=="oid"&&key!=="cid") clickUrl+="&"+encode(key)+"="+encode(value);
+      });
+      fetch(clickUrl,{credentials:"omit",headers:{Accept:"application/json"}}).then(function(response){
+        if(!response.ok) throw new Error("direct click registration failed");
+        return response.json();
+      }).then(function(payload){
+        if(typeof payload.cid!=="string"||!payload.cid) throw new Error("direct click registration returned no cid");
+        w.localStorage.setItem("trackin_cid",payload.cid);
+        publish(payload.cid);
+      }).catch(function(){publish(null);});
+    } else publish(null);
+  }
   var script=d.createElement("script");
   script.defer=true;
   script.src=loaderUrl+(loaderUrl.indexOf("?")===-1?"?":"&")+"durl="+encode(w.location.href)+"&dref="+encode(d.referrer)+"&dt="+encode(d.title)+"&vtm="+(new Date()).getTime();
