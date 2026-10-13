@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 
 type ParameterRow = { name: string; parameter: string; token: string; enabled: boolean };
 const fieldClass = "block w-full border-2 border-[#121212] bg-white px-3 py-2 text-sm text-[#121212] outline-none transition focus:border-[#1040C0] focus:ring-2 focus:ring-[#1040C0]/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1040C0]";
@@ -22,6 +22,19 @@ export default function TrafficSourceForm({ onCreated, source, duplicate = false
   const [done, setDone] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const postbackRef = useRef<HTMLInputElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    if (!source || !formRef.current) return;
+    const configuration = source.configuration ?? {};
+    const externalId = configuration.externalId && typeof configuration.externalId === "object" && !Array.isArray(configuration.externalId) ? configuration.externalId as Record<string, unknown> : {};
+    const parameter = formRef.current.elements.namedItem("externalIdParameter") as HTMLInputElement | null;
+    const token = formRef.current.elements.namedItem("externalIdToken") as HTMLInputElement | null;
+    const postback = formRef.current.elements.namedItem("postbackUrl") as HTMLInputElement | null;
+    if (parameter) parameter.value = typeof externalId.parameter === "string" ? externalId.parameter : "";
+    if (token) token.value = typeof externalId.token === "string" ? externalId.token : "";
+    if (postback) postback.value = typeof configuration.postbackUrl === "string" ? configuration.postbackUrl : "";
+  }, [source]);
 
   function updateRow(index: number, changes: Partial<ParameterRow>) {
     setRows((current) => current.map((row, rowIndex) => rowIndex === index ? { ...row, ...changes } : row));
@@ -76,7 +89,7 @@ export default function TrafficSourceForm({ onCreated, source, duplicate = false
     }
   }
 
-  return <form onSubmit={submit} className="space-y-7" noValidate>
+  return <form ref={formRef} onSubmit={submit} className="space-y-7" noValidate>
     {error ? <div role="alert" className="border-2 border-[#D02020] bg-[#F0F0F0] px-4 py-3 text-sm text-[#D02020]">{error}</div> : null}
     {done ? <div role="status" className="border-2 border-[#121212] bg-[#F0C020] px-4 py-3 text-sm text-[#121212]">Traffic source created and ready to attach to a campaign.</div> : null}
     <section><h2 className="text-lg font-semibold text-[#121212]">General</h2><label className={`${labelClass} mt-5 block`}>Name<input required name="name" maxLength={200} defaultValue={source?.name ?? ""} className={`${fieldClass} mt-2`} placeholder="Traffic source name" /></label></section>
