@@ -62,8 +62,7 @@ jobs:
              DIRECT_HOST=\${DIRECT_HOST%%:*} && \
              DIRECT_IPV4=\$(getent ahostsv4 \"\$DIRECT_HOST\" | awk 'NR==1 {print \$1}') && \
              test -n \"\$DIRECT_IPV4\" && \
-             DIRECT_URL=\${DIRECT_URL/\$DIRECT_HOST/\$DIRECT_IPV4} && \
-             export DIRECT_URL && \
+             printf '%s %s\\n' \"\$DIRECT_IPV4\" \"\$DIRECT_HOST\" >> /etc/hosts && \
              npm run db:migrate && \
              npm run build && \
              pm2 restart trakio --update-env"
