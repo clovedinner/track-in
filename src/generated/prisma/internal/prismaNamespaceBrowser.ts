@@ -106,6 +106,7 @@ export const CampaignScalarFieldEnum = {
   slug: 'slug',
   name: 'name',
   status: 'status',
+  trackingMode: 'trackingMode',
   destinationUrl: 'destinationUrl',
   trafficSourceId: 'trafficSourceId',
   offerId: 'offerId',

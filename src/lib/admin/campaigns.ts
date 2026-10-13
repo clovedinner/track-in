@@ -1,4 +1,4 @@
-import { CampaignStatus } from "../../generated/prisma/client";
+import { CampaignStatus, CampaignTrackingMode } from "../../generated/prisma/client";
 
 const campaignSlugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const trackingParameterPattern = /^[A-Za-z][A-Za-z0-9_-]{0,63}$/;
@@ -10,6 +10,7 @@ export type CreateCampaignInput = {
   name: string;
   destinationUrl: string;
   status: CampaignStatus;
+  trackingMode: CampaignTrackingMode;
   defaultCurrency: string;
   trafficSourceId?: string;
   offerId?: string;
@@ -99,6 +100,10 @@ export function parseCreateCampaignInput(body: unknown): CreateCampaignInput {
   if (typeof statusValue !== "string" || !campaignStatuses.has(statusValue)) {
     throw new CampaignInputError("status", "status must be active, paused, or archived.");
   }
+  const trackingMode = input.trackingMode === undefined ? CampaignTrackingMode.redirect : input.trackingMode;
+  if (trackingMode !== CampaignTrackingMode.redirect && trackingMode !== CampaignTrackingMode.direct) {
+    throw new CampaignInputError("trackingMode", "trackingMode must be redirect or direct.");
+  }
 
   const defaultCurrency = requireString(input.defaultCurrency, "defaultCurrency", 3).toUpperCase();
   if (!/^[A-Z]{3}$/.test(defaultCurrency)) {
@@ -124,6 +129,7 @@ export function parseCreateCampaignInput(body: unknown): CreateCampaignInput {
     name,
     destinationUrl: parseDestinationUrl(input.destinationUrl),
     status: statusValue as CampaignStatus,
+    trackingMode,
     defaultCurrency,
     trafficSourceId,
     offerId,

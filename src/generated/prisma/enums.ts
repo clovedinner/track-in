@@ -18,6 +18,14 @@ export const CampaignStatus = {
 export type CampaignStatus = (typeof CampaignStatus)[keyof typeof CampaignStatus]
 
 
+export const CampaignTrackingMode = {
+  redirect: 'redirect',
+  direct: 'direct'
+} as const
+
+export type CampaignTrackingMode = (typeof CampaignTrackingMode)[keyof typeof CampaignTrackingMode]
+
+
 export const OutboundPostbackStatus = {
   pending: 'pending',
   processing: 'processing',

@@ -1079,6 +1079,7 @@ export const CampaignScalarFieldEnum = {
   slug: 'slug',
   name: 'name',
   status: 'status',
+  trackingMode: 'trackingMode',
   destinationUrl: 'destinationUrl',
   trafficSourceId: 'trafficSourceId',
   offerId: 'offerId',
@@ -1282,6 +1283,20 @@ export type EnumCampaignStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$P
  * Reference to a field of type 'CampaignStatus[]'
  */
 export type ListEnumCampaignStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CampaignStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'CampaignTrackingMode'
+ */
+export type EnumCampaignTrackingModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CampaignTrackingMode'>
+    
+
+
+/**
+ * Reference to a field of type 'CampaignTrackingMode[]'
+ */
+export type ListEnumCampaignTrackingModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CampaignTrackingMode[]'>
     
 
 

@@ -16,6 +16,9 @@ describe("parseCreateCampaignInput", () => {
       ...validCampaign,
       defaultCurrency: "IDR",
       status: "paused",
+      trackingMode: "redirect",
+      trafficSourceId: undefined,
+      offerId: undefined,
     });
   });
 

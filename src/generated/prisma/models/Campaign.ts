@@ -29,6 +29,7 @@ export type CampaignMinAggregateOutputType = {
   slug: string | null
   name: string | null
   status: $Enums.CampaignStatus | null
+  trackingMode: $Enums.CampaignTrackingMode | null
   destinationUrl: string | null
   trafficSourceId: string | null
   offerId: string | null
@@ -43,6 +44,7 @@ export type CampaignMaxAggregateOutputType = {
   slug: string | null
   name: string | null
   status: $Enums.CampaignStatus | null
+  trackingMode: $Enums.CampaignTrackingMode | null
   destinationUrl: string | null
   trafficSourceId: string | null
   offerId: string | null
@@ -57,6 +59,7 @@ export type CampaignCountAggregateOutputType = {
   slug: number
   name: number
   status: number
+  trackingMode: number
   destinationUrl: number
   trafficSourceId: number
   offerId: number
@@ -74,6 +77,7 @@ export type CampaignMinAggregateInputType = {
   slug?: true
   name?: true
   status?: true
+  trackingMode?: true
   destinationUrl?: true
   trafficSourceId?: true
   offerId?: true
@@ -88,6 +92,7 @@ export type CampaignMaxAggregateInputType = {
   slug?: true
   name?: true
   status?: true
+  trackingMode?: true
   destinationUrl?: true
   trafficSourceId?: true
   offerId?: true
@@ -102,6 +107,7 @@ export type CampaignCountAggregateInputType = {
   slug?: true
   name?: true
   status?: true
+  trackingMode?: true
   destinationUrl?: true
   trafficSourceId?: true
   offerId?: true
@@ -190,6 +196,7 @@ export type CampaignGroupByOutputType = {
   slug: string
   name: string
   status: $Enums.CampaignStatus
+  trackingMode: $Enums.CampaignTrackingMode
   destinationUrl: string
   trafficSourceId: string | null
   offerId: string | null
@@ -226,6 +233,7 @@ export type CampaignWhereInput = {
   slug?: Prisma.StringFilter<"Campaign"> | string
   name?: Prisma.StringFilter<"Campaign"> | string
   status?: Prisma.EnumCampaignStatusFilter<"Campaign"> | $Enums.CampaignStatus
+  trackingMode?: Prisma.EnumCampaignTrackingModeFilter<"Campaign"> | $Enums.CampaignTrackingMode
   destinationUrl?: Prisma.StringFilter<"Campaign"> | string
   trafficSourceId?: Prisma.UuidNullableFilter<"Campaign"> | string | null
   offerId?: Prisma.UuidNullableFilter<"Campaign"> | string | null
@@ -244,6 +252,7 @@ export type CampaignOrderByWithRelationInput = {
   slug?: Prisma.SortOrder
   name?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  trackingMode?: Prisma.SortOrder
   destinationUrl?: Prisma.SortOrder
   trafficSourceId?: Prisma.SortOrderInput | Prisma.SortOrder
   offerId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -265,6 +274,7 @@ export type CampaignWhereUniqueInput = Prisma.AtLeast<{
   slug?: Prisma.StringFilter<"Campaign"> | string
   name?: Prisma.StringFilter<"Campaign"> | string
   status?: Prisma.EnumCampaignStatusFilter<"Campaign"> | $Enums.CampaignStatus
+  trackingMode?: Prisma.EnumCampaignTrackingModeFilter<"Campaign"> | $Enums.CampaignTrackingMode
   destinationUrl?: Prisma.StringFilter<"Campaign"> | string
   trafficSourceId?: Prisma.UuidNullableFilter<"Campaign"> | string | null
   offerId?: Prisma.UuidNullableFilter<"Campaign"> | string | null
@@ -283,6 +293,7 @@ export type CampaignOrderByWithAggregationInput = {
   slug?: Prisma.SortOrder
   name?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  trackingMode?: Prisma.SortOrder
   destinationUrl?: Prisma.SortOrder
   trafficSourceId?: Prisma.SortOrderInput | Prisma.SortOrder
   offerId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -304,6 +315,7 @@ export type CampaignScalarWhereWithAggregatesInput = {
   slug?: Prisma.StringWithAggregatesFilter<"Campaign"> | string
   name?: Prisma.StringWithAggregatesFilter<"Campaign"> | string
   status?: Prisma.EnumCampaignStatusWithAggregatesFilter<"Campaign"> | $Enums.CampaignStatus
+  trackingMode?: Prisma.EnumCampaignTrackingModeWithAggregatesFilter<"Campaign"> | $Enums.CampaignTrackingMode
   destinationUrl?: Prisma.StringWithAggregatesFilter<"Campaign"> | string
   trafficSourceId?: Prisma.UuidNullableWithAggregatesFilter<"Campaign"> | string | null
   offerId?: Prisma.UuidNullableWithAggregatesFilter<"Campaign"> | string | null
@@ -319,6 +331,7 @@ export type CampaignCreateInput = {
   slug: string
   name: string
   status?: $Enums.CampaignStatus
+  trackingMode?: $Enums.CampaignTrackingMode
   destinationUrl: string
   defaultCurrency: string
   allowedTrackingParameters?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -335,6 +348,7 @@ export type CampaignUncheckedCreateInput = {
   slug: string
   name: string
   status?: $Enums.CampaignStatus
+  trackingMode?: $Enums.CampaignTrackingMode
   destinationUrl: string
   trafficSourceId?: string | null
   offerId?: string | null
@@ -351,6 +365,7 @@ export type CampaignUpdateInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
+  trackingMode?: Prisma.EnumCampaignTrackingModeFieldUpdateOperationsInput | $Enums.CampaignTrackingMode
   destinationUrl?: Prisma.StringFieldUpdateOperationsInput | string
   defaultCurrency?: Prisma.StringFieldUpdateOperationsInput | string
   allowedTrackingParameters?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -367,6 +382,7 @@ export type CampaignUncheckedUpdateInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
+  trackingMode?: Prisma.EnumCampaignTrackingModeFieldUpdateOperationsInput | $Enums.CampaignTrackingMode
   destinationUrl?: Prisma.StringFieldUpdateOperationsInput | string
   trafficSourceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -383,6 +399,7 @@ export type CampaignCreateManyInput = {
   slug: string
   name: string
   status?: $Enums.CampaignStatus
+  trackingMode?: $Enums.CampaignTrackingMode
   destinationUrl: string
   trafficSourceId?: string | null
   offerId?: string | null
@@ -398,6 +415,7 @@ export type CampaignUpdateManyMutationInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
+  trackingMode?: Prisma.EnumCampaignTrackingModeFieldUpdateOperationsInput | $Enums.CampaignTrackingMode
   destinationUrl?: Prisma.StringFieldUpdateOperationsInput | string
   defaultCurrency?: Prisma.StringFieldUpdateOperationsInput | string
   allowedTrackingParameters?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -411,6 +429,7 @@ export type CampaignUncheckedUpdateManyInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
+  trackingMode?: Prisma.EnumCampaignTrackingModeFieldUpdateOperationsInput | $Enums.CampaignTrackingMode
   destinationUrl?: Prisma.StringFieldUpdateOperationsInput | string
   trafficSourceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -436,6 +455,7 @@ export type CampaignCountOrderByAggregateInput = {
   slug?: Prisma.SortOrder
   name?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  trackingMode?: Prisma.SortOrder
   destinationUrl?: Prisma.SortOrder
   trafficSourceId?: Prisma.SortOrder
   offerId?: Prisma.SortOrder
@@ -451,6 +471,7 @@ export type CampaignMaxOrderByAggregateInput = {
   slug?: Prisma.SortOrder
   name?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  trackingMode?: Prisma.SortOrder
   destinationUrl?: Prisma.SortOrder
   trafficSourceId?: Prisma.SortOrder
   offerId?: Prisma.SortOrder
@@ -465,6 +486,7 @@ export type CampaignMinOrderByAggregateInput = {
   slug?: Prisma.SortOrder
   name?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  trackingMode?: Prisma.SortOrder
   destinationUrl?: Prisma.SortOrder
   trafficSourceId?: Prisma.SortOrder
   offerId?: Prisma.SortOrder
@@ -523,6 +545,10 @@ export type CampaignUncheckedUpdateManyWithoutTrafficSourceNestedInput = {
 
 export type EnumCampaignStatusFieldUpdateOperationsInput = {
   set?: $Enums.CampaignStatus
+}
+
+export type EnumCampaignTrackingModeFieldUpdateOperationsInput = {
+  set?: $Enums.CampaignTrackingMode
 }
 
 export type NullableDateTimeFieldUpdateOperationsInput = {
@@ -590,6 +616,7 @@ export type CampaignCreateWithoutTrafficSourceInput = {
   slug: string
   name: string
   status?: $Enums.CampaignStatus
+  trackingMode?: $Enums.CampaignTrackingMode
   destinationUrl: string
   defaultCurrency: string
   allowedTrackingParameters?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -605,6 +632,7 @@ export type CampaignUncheckedCreateWithoutTrafficSourceInput = {
   slug: string
   name: string
   status?: $Enums.CampaignStatus
+  trackingMode?: $Enums.CampaignTrackingMode
   destinationUrl: string
   offerId?: string | null
   defaultCurrency: string
@@ -649,6 +677,7 @@ export type CampaignScalarWhereInput = {
   slug?: Prisma.StringFilter<"Campaign"> | string
   name?: Prisma.StringFilter<"Campaign"> | string
   status?: Prisma.EnumCampaignStatusFilter<"Campaign"> | $Enums.CampaignStatus
+  trackingMode?: Prisma.EnumCampaignTrackingModeFilter<"Campaign"> | $Enums.CampaignTrackingMode
   destinationUrl?: Prisma.StringFilter<"Campaign"> | string
   trafficSourceId?: Prisma.UuidNullableFilter<"Campaign"> | string | null
   offerId?: Prisma.UuidNullableFilter<"Campaign"> | string | null
@@ -664,6 +693,7 @@ export type CampaignCreateWithoutOfferInput = {
   slug: string
   name: string
   status?: $Enums.CampaignStatus
+  trackingMode?: $Enums.CampaignTrackingMode
   destinationUrl: string
   defaultCurrency: string
   allowedTrackingParameters?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -679,6 +709,7 @@ export type CampaignUncheckedCreateWithoutOfferInput = {
   slug: string
   name: string
   status?: $Enums.CampaignStatus
+  trackingMode?: $Enums.CampaignTrackingMode
   destinationUrl: string
   trafficSourceId?: string | null
   defaultCurrency: string
@@ -720,6 +751,7 @@ export type CampaignCreateWithoutClicksInput = {
   slug: string
   name: string
   status?: $Enums.CampaignStatus
+  trackingMode?: $Enums.CampaignTrackingMode
   destinationUrl: string
   defaultCurrency: string
   allowedTrackingParameters?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -735,6 +767,7 @@ export type CampaignUncheckedCreateWithoutClicksInput = {
   slug: string
   name: string
   status?: $Enums.CampaignStatus
+  trackingMode?: $Enums.CampaignTrackingMode
   destinationUrl: string
   trafficSourceId?: string | null
   offerId?: string | null
@@ -766,6 +799,7 @@ export type CampaignUpdateWithoutClicksInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
+  trackingMode?: Prisma.EnumCampaignTrackingModeFieldUpdateOperationsInput | $Enums.CampaignTrackingMode
   destinationUrl?: Prisma.StringFieldUpdateOperationsInput | string
   defaultCurrency?: Prisma.StringFieldUpdateOperationsInput | string
   allowedTrackingParameters?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -781,6 +815,7 @@ export type CampaignUncheckedUpdateWithoutClicksInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
+  trackingMode?: Prisma.EnumCampaignTrackingModeFieldUpdateOperationsInput | $Enums.CampaignTrackingMode
   destinationUrl?: Prisma.StringFieldUpdateOperationsInput | string
   trafficSourceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -796,6 +831,7 @@ export type CampaignCreateManyTrafficSourceInput = {
   slug: string
   name: string
   status?: $Enums.CampaignStatus
+  trackingMode?: $Enums.CampaignTrackingMode
   destinationUrl: string
   offerId?: string | null
   defaultCurrency: string
@@ -810,6 +846,7 @@ export type CampaignUpdateWithoutTrafficSourceInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
+  trackingMode?: Prisma.EnumCampaignTrackingModeFieldUpdateOperationsInput | $Enums.CampaignTrackingMode
   destinationUrl?: Prisma.StringFieldUpdateOperationsInput | string
   defaultCurrency?: Prisma.StringFieldUpdateOperationsInput | string
   allowedTrackingParameters?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -825,6 +862,7 @@ export type CampaignUncheckedUpdateWithoutTrafficSourceInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
+  trackingMode?: Prisma.EnumCampaignTrackingModeFieldUpdateOperationsInput | $Enums.CampaignTrackingMode
   destinationUrl?: Prisma.StringFieldUpdateOperationsInput | string
   offerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultCurrency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -840,6 +878,7 @@ export type CampaignUncheckedUpdateManyWithoutTrafficSourceInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
+  trackingMode?: Prisma.EnumCampaignTrackingModeFieldUpdateOperationsInput | $Enums.CampaignTrackingMode
   destinationUrl?: Prisma.StringFieldUpdateOperationsInput | string
   offerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultCurrency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -854,6 +893,7 @@ export type CampaignCreateManyOfferInput = {
   slug: string
   name: string
   status?: $Enums.CampaignStatus
+  trackingMode?: $Enums.CampaignTrackingMode
   destinationUrl: string
   trafficSourceId?: string | null
   defaultCurrency: string
@@ -868,6 +908,7 @@ export type CampaignUpdateWithoutOfferInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
+  trackingMode?: Prisma.EnumCampaignTrackingModeFieldUpdateOperationsInput | $Enums.CampaignTrackingMode
   destinationUrl?: Prisma.StringFieldUpdateOperationsInput | string
   defaultCurrency?: Prisma.StringFieldUpdateOperationsInput | string
   allowedTrackingParameters?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -883,6 +924,7 @@ export type CampaignUncheckedUpdateWithoutOfferInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
+  trackingMode?: Prisma.EnumCampaignTrackingModeFieldUpdateOperationsInput | $Enums.CampaignTrackingMode
   destinationUrl?: Prisma.StringFieldUpdateOperationsInput | string
   trafficSourceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultCurrency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -898,6 +940,7 @@ export type CampaignUncheckedUpdateManyWithoutOfferInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
+  trackingMode?: Prisma.EnumCampaignTrackingModeFieldUpdateOperationsInput | $Enums.CampaignTrackingMode
   destinationUrl?: Prisma.StringFieldUpdateOperationsInput | string
   trafficSourceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   defaultCurrency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -943,6 +986,7 @@ export type CampaignSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   slug?: boolean
   name?: boolean
   status?: boolean
+  trackingMode?: boolean
   destinationUrl?: boolean
   trafficSourceId?: boolean
   offerId?: boolean
@@ -962,6 +1006,7 @@ export type CampaignSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   slug?: boolean
   name?: boolean
   status?: boolean
+  trackingMode?: boolean
   destinationUrl?: boolean
   trafficSourceId?: boolean
   offerId?: boolean
@@ -979,6 +1024,7 @@ export type CampaignSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   slug?: boolean
   name?: boolean
   status?: boolean
+  trackingMode?: boolean
   destinationUrl?: boolean
   trafficSourceId?: boolean
   offerId?: boolean
@@ -996,6 +1042,7 @@ export type CampaignSelectScalar = {
   slug?: boolean
   name?: boolean
   status?: boolean
+  trackingMode?: boolean
   destinationUrl?: boolean
   trafficSourceId?: boolean
   offerId?: boolean
@@ -1006,7 +1053,7 @@ export type CampaignSelectScalar = {
   archivedAt?: boolean
 }
 
-export type CampaignOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "slug" | "name" | "status" | "destinationUrl" | "trafficSourceId" | "offerId" | "defaultCurrency" | "allowedTrackingParameters" | "createdAt" | "updatedAt" | "archivedAt", ExtArgs["result"]["campaign"]>
+export type CampaignOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "slug" | "name" | "status" | "trackingMode" | "destinationUrl" | "trafficSourceId" | "offerId" | "defaultCurrency" | "allowedTrackingParameters" | "createdAt" | "updatedAt" | "archivedAt", ExtArgs["result"]["campaign"]>
 export type CampaignInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   trafficSource?: boolean | Prisma.Campaign$trafficSourceArgs<ExtArgs>
   offer?: boolean | Prisma.Campaign$offerArgs<ExtArgs>
@@ -1034,6 +1081,7 @@ export type $CampaignPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     slug: string
     name: string
     status: $Enums.CampaignStatus
+    trackingMode: $Enums.CampaignTrackingMode
     destinationUrl: string
     trafficSourceId: string | null
     offerId: string | null
@@ -1472,6 +1520,7 @@ export interface CampaignFieldRefs {
   readonly slug: Prisma.FieldRef<"Campaign", 'String'>
   readonly name: Prisma.FieldRef<"Campaign", 'String'>
   readonly status: Prisma.FieldRef<"Campaign", 'CampaignStatus'>
+  readonly trackingMode: Prisma.FieldRef<"Campaign", 'CampaignTrackingMode'>
   readonly destinationUrl: Prisma.FieldRef<"Campaign", 'String'>
   readonly trafficSourceId: Prisma.FieldRef<"Campaign", 'String'>
   readonly offerId: Prisma.FieldRef<"Campaign", 'String'>

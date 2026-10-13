@@ -56,11 +56,13 @@ export default function CampaignForm() {
     const name = String(form.get("name") ?? "").trim();
     const trafficSourceId = String(form.get("trafficSourceId") ?? "");
     const offerId = String(form.get("offerId") ?? "");
+    const trackingMode = String(form.get("trackingMode") ?? "redirect");
     const body = {
       name,
       slug: slugify(name),
       trafficSourceId,
       offerId,
+      trackingMode,
       status: "paused",
       defaultCurrency: "USD",
       destinationUrl: "https://pending.invalid/",
@@ -108,6 +110,7 @@ export default function CampaignForm() {
           <label className={labelClass}>Name<input required name="name" maxLength={200} className={fieldClass} placeholder="Campaign name" autoFocus /></label>
           <label className={labelClass}>Traffic source<select required name="trafficSourceId" defaultValue="" className={fieldClass} disabled={loadingLists}><option value="">{loadingLists ? "Loading traffic sources…" : "Select traffic source"}</option>{sources.map((source) => <option key={source.id} value={source.id}>{source.name} ({source.type})</option>)}</select></label>
           <label className={labelClass}>Offer<select required name="offerId" defaultValue="" className={fieldClass} disabled={loadingLists}><option value="">{loadingLists ? "Loading offers…" : "Select offer"}</option>{offers.map((offer) => <option key={offer.id} value={offer.id}>{offer.name}</option>)}</select></label>
+          <fieldset><legend className={labelClass}>Campaign routing</legend><div className="mt-2 grid gap-3 sm:grid-cols-2"><label className="border-2 border-[#121212] bg-white p-3 text-sm"><input type="radio" name="trackingMode" value="redirect" defaultChecked className="mr-2 accent-[#1040C0]" />Redirect through Trakio tracker</label><label className="border-2 border-[#121212] bg-white p-3 text-sm"><input type="radio" name="trackingMode" value="direct" className="mr-2 accent-[#1040C0]" />Direct to offer URL</label></div><p className="mt-2 text-xs text-[#3e4855]">Redirect records clicks in Trakio. Direct sends traffic straight to the offer with configured traffic-source parameters.</p></fieldset>
           {!loadingLists && sources.length === 0 ? <p className="text-sm text-[#D02020]">Create an enabled traffic source before creating a campaign.</p> : null}
           {!loadingLists && offers.length === 0 ? <p className="text-sm text-[#D02020]">Create an offer before creating a campaign.</p> : null}
           <footer className="-mx-5 flex items-center justify-between border-t-2 border-[#121212] px-5 pt-5 sm:-mx-7 sm:px-7">

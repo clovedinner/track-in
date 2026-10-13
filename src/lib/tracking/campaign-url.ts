@@ -134,3 +134,19 @@ export function buildAllCampaignTrackingUrls(
     trafficjunky: buildCampaignTrackingUrl({ ...input, provider: "trafficjunky" }),
   };
 }
+
+export function buildDirectCampaignUrl(input: {
+  offerUrl: string;
+  externalId?: { parameter?: string; token?: string; enabled?: boolean };
+  parameters?: ReadonlyArray<{ parameter?: string; token?: string; enabled?: boolean }>;
+}): string {
+  const destination = new URL(input.offerUrl);
+  const entries = [input.externalId, ...(input.parameters ?? [])];
+  for (const entry of entries) {
+    if (!entry?.enabled || !entry.parameter || !entry.token) continue;
+    validateParameterName(entry.parameter);
+    validateMacro(entry.token, entry.parameter);
+    destination.searchParams.set(entry.parameter, entry.token);
+  }
+  return destination.toString();
+}

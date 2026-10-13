@@ -208,6 +208,13 @@ export type EnumCampaignStatusFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumCampaignStatusFilter<$PrismaModel> | $Enums.CampaignStatus
 }
 
+export type EnumCampaignTrackingModeFilter<$PrismaModel = never> = {
+  equals?: $Enums.CampaignTrackingMode | Prisma.EnumCampaignTrackingModeFieldRefInput<$PrismaModel>
+  in?: $Enums.CampaignTrackingMode[] | Prisma.ListEnumCampaignTrackingModeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CampaignTrackingMode[] | Prisma.ListEnumCampaignTrackingModeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCampaignTrackingModeFilter<$PrismaModel> | $Enums.CampaignTrackingMode
+}
+
 export type UuidNullableFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel> | null
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel> | null
@@ -239,6 +246,16 @@ export type EnumCampaignStatusWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumCampaignStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumCampaignStatusFilter<$PrismaModel>
+}
+
+export type EnumCampaignTrackingModeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CampaignTrackingMode | Prisma.EnumCampaignTrackingModeFieldRefInput<$PrismaModel>
+  in?: $Enums.CampaignTrackingMode[] | Prisma.ListEnumCampaignTrackingModeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CampaignTrackingMode[] | Prisma.ListEnumCampaignTrackingModeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCampaignTrackingModeWithAggregatesFilter<$PrismaModel> | $Enums.CampaignTrackingMode
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCampaignTrackingModeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCampaignTrackingModeFilter<$PrismaModel>
 }
 
 export type UuidNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -546,6 +563,13 @@ export type NestedEnumCampaignStatusFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumCampaignStatusFilter<$PrismaModel> | $Enums.CampaignStatus
 }
 
+export type NestedEnumCampaignTrackingModeFilter<$PrismaModel = never> = {
+  equals?: $Enums.CampaignTrackingMode | Prisma.EnumCampaignTrackingModeFieldRefInput<$PrismaModel>
+  in?: $Enums.CampaignTrackingMode[] | Prisma.ListEnumCampaignTrackingModeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CampaignTrackingMode[] | Prisma.ListEnumCampaignTrackingModeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCampaignTrackingModeFilter<$PrismaModel> | $Enums.CampaignTrackingMode
+}
+
 export type NestedUuidNullableFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel> | null
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel> | null
@@ -576,6 +600,16 @@ export type NestedEnumCampaignStatusWithAggregatesFilter<$PrismaModel = never> =
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumCampaignStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumCampaignStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumCampaignTrackingModeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CampaignTrackingMode | Prisma.EnumCampaignTrackingModeFieldRefInput<$PrismaModel>
+  in?: $Enums.CampaignTrackingMode[] | Prisma.ListEnumCampaignTrackingModeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CampaignTrackingMode[] | Prisma.ListEnumCampaignTrackingModeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCampaignTrackingModeWithAggregatesFilter<$PrismaModel> | $Enums.CampaignTrackingMode
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCampaignTrackingModeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCampaignTrackingModeFilter<$PrismaModel>
 }
 
 export type NestedUuidNullableWithAggregatesFilter<$PrismaModel = never> = {

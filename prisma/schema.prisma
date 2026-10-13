@@ -17,6 +17,13 @@ enum CampaignStatus {
   @@map("campaign_status")
 }
 
+enum CampaignTrackingMode {
+  redirect
+  direct
+
+  @@map("campaign_tracking_mode")
+}
+
 enum OutboundPostbackStatus {
   pending
   processing
@@ -60,6 +67,7 @@ model Campaign {
   slug                      String
   name                      String
   status                    CampaignStatus @default(paused)
+  trackingMode              CampaignTrackingMode @default(redirect) @map("tracking_mode")
   destinationUrl            String         @map("destination_url")
   trafficSourceId           String?        @map("traffic_source_id") @db.Uuid
   offerId                   String?        @map("offer_id") @db.Uuid

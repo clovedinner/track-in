@@ -1,4 +1,4 @@
-import { buildCampaignTrackingUrl } from "@/lib/tracking/campaign-url";
+import { buildCampaignTrackingUrl, buildDirectCampaignUrl } from "@/lib/tracking/campaign-url";
 import { generateDefaultGtmSnippets } from "@/lib/setup/gtm-snippets";
 import { parseProviderId, validateProviderConfiguration, type ProviderId } from "@/lib/providers/config";
 
@@ -7,6 +7,7 @@ export type CampaignSetupInput = {
   slug: string;
   name: string;
   status: string;
+  trackingMode?: string;
   destinationUrl: string;
   defaultCurrency: string;
   allowedTrackingParameters: unknown;
@@ -20,6 +21,7 @@ export type CampaignSetupInput = {
 export type CampaignSetupReport = {
   campaign: { id: string; name: string; slug: string; status: string; destinationUrl: string };
   trackerBaseUrl: string;
+  trackingMode: string;
   trackingUrls: Partial<Record<ProviderId, string>>;
   gtm: ReturnType<typeof generateDefaultGtmSnippets>;
   checks: {
@@ -59,13 +61,23 @@ function normalizeBaseUrl(value: string): string {
 
 export function buildCampaignSetupReport(input: CampaignSetupInput, trackerBaseUrl: string): CampaignSetupReport {
   const baseUrl = normalizeBaseUrl(trackerBaseUrl);
+  const trackingMode = input.trackingMode ?? "redirect";
   const allowedTrackingParameters = asStringArray(input.allowedTrackingParameters);
   const provider = safeProvider(input.trafficSource?.type);
   let trackingUrls: Partial<Record<ProviderId, string>> = {};
   let trackingError: string | null = null;
   if (provider) {
     try {
-      trackingUrls = { [provider]: buildCampaignTrackingUrl({ trackerBaseUrl: baseUrl, campaignSlug: input.slug, provider, allowedTrackingParameters }) };
+      const configuration = input.trafficSource?.configuration;
+      if (trackingMode === "direct") {
+        const offerUrl = input.destinationUrl;
+        const record = configuration && typeof configuration === "object" && !Array.isArray(configuration) ? configuration as Record<string, unknown> : {};
+        const externalId = record.externalId && typeof record.externalId === "object" && !Array.isArray(record.externalId) ? record.externalId as { parameter?: string; token?: string; enabled?: boolean } : undefined;
+        const parameters = Array.isArray(record.parameters) ? record.parameters as Array<{ parameter?: string; token?: string; enabled?: boolean }> : [];
+        trackingUrls = { [provider]: buildDirectCampaignUrl({ offerUrl, externalId, parameters }) };
+      } else {
+        trackingUrls = { [provider]: buildCampaignTrackingUrl({ trackerBaseUrl: baseUrl, campaignSlug: input.slug, provider, allowedTrackingParameters }) };
+      }
     } catch (error) {
       trackingError = error instanceof Error ? error.message : "Tracking URL configuration is invalid.";
     }
@@ -83,6 +95,7 @@ export function buildCampaignSetupReport(input: CampaignSetupInput, trackerBaseU
   return {
     campaign: { id: input.id, name: input.name, slug: input.slug, status: input.status, destinationUrl: input.destinationUrl },
     trackerBaseUrl: baseUrl,
+    trackingMode,
     trackingUrls,
     gtm: generateDefaultGtmSnippets(baseUrl),
     checks: {
