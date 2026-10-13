@@ -47,10 +47,17 @@ jobs:
             "cd '$VPS_APP_DIR' && unset NODE_ENV && \
              git fetch origin main && \
              git reset --hard origin/main && \
+             set -a && . ./.env.production && set +a && \
+             test -n \"\$DIRECT_URL\" && \
              npm install --no-audit --no-fund && \
              export NODE_ENV=production && \
              export NODE_OPTIONS=--dns-result-order=ipv4first && \
              npm run db:generate && \
+             DIRECT_HOST=\$(printf '%s' \"\$DIRECT_URL\" | sed -E 's#^[^@]+@([^/:?]+).*$#\1#') && \
+             DIRECT_IPV4=\$(getent ahostsv4 \"\$DIRECT_HOST\" | awk 'NR==1 {print $1}') && \
+             test -n \"\$DIRECT_IPV4\" && \
+             DIRECT_URL=\${DIRECT_URL/\$DIRECT_HOST/\$DIRECT_IPV4} && \
+             export DIRECT_URL && \
              npm run db:migrate && \
              npm run build && \
              pm2 restart trakio --update-env"
