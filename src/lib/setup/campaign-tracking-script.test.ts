@@ -7,6 +7,7 @@ describe("campaign tracking install script", () => {
     const script = buildCampaignTrackingScript("https://tracker.example.test/");
     expect(script).toContain("https://tracker.example.test/g/.js");
     expect(script).toContain("/g/click?cpid=");
+    expect(script).toContain("callback=trackInDirectClick");
     expect(script).toContain("trackin_cid_ready");
     expect(script).toContain("trackin_cid=");
     expect(script).toContain("replaceState");

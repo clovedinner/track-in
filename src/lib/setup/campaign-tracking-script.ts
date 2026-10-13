@@ -49,14 +49,16 @@ export function buildCampaignTrackingScript(trackerBaseUrl: string): string {
       pageParams.forEach(function(value,key){
         if(key!=="cpid"&&key!=="oid"&&key!=="cid") clickUrl+="&"+encode(key)+"="+encode(value);
       });
-      fetch(clickUrl,{credentials:"omit",headers:{Accept:"application/json"}}).then(function(response){
-        if(!response.ok) throw new Error("direct click registration failed");
-        return response.json();
-      }).then(function(payload){
-        if(typeof payload.cid!=="string"||!payload.cid) throw new Error("direct click registration returned no cid");
+      w.trackInDirectClick=function(payload){
+        if(!payload||typeof payload.cid!=="string"||!payload.cid){publish(null);return;}
         w.localStorage.setItem("trackin_cid",payload.cid);
         publish(payload.cid);
-      }).catch(function(){publish(null);});
+      };
+      var clickScript=d.createElement("script");
+      clickScript.async=true;
+      clickScript.src=clickUrl+"&callback=trackInDirectClick";
+      clickScript.onerror=function(){publish(null);};
+      d.head.appendChild(clickScript);
     } else publish(null);
   }
   var script=d.createElement("script");

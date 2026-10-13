@@ -18,6 +18,17 @@ function json(body: Record<string, string>, status: number, correlationId: strin
   });
 }
 
+function jsonp(callback: string, body: Record<string, string>, status: number, correlationId: string): Response {
+  return new Response(`${callback}(${JSON.stringify(body)});`, {
+    status,
+    headers: {
+      "cache-control": "no-store, max-age=0",
+      "content-type": "application/javascript; charset=utf-8",
+      "x-request-id": correlationId,
+    },
+  });
+}
+
 export async function GET(request: Request): Promise<Response> {
   const correlationId = getCorrelationId(request);
   const url = new URL(request.url);
@@ -25,9 +36,13 @@ export async function GET(request: Request): Promise<Response> {
   const rawOfferId = url.searchParams.get("oid");
   const campaignId = rawCampaignId === null ? null : rawCampaignId.trim();
   const offerId = rawOfferId === null ? null : rawOfferId.trim();
+  const callback = url.searchParams.get("callback");
+  const respond = (body: Record<string, string>, status: number): Response => callback && /^[A-Za-z_$][A-Za-z0-9_$]{0,63}$/.test(callback)
+    ? jsonp(callback, body, status, correlationId)
+    : json(body, status, correlationId);
 
   if (!campaignId || !uuidPattern.test(campaignId) || (offerId !== null && !uuidPattern.test(offerId))) {
-    return json({ error: "invalid_direct_context" }, 400, correlationId);
+    return respond({ error: "invalid_direct_context" }, 400);
   }
 
   try {
@@ -46,7 +61,7 @@ export async function GET(request: Request): Promise<Response> {
       },
     });
 
-    if (!campaign) return json({ error: "campaign_not_found" }, 404, correlationId);
+    if (!campaign) return respond({ error: "campaign_not_found" }, 404);
 
     const clickId = createClickId();
     const trackingTokens = collectTrackingTokens(url.searchParams, campaign.allowedTrackingParameters);
@@ -69,13 +84,13 @@ export async function GET(request: Request): Promise<Response> {
     });
 
     logger.info("tracking.direct_click_recorded", { campaignId, correlationId });
-    return json({ cid: clickId }, 200, correlationId);
+    return respond({ cid: clickId }, 200);
   } catch (error) {
     logger.error("tracking.direct_click_failed", {
       campaignId,
       correlationId,
       error: error instanceof Error ? error.message : "unknown",
     });
-    return json({ error: "direct_click_unavailable" }, 500, correlationId);
+    return respond({ error: "direct_click_unavailable" }, 500);
   }
 }
