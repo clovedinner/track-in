@@ -10,6 +10,8 @@ describe("campaign tracking install script", () => {
     expect(script).toContain("callback=trackInDirectClick");
     expect(script).toContain("trackin_cid_ready");
     expect(script).toContain("trackin_cid=");
+    expect(script).toContain("if(!w[callbackName])");
+    expect(script).toContain("directLoaderStarted");
     expect(script).toContain("replaceState");
     expect(script).toContain("<meta http-equiv=\"delegate-ch\"");
     expect(script).toContain("<noscript>");

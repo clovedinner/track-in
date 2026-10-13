@@ -16,9 +16,10 @@ export function buildCampaignTrackingScript(trackerBaseUrl: string): string {
 <script>
 (function(w,d,encode,loaderUrl){
   var callbackName="dtpCallback";
-  if (w[callbackName]) return;
-  w[callbackName]={state:{callbackQueue:[]},loaderVersion:"1.0",registerConversion:function(event){this.state.callbackQueue.push(event)}};
   w.trackIn=w.trackIn||{};
+  if(!w[callbackName]) w[callbackName]={state:{callbackQueue:[]},loaderVersion:"1.0",registerConversion:function(event){this.state.callbackQueue.push(event)}};
+  if(w.trackIn.directLoaderStarted) return;
+  w.trackIn.directLoaderStarted=true;
   function publish(cid){
     w.trackIn.cid=cid||null;
     if(cid){
