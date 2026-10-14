@@ -67,10 +67,11 @@ function shortId(value: string) {
   return `${value.slice(0, 8)}…${value.slice(-6)}`;
 }
 
-function tokenSummary(value: unknown) {
-  if (!value || typeof value !== "object" || Array.isArray(value)) return "—";
+function TokenList({ value }: { value: unknown }) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return <span>—</span>;
   const entries = Object.entries(value);
-  return entries.length === 0 ? "—" : entries.map(([key, token]) => `${key}=${String(token)}`).join(" · ");
+  if (entries.length === 0) return <span>—</span>;
+  return <div className="flex max-w-full flex-wrap gap-1.5">{entries.map(([key, token]) => <span key={key} className="inline-flex max-w-full break-all border border-[#121212] bg-[#F0F0F0] px-1.5 py-1 font-mono text-[11px] leading-4"><strong>{key}=</strong>{String(token)}</span>)}</div>;
 }
 
 export default async function AdminDashboardPage({
@@ -154,7 +155,7 @@ function Activity({ snapshot }: { snapshot: Awaited<ReturnType<typeof getVerific
     return <section className="mt-10 border-2 border-dashed border-[#121212] bg-[#FFFFFF] px-6 py-10"><h2 className="text-lg font-semibold">No recent activity to inspect.</h2><p className="mt-2 max-w-xl text-sm leading-6">Send a test click through an active campaign, then complete a controlled conversion. The latest records will appear here.</p></section>;
   }
 
-  return <div className="mt-10 grid gap-10"><ActivityTable title="Recent clicks" description="The tracker records these before redirecting the visitor." headers={["Campaign", "Click ID", "Captured", "Tokens"]}>{snapshot.recentClicks.map((click) => <tr key={click.clickId} className="border-t-2 border-[#121212] align-top"><td className="px-3 py-4 font-medium">{click.campaign.name}</td><td className="px-3 py-4 font-mono text-xs">{shortId(click.clickId)}</td><td className="whitespace-nowrap px-3 py-4 text-xs">{formatDate(click.clickedAt)}</td><td className="max-w-48 px-3 py-4 text-xs leading-5">{tokenSummary(click.trackingTokens)}</td></tr>)}</ActivityTable><ActivityTable title="Recent conversions" description="Each row ties a conversion event back to the campaign that received it." headers={["Event", "Campaign", "Value", "Received"]}>{snapshot.recentConversions.map((conversion) => <tr key={conversion.id} className="border-t-2 border-[#121212] align-top"><td className="px-3 py-4"><p className="font-medium">{conversion.eventType}</p><p className="mt-1 font-mono text-[11px]">{shortId(conversion.eventId)}</p></td><td className="px-3 py-4 text-sm">{conversion.click.campaign.name}</td><td className="whitespace-nowrap px-3 py-4 text-sm">{conversion.valueMinor.toString()} <span className="text-xs">{conversion.currency} minor</span></td><td className="whitespace-nowrap px-3 py-4 text-xs">{formatDate(conversion.receivedAt)}</td></tr>)}</ActivityTable></div>;
+  return <div className="mt-10 grid gap-10"><ActivityTable title="Recent clicks" description="The tracker records these before redirecting the visitor." headers={["Campaign", "Click ID", "Captured", "Tokens"]}>{snapshot.recentClicks.map((click) => <tr key={click.clickId} className="border-t-2 border-[#121212] align-top"><td className="px-3 py-4 font-medium">{click.campaign.name}</td><td className="px-3 py-4 font-mono text-xs">{shortId(click.clickId)}</td><td className="whitespace-nowrap px-3 py-4 text-xs">{formatDate(click.clickedAt)}</td><td className="px-3 py-4 text-xs leading-5"><TokenList value={click.trackingTokens} /></td></tr>)}</ActivityTable><ActivityTable title="Recent conversions" description="Each row ties a conversion event back to the campaign that received it." headers={["Event", "Campaign", "Value", "Received"]}>{snapshot.recentConversions.map((conversion) => <tr key={conversion.id} className="border-t-2 border-[#121212] align-top"><td className="px-3 py-4"><p className="font-medium">{conversion.eventType}</p><p className="mt-1 font-mono text-[11px]">{shortId(conversion.eventId)}</p></td><td className="px-3 py-4 text-sm">{conversion.click.campaign.name}</td><td className="whitespace-nowrap px-3 py-4 text-sm">{conversion.valueMinor.toString()} <span className="text-xs">{conversion.currency} minor</span></td><td className="whitespace-nowrap px-3 py-4 text-xs">{formatDate(conversion.receivedAt)}</td></tr>)}</ActivityTable></div>;
 }
 
 function ActivityTable({ title, description, headers, children }: { title: string; description: string; headers: string[]; children: React.ReactNode }) {
