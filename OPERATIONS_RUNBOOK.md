@@ -139,3 +139,30 @@ not improvise a destructive in-place restore while traffic is active.
 After recovery, rotate credentials if there is any possibility that the
 database URL or platform secret was exposed, and review pending outbound jobs
 before resuming traffic.
+
+## Outbound delivery worker
+
+The web process accepts conversions and writes durable outbound jobs. The
+separate `trakio-outbox` PM2 process delivers those jobs to the configured
+traffic source and applies bounded retries.
+
+Check both processes:
+
+```bash
+pm2 status
+pm2 logs trakio-outbox --lines 100
+```
+
+On a fresh VPS, start the worker from the application directory and persist it
+for reboot recovery:
+
+```bash
+cd /root/app
+pm2 start npm --name trakio-outbox -- run worker:outbox
+pm2 save
+```
+
+After an accepted test conversion, confirm its Delivery Health row moves from
+`pending` to `delivered`. A row with `attempts: 0` and no diagnostic means the
+worker has not claimed it; restart the worker and inspect its logs before
+retrying the conversion.

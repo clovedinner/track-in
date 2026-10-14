@@ -7,6 +7,7 @@
     "dev": "prisma generate && next dev",
     "build": "prisma generate && next build",
     "start": "next start",
+    "worker:outbox": "tsx scripts/outbox-worker.ts",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "db:generate": "prisma generate",
@@ -43,6 +44,7 @@
     "prisma": "6.19.3",
     "tailwindcss": "^4",
     "testcontainers": "^12.2.0",
+    "tsx": "^4.23.15",
     "typescript": "^5",
     "vitest": "^5.0.3"
   }

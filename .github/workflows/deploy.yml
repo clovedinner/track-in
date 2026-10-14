@@ -65,10 +65,12 @@ jobs:
              printf '%s %s\\n' \"\$DIRECT_IPV4\" \"\$DIRECT_HOST\" >> /etc/hosts && \
              npm run db:migrate && \
              npm run build && \
-             pm2 restart trakio --update-env"
+             pm2 restart trakio --update-env && \
+             (pm2 describe trakio-outbox >/dev/null 2>&1 && pm2 restart trakio-outbox --update-env || pm2 start npm --name trakio-outbox -- run worker:outbox) && \
+             pm2 save"
 
       - name: Verify deployed process
         run: |
           set -eu
           ssh -p "$VPS_PORT" "$VPS_USER@$VPS_HOST" \
-            "cd '$VPS_APP_DIR' && pm2 describe trakio >/dev/null && curl --fail --silent --show-error http://127.0.0.1:3000/api/health"
+            "cd '$VPS_APP_DIR' && pm2 describe trakio >/dev/null && pm2 describe trakio-outbox >/dev/null && curl --fail --silent --show-error http://127.0.0.1:3000/api/health"
