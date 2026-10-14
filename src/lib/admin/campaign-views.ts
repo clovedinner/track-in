@@ -17,8 +17,12 @@ export type CampaignListRow = {
   slug: string;
   name: string;
   status: CampaignStatus;
+  trackingMode: string;
   destinationUrl: string;
+  trafficSourceId: string | null;
+  offerId: string | null;
   defaultCurrency: string;
+  allowedTrackingParameters: Prisma.JsonValue;
   trafficSourceName: string | null;
   createdAt: Date;
   clicks: number;
@@ -100,8 +104,12 @@ export async function getCampaignList(filters: CampaignListFilters = {}): Promis
       slug: true,
       name: true,
       status: true,
+      trackingMode: true,
       destinationUrl: true,
+      trafficSourceId: true,
+      offerId: true,
       defaultCurrency: true,
+      allowedTrackingParameters: true,
       createdAt: true,
       trafficSource: { select: { name: true } },
       clicks: { select: { conversions: { select: { valueMinor: true, eventType: true } } } },
@@ -115,8 +123,12 @@ export async function getCampaignList(filters: CampaignListFilters = {}): Promis
       slug: campaign.slug,
       name: campaign.name,
       status: campaign.status,
+      trackingMode: campaign.trackingMode,
       destinationUrl: campaign.destinationUrl,
+      trafficSourceId: campaign.trafficSourceId,
+      offerId: campaign.offerId,
       defaultCurrency: campaign.defaultCurrency,
+      allowedTrackingParameters: campaign.allowedTrackingParameters,
       trafficSourceName: campaign.trafficSource?.name ?? null,
       createdAt: campaign.createdAt,
       clicks: campaign.clicks.length,
