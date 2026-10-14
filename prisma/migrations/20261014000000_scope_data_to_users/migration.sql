@@ -22,39 +22,31 @@ ALTER TABLE "campaigns" ADD CONSTRAINT "campaigns_owner_id_fkey" FOREIGN KEY ("o
 ALTER TABLE "offers" ADD CONSTRAINT "offers_owner_id_fkey" FOREIGN KEY ("owner_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "traffic_sources" ADD CONSTRAINT "traffic_sources_owner_id_fkey" FOREIGN KEY ("owner_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
--- Existing single-account data can contain duplicate names. Preserve every
--- record while making names unique within the owning account.
+-- Existing single-account data can contain duplicate test names. Keep the
+-- newest record for each duplicate offer name; campaign references are
+-- nullable and use ON DELETE SET NULL.
+WITH ranked_offers AS (
+  SELECT "id",
+         ROW_NUMBER() OVER (
+           PARTITION BY "owner_id", "name"
+           ORDER BY "created_at" DESC, "id" DESC
+         ) AS duplicate_number
+  FROM "offers"
+)
+DELETE FROM "offers" AS offer
+USING ranked_offers AS ranked
+WHERE offer."id" = ranked."id"
+  AND ranked.duplicate_number > 1;
+
+-- Traffic sources may be referenced by immutable clicks, so retain every
+-- record and rename duplicate names before enforcing case-insensitive
+-- per-account uniqueness.
 DO $$
 DECLARE
   duplicate_record RECORD;
   candidate_name TEXT;
   suffix INTEGER;
 BEGIN
-  FOR duplicate_record IN
-    SELECT "id", "owner_id", "name",
-           ROW_NUMBER() OVER (
-             PARTITION BY "owner_id", "name"
-             ORDER BY "created_at", "id"
-           ) AS duplicate_number
-    FROM "offers"
-  LOOP
-    IF duplicate_record.duplicate_number > 1 THEN
-      suffix := duplicate_record.duplicate_number;
-      candidate_name := duplicate_record.name || ' (' || suffix || ')';
-      WHILE EXISTS (
-        SELECT 1 FROM "offers"
-        WHERE "owner_id" = duplicate_record.owner_id
-          AND "name" = candidate_name
-      ) LOOP
-        suffix := suffix + 1;
-        candidate_name := duplicate_record.name || ' (' || suffix || ')';
-      END LOOP;
-      UPDATE "offers"
-      SET "name" = candidate_name
-      WHERE "id" = duplicate_record.id;
-    END IF;
-  END LOOP;
-
   FOR duplicate_record IN
     SELECT "id", "owner_id", "name",
            ROW_NUMBER() OVER (
