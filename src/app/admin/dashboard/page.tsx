@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 
 import { prisma } from "@/lib/database/prisma";
 import { getOverviewMetrics, type DashboardFilters } from "@/lib/metrics/queries";
+import { getVerificationSnapshot } from "@/lib/admin/verification";
+import { logger } from "@/lib/observability/logger";
 import AdminNavigation from "@/app/admin/admin-navigation";
 
 export const metadata: Metadata = {
-  title: "Overview | Trakio",
-  description: "Private campaign performance overview.",
+  title: "Dashboard | Trakio",
+  description: "Private campaign and conversion dashboard.",
 };
 
 export const dynamic = "force-dynamic";
@@ -41,16 +43,34 @@ function formatInteger(value: number) {
   return value.toLocaleString("en-US");
 }
 
-function formatRate(value: number | null) {
-  return value === null ? "Unavailable" : `${(value * 100).toFixed(2)}%`;
-}
-
-function formatMinor(value: number | null) {
-  return value === null ? "Unavailable" : `${formatInteger(value)} minor units`;
-}
-
 function filterValue(value: string | string[] | undefined) {
   return first(value) ?? "";
+}
+
+async function loadVerificationSnapshot() {
+  try {
+    return await getVerificationSnapshot();
+  } catch (error) {
+    logger.error("admin.dashboard_activity_failed", {
+      error: error instanceof Error ? error.message : "unknown",
+      errorName: error instanceof Error ? error.name : "UnknownError",
+    });
+    return null;
+  }
+}
+
+function formatDate(value: Date) {
+  return `${new Intl.DateTimeFormat("en", { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" }).format(value)} UTC`;
+}
+
+function shortId(value: string) {
+  return `${value.slice(0, 8)}…${value.slice(-6)}`;
+}
+
+function tokenSummary(value: unknown) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return "—";
+  const entries = Object.entries(value);
+  return entries.length === 0 ? "—" : entries.map(([key, token]) => `${key}=${String(token)}`).join(" · ");
 }
 
 export default async function AdminDashboardPage({
@@ -61,11 +81,12 @@ export default async function AdminDashboardPage({
   const params = (await searchParams) ?? {};
   const filters = buildFilters(params);
 
-  const [metrics, campaigns, trafficSources, eventRows] = await Promise.all([
+  const [metrics, campaigns, trafficSources, eventRows, snapshot] = await Promise.all([
     getOverviewMetrics(filters),
     prisma.campaign.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true, slug: true } }),
     prisma.trafficSource.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true, type: true } }),
     prisma.conversion.findMany({ distinct: ["eventType"], orderBy: { eventType: "asc" }, select: { eventType: true } }),
+    loadVerificationSnapshot(),
   ]);
 
   const hasData = metrics.clicks > 0 || metrics.conversions > 0;
@@ -79,7 +100,7 @@ export default async function AdminDashboardPage({
           <div>
             <a className="text-xs font-semibold uppercase tracking-[0.2em] text-[#D02020] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#D02020]" href="/admin/dashboard">Trakio / private</a>
             <h1 className="mt-3 max-w-3xl text-4xl font-semibold tracking-[-0.04em] sm:text-5xl">Performance overview.</h1>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-[#121212]">The numbers that answer whether tracked traffic is converting and whether outbound delivery is healthy.</p>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-[#121212]">See whether tracked traffic is converting, then inspect the latest clicks and conversion records in the same place.</p>
           </div>
           <div className="text-left text-xs text-[#121212] sm:text-right">
             <p className="font-semibold uppercase tracking-[0.16em] text-[#121212]">UTC</p>
@@ -105,15 +126,10 @@ export default async function AdminDashboardPage({
           </form>
         </section>
 
-        <section className="mt-8 grid gap-px border-x-2 border-b-2 border-[#121212] bg-[#121212] sm:grid-cols-2 xl:grid-cols-4" aria-label="Overview metrics">
+        <section className="mt-8 grid gap-px border-x-2 border-b-2 border-[#121212] bg-[#121212] sm:grid-cols-3" aria-label="Dashboard metrics">
           <Metric label="Clicks" value={formatInteger(metrics.clicks)} />
           <Metric label="Conversions" value={formatInteger(metrics.conversions)} />
-          <Metric label="Conversion rate" value={formatRate(metrics.conversionRate)} />
-          <Metric label="Revenue" value={formatMinor(metrics.revenueMinor)} />
-          <Metric label="Profit" value={formatMinor(metrics.profitMinor)} note="Requires imported cost" />
-          <Metric label="ROI" value={metrics.roi === null ? "Unavailable" : `${(metrics.roi * 100).toFixed(2)}%`} note="Requires non-zero cost" />
-          <Metric label="Pending / processing" value={formatInteger(metrics.pendingDeliveries)} tone={metrics.pendingDeliveries > 0 ? "alert" : "normal"} />
-          <Metric label="Retrying / failed" value={`${formatInteger(metrics.retryingDeliveries)} / ${formatInteger(metrics.permanentlyFailedDeliveries)}`} tone={metrics.permanentlyFailedDeliveries > 0 ? "alert" : "normal"} />
+          <Metric label="Conversion rate" value={metrics.conversionRate === null ? "Unavailable" : `${(metrics.conversionRate * 100).toFixed(2)}%`} />
         </section>
 
         {!hasData ? (
@@ -122,20 +138,25 @@ export default async function AdminDashboardPage({
             <p className="mt-2 max-w-xl text-sm leading-6 text-[#121212]">{hasFilters ? "Try a wider date range or clear one of the filters." : "Send a test click through an active campaign, then complete a controlled conversion. The metrics will appear here from the persisted records."}</p>
           </section>
         ) : (
-          <section className="mt-10 grid gap-6 lg:grid-cols-2" aria-label="Delivery summary">
-            <Summary title="Outbound delivery" description="Durable postback work created from accepted conversions." items={[["Pending or processing", metrics.pendingDeliveries], ["Retrying", metrics.retryingDeliveries], ["Permanently failed", metrics.permanentlyFailedDeliveries]]} />
-            <section className="border-2 border-[#121212] bg-[#FFFFFF] p-6"><h2 className="text-xl font-semibold tracking-[-0.02em]">Metric notes</h2><p className="mt-3 text-sm leading-6 text-[#121212]">Revenue is displayed in persisted minor units because the current overview can contain multiple currencies. Cost, profit, and ROI remain unavailable until cost imports are added.</p></section>
-          </section>
+          <Activity snapshot={snapshot} />
         )}
       </div>
     </main>
   );
 }
 
-function Metric({ label, value, note, tone = "normal" }: { label: string; value: string; note?: string; tone?: "normal" | "alert" }) {
-  return <div className="bg-[#FFFFFF] px-5 py-5 sm:px-6"><p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#121212]">{label}</p><p className={`mt-3 text-2xl font-semibold tracking-[-0.04em] sm:text-3xl ${tone === "alert" ? "text-[#D02020]" : "text-[#121212]"}`}>{value}</p>{note ? <p className="mt-2 text-xs text-[#121212]">{note}</p> : null}</div>;
+function Metric({ label, value }: { label: string; value: string }) {
+  return <div className="bg-[#FFFFFF] px-5 py-5 sm:px-6"><p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#121212]">{label}</p><p className="mt-3 text-2xl font-semibold tracking-[-0.04em] sm:text-3xl">{value}</p></div>;
 }
 
-function Summary({ title, description, items }: { title: string; description: string; items: [string, number][] }) {
-  return <section className="border-2 border-[#121212] bg-[#FFFFFF] p-6"><h2 className="text-xl font-semibold tracking-[-0.02em]">{title}</h2><p className="mt-1 text-sm text-[#121212]">{description}</p><dl className="mt-5 grid gap-3 sm:grid-cols-3">{items.map(([label, value]) => <div key={label} className="border-t-2 border-[#121212] pt-3"><dt className="text-xs text-[#121212]">{label}</dt><dd className="mt-1 text-2xl font-semibold">{value.toLocaleString("en-US")}</dd></div>)}</dl></section>;
+function Activity({ snapshot }: { snapshot: Awaited<ReturnType<typeof getVerificationSnapshot>> | null }) {
+  if (!snapshot || (snapshot.recentClicks.length === 0 && snapshot.recentConversions.length === 0)) {
+    return <section className="mt-10 border-2 border-dashed border-[#121212] bg-[#FFFFFF] px-6 py-10"><h2 className="text-lg font-semibold">No recent activity to inspect.</h2><p className="mt-2 max-w-xl text-sm leading-6">Send a test click through an active campaign, then complete a controlled conversion. The latest records will appear here.</p></section>;
+  }
+
+  return <div className="mt-10 grid gap-10 xl:grid-cols-[1fr_1.15fr]"><ActivityTable title="Recent clicks" description="The tracker records these before redirecting the visitor." headers={["Campaign", "Click ID", "Captured", "Tokens"]}>{snapshot.recentClicks.map((click) => <tr key={click.clickId} className="border-t-2 border-[#121212] align-top"><td className="px-3 py-4 font-medium">{click.campaign.name}</td><td className="px-3 py-4 font-mono text-xs">{shortId(click.clickId)}</td><td className="whitespace-nowrap px-3 py-4 text-xs">{formatDate(click.clickedAt)}</td><td className="max-w-48 px-3 py-4 text-xs leading-5">{tokenSummary(click.trackingTokens)}</td></tr>)}</ActivityTable><ActivityTable title="Recent conversions" description="Each row ties a conversion event back to the campaign that received it." headers={["Event", "Campaign", "Value", "Received"]}>{snapshot.recentConversions.map((conversion) => <tr key={conversion.id} className="border-t-2 border-[#121212] align-top"><td className="px-3 py-4"><p className="font-medium">{conversion.eventType}</p><p className="mt-1 font-mono text-[11px]">{shortId(conversion.eventId)}</p></td><td className="px-3 py-4 text-sm">{conversion.click.campaign.name}</td><td className="whitespace-nowrap px-3 py-4 text-sm">{conversion.valueMinor.toString()} <span className="text-xs">{conversion.currency} minor</span></td><td className="whitespace-nowrap px-3 py-4 text-xs">{formatDate(conversion.receivedAt)}</td></tr>)}</ActivityTable></div>;
+}
+
+function ActivityTable({ title, description, headers, children }: { title: string; description: string; headers: string[]; children: React.ReactNode }) {
+  return <section className="min-w-0"><div className="mb-4"><h2 className="text-xl font-semibold tracking-[-0.02em]">{title}</h2><p className="mt-1 text-sm">{description}</p></div><div className="overflow-x-auto border-2 border-[#121212] bg-[#FFFFFF]"><table className="w-full min-w-[620px] border-collapse text-left text-sm"><thead className="bg-[#E0E0E0] text-xs uppercase tracking-[0.1em]"><tr>{headers.map((header) => <th key={header} className="px-3 py-3 font-semibold">{header}</th>)}</tr></thead><tbody>{children}</tbody></table></div></section>;
 }

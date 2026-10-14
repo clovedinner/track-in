@@ -1,6 +1,5 @@
 export const adminNavigation = [
-  { href: "/admin/verification", label: "Verification" },
-  { href: "/admin/dashboard", label: "Overview" },
+  { href: "/admin/dashboard", label: "Dashboard" },
   { href: "/admin/campaigns", label: "Campaigns" },
   { href: "/admin/offers", label: "Offers" },
   { href: "/admin/traffic-sources", label: "Traffic sources" },

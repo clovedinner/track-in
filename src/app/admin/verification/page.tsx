@@ -1,12 +1,5 @@
-import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 
-import AdminVerificationPage from "@/app/admin/page";
-
-export const metadata: Metadata = {
-  title: "Verification | Trakio",
-  description: "Private click and conversion verification.",
-};
-
-export const dynamic = "force-dynamic";
-
-export default AdminVerificationPage;
+export default function VerificationPage() {
+  redirect("/admin/dashboard");
+}
