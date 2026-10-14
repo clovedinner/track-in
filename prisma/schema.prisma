@@ -110,7 +110,7 @@ model BillingPayment {
   provider              String
   plan                  String
   amountMinor           BigInt                @map("amount_minor")
-  currency              String                @db.Char(3)
+  currency              String                @db.VarChar(10)
   network               String?
   status                BillingPaymentStatus @default(pending)
   providerTransactionId String?               @map("provider_transaction_id")
