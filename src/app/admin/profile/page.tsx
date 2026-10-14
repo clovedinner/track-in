@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import AdminNavigation from "@/app/admin/admin-navigation";
 import { requireCurrentUser } from "@/lib/auth/current-user";
+import { prisma } from "@/lib/database/prisma";
 
 export const metadata: Metadata = {
   title: "Profile | Trakio",
@@ -11,6 +12,10 @@ export const metadata: Metadata = {
 
 export default async function ProfilePage() {
   const user = await requireCurrentUser({ allowInactive: true });
+  const subscription = await prisma.subscription.findFirst({ where: { userId: user.id }, orderBy: { createdAt: "desc" } });
+  const statusLabel = user.accountStatus === "active" ? "Active" : user.accountStatus.replaceAll("_", " ");
+  const periodEnd = subscription?.currentPeriodEnd ? subscription.currentPeriodEnd.toISOString().slice(0, 10) : "Never";
+  const nextInvoice = subscription?.nextInvoiceAt ? subscription.nextInvoiceAt.toISOString().slice(0, 10) : "-";
   return (
     <main className="min-h-screen bg-[#F0F0F0] text-[#121212]">
       <AdminNavigation pathname="/admin/profile" />
@@ -48,13 +53,17 @@ export default async function ProfilePage() {
             <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.16em]">Current subscription</p>
-                <h2 id="subscription-heading" className="mt-2 text-3xl font-black tracking-[-0.04em]">Free</h2>
-                <p className="mt-3 max-w-lg text-sm leading-6">No paid plan is active and no payment method is stored.</p>
+                <h2 id="subscription-heading" className="mt-2 text-3xl font-black tracking-[-0.04em]">{subscription?.plan ?? "Payment required"}</h2>
+                <p className="mt-3 max-w-lg text-sm leading-6">{subscription ? `${statusLabel} subscription · expires ${periodEnd}.` : "Choose a plan to unlock the Trakio dashboard."}</p>
               </div>
-              <span className="border-2 border-[#121212] bg-[#FFFFFF] px-3 py-2 text-xs font-bold uppercase tracking-[0.12em]">Default</span>
+              <span className="border-2 border-[#121212] bg-[#FFFFFF] px-3 py-2 text-xs font-bold uppercase tracking-[0.12em]">{statusLabel}</span>
             </div>
             <div className="mt-7 border-t-2 border-[#121212] pt-5">
-              <p className="text-sm leading-6">Select a plan to open the USDT TRC20 payment mockup. Payment confirmation is manual in this first version.</p>
+              <dl className="grid gap-3 text-sm sm:grid-cols-2">
+                <div><dt className="text-xs font-bold uppercase tracking-[0.12em]">Plan status</dt><dd className="mt-1 font-semibold capitalize">{statusLabel}</dd></div>
+                <div><dt className="text-xs font-bold uppercase tracking-[0.12em]">Next invoice</dt><dd className="mt-1 font-semibold">{nextInvoice}</dd></div>
+              </dl>
+              <p className="mt-5 text-sm leading-6">Payments are verified through the configured billing provider before access is activated.</p>
               <Link href="/admin/subscribe" className="mt-5 inline-flex min-h-11 items-center border-2 border-[#121212] bg-[#1040C0] px-5 py-3 text-sm font-bold text-[#FFFFFF] shadow-[4px_4px_0_#121212] transition hover:bg-[#D02020] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#121212]">
                 Subscribe
               </Link>
