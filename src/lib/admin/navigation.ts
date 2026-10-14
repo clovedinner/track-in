@@ -3,6 +3,7 @@ export const adminNavigation = [
   { href: "/admin/campaigns", label: "Campaigns" },
   { href: "/admin/offers", label: "Offers" },
   { href: "/admin/traffic-sources", label: "Traffic sources" },
+  { href: "/admin/conversions", label: "Conversions" },
   { href: "/admin/delivery-health", label: "Delivery health" },
 ] as const;
 

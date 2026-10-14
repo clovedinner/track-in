@@ -16,6 +16,7 @@ describe("admin navigation", () => {
       "/admin/campaigns",
       "/admin/offers",
       "/admin/traffic-sources",
+      "/admin/conversions",
       "/admin/delivery-health",
     ]);
   });
