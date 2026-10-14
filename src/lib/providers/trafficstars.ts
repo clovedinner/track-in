@@ -7,6 +7,7 @@ export type TrafficStarsConfig = {
   key?: string;
   allowDuplicates?: boolean;
   goalId?: string;
+  externalId?: { parameter: string; enabled?: boolean };
 };
 
 export type TrafficStarsConversion = {

@@ -37,8 +37,15 @@ function conversionFor(job: OutboxJob) {
   return job.conversion;
 }
 
-function originalTrafficStarsToken(job: OutboxJob): string {
+function originalTrafficStarsToken(job: OutboxJob, config: TrafficStarsConfig): string {
   const tokens = tokensFor(job);
+  const configuredParameter = config.externalId?.enabled !== false ? config.externalId?.parameter : undefined;
+  if (configuredParameter) {
+    const configuredValue = tokens[configuredParameter];
+    if (typeof configuredValue === "string" && configuredValue.trim().length > 0 && configuredValue.length <= 256) {
+      return configuredValue.trim();
+    }
+  }
   for (const key of ["clickid", "click_id", "CLICKID", "CLICK_ID"]) {
     const value = tokens[key];
     if (typeof value === "string" && value.trim().length > 0 && value.length <= 256) return value.trim();
@@ -60,7 +67,7 @@ export function createProviderOutboxDelivery(fetchImpl: FetchLike = fetch): Outb
 
       if (providerId === "trafficstars") {
         const request = buildTrafficStarsRequest(config as TrafficStarsConfig, {
-          clickId: originalTrafficStarsToken(job),
+          clickId: originalTrafficStarsToken(job, config as TrafficStarsConfig),
           eventId: conversion.eventId,
           eventType: conversion.eventType,
           valueMinor: conversion.valueMinor,

@@ -35,6 +35,22 @@ describe("provider outbox delivery", () => {
     expect(String(successfulFetch.mock.calls[0]?.[0])).toContain(expected);
   });
 
+  it("uses the configured TrafficStars external-ID parameter", async () => {
+    successfulFetch.mockClear();
+    const deliver = createProviderOutboxDelivery(successfulFetch);
+    const result = await deliver(baseJob({
+      providerId: "trafficstars",
+      providerConfiguration: {
+        postbackUrl: "https://provider.example.test/postback",
+        externalId: { parameter: "externalid", token: "{externalid}" },
+      },
+      clickTokens: { externalid: "real-source-token" },
+    }));
+
+    expect(result.outcome).toBe("delivered");
+    expect(String(successfulFetch.mock.calls[0]?.[0])).toContain("clickid=real-source-token");
+  });
+
   it("classifies missing provider context as a permanent failure", async () => {
     const result = await createProviderOutboxDelivery(successfulFetch)(baseJob({ providerId: undefined }));
     expect(result).toMatchObject({ outcome: "failed", kind: "permanent" });
