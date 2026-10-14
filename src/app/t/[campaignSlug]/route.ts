@@ -7,6 +7,7 @@ import {
   buildTrackingDestination,
   collectTrackingTokens,
   createClickId,
+  enabledTrafficSourceParameters,
 } from "@/lib/tracking/click";
 
 type TrackingRouteContext = {
@@ -27,6 +28,7 @@ export async function GET(request: Request, context: TrackingRouteContext): Prom
       destinationUrl: true,
       trafficSourceId: true,
       allowedTrackingParameters: true,
+      trafficSource: { select: { configuration: true } },
     },
   });
 
@@ -39,10 +41,9 @@ export async function GET(request: Request, context: TrackingRouteContext): Prom
   }
 
   const clickId = createClickId();
-  const trackingTokens = collectTrackingTokens(
-    new URL(request.url).searchParams,
-    campaign.allowedTrackingParameters,
-  );
+  const configuredParameters = enabledTrafficSourceParameters(campaign.trafficSource?.configuration);
+  const allowedParameters = configuredParameters.length > 0 ? configuredParameters : campaign.allowedTrackingParameters;
+  const trackingTokens = collectTrackingTokens(new URL(request.url).searchParams, allowedParameters);
   const destination = buildTrackingDestination(campaign.destinationUrl, clickId, trackingTokens);
   const requestUrl = new URL(request.url);
   const forwardedFor = request.headers.get("x-forwarded-for");

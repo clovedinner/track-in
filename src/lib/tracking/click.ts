@@ -2,6 +2,28 @@ import { randomBytes } from "node:crypto";
 
 const reservedParameter = "cid";
 
+type TrafficSourceConfiguration = {
+  externalId?: { parameter?: unknown; enabled?: unknown };
+  parameters?: Array<{ parameter?: unknown; enabled?: unknown }>;
+};
+
+/** Return the traffic-source parameters enabled for click attribution. */
+export function enabledTrafficSourceParameters(configuration: unknown): string[] {
+  if (!configuration || typeof configuration !== "object" || Array.isArray(configuration)) return [];
+  const record = configuration as TrafficSourceConfiguration;
+  const parameters: string[] = [];
+  if (record.externalId?.enabled !== false && typeof record.externalId?.parameter === "string" && record.externalId.parameter.trim()) {
+    parameters.push(record.externalId.parameter.trim());
+  }
+  if (Array.isArray(record.parameters)) {
+    for (const entry of record.parameters) {
+      if (entry?.enabled === false || typeof entry?.parameter !== "string" || !entry.parameter.trim()) continue;
+      parameters.push(entry.parameter.trim());
+    }
+  }
+  return [...new Set(parameters)];
+}
+
 export function createClickId(): string {
   return randomBytes(18).toString("base64url");
 }

@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/database/prisma";
 import { getCorrelationId } from "@/lib/observability/correlation-id";
 import { logger } from "@/lib/observability/logger";
-import { collectTrackingTokens, createClickId } from "@/lib/tracking/click";
+import { collectTrackingTokens, createClickId, enabledTrafficSourceParameters } from "@/lib/tracking/click";
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -58,13 +58,16 @@ export async function GET(request: Request): Promise<Response> {
         destinationUrl: true,
         trafficSourceId: true,
         allowedTrackingParameters: true,
+        trafficSource: { select: { configuration: true } },
       },
     });
 
     if (!campaign) return respond({ error: "campaign_not_found" }, 404);
 
     const clickId = createClickId();
-    const trackingTokens = collectTrackingTokens(url.searchParams, campaign.allowedTrackingParameters);
+    const configuredParameters = enabledTrafficSourceParameters(campaign.trafficSource?.configuration);
+    const allowedParameters = configuredParameters.length > 0 ? configuredParameters : campaign.allowedTrackingParameters;
+    const trackingTokens = collectTrackingTokens(url.searchParams, allowedParameters);
     const forwardedFor = request.headers.get("x-forwarded-for");
     const ipAddress = forwardedFor?.split(",")[0]?.trim() || null;
 
