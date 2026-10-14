@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   getPostbackDestination,
   hasValidBearerSecret,
+  isSetupTestClick,
   parseConversionPayload,
   parseVoluumPostback,
 } from "./intake";
@@ -48,6 +49,12 @@ describe("conversion intake", () => {
     );
     expect(getPostbackDestination({ postbackUrl: "javascript:alert(1)" })).toBeUndefined();
     expect(getPostbackDestination({})).toBeUndefined();
+  });
+
+  it("recognizes setup clicks without treating normal token data as setup", () => {
+    expect(isSetupTestClick({ _setupTest: true })).toBe(true);
+    expect(isSetupTestClick({ ACLID: "source-click" })).toBe(false);
+    expect(isSetupTestClick(null)).toBe(false);
   });
 
   it("parses Voluum-compatible registration and FTD events", () => {

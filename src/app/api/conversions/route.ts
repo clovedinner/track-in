@@ -9,6 +9,7 @@ import {
   getPostbackDestination,
   hasValidBearerSecret,
   hashConversionPayload,
+  isSetupTestClick,
   MAX_CONVERSION_BODY_BYTES,
   MONEY_SITE_SOURCE,
   parseConversionPayload,
@@ -63,7 +64,7 @@ export async function POST(request: Request): Promise<Response> {
 
     const click = await prisma.click.findUnique({
       where: { clickId: input.cid },
-      select: { id: true, trafficSourceId: true, trafficSource: { select: { id: true, enabled: true, configuration: true } } },
+      select: { id: true, trafficSourceId: true, trackingTokens: true, trafficSource: { select: { id: true, enabled: true, configuration: true } } },
     });
     if (!click) {
       return apiErrorResponse(new ApiError("not_found", 404, "Unknown click ID."), correlationId);
@@ -90,7 +91,7 @@ export async function POST(request: Request): Promise<Response> {
       const destination = click.trafficSource?.enabled
         ? getPostbackDestination(click.trafficSource.configuration)
         : undefined;
-      if (click.trafficSourceId !== null && click.trafficSource?.enabled && destination !== undefined) {
+      if (!isSetupTestClick(click.trackingTokens) && click.trafficSourceId !== null && click.trafficSource?.enabled && destination !== undefined) {
         await transaction.outboundPostback.create({
           data: {
             conversionId: created.id,

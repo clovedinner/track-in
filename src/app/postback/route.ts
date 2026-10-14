@@ -6,6 +6,7 @@ import { logger } from "@/lib/observability/logger";
 import {
   getPostbackDestination,
   hashConversionPayload,
+  isSetupTestClick,
   parseVoluumPostback,
   VOLUUM_COMPAT_SOURCE,
 } from "@/lib/conversions/intake";
@@ -46,6 +47,7 @@ export async function GET(request: Request): Promise<Response> {
       select: {
         id: true,
         trafficSourceId: true,
+        trackingTokens: true,
         campaign: { select: { defaultCurrency: true } },
         trafficSource: { select: { enabled: true, configuration: true } },
       },
@@ -73,7 +75,7 @@ export async function GET(request: Request): Promise<Response> {
       const destination = click.trafficSource?.enabled
         ? getPostbackDestination(click.trafficSource.configuration)
         : undefined;
-      if (click.trafficSourceId !== null && click.trafficSource?.enabled && destination !== undefined) {
+      if (!isSetupTestClick(click.trackingTokens) && click.trafficSourceId !== null && click.trafficSource?.enabled && destination !== undefined) {
         await transaction.outboundPostback.create({
           data: {
             conversionId: created.id,

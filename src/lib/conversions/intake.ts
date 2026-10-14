@@ -149,3 +149,9 @@ export function getPostbackDestination(configuration: unknown): string | undefin
   const destination = record.postbackUrl ?? record.endpoint;
   return typeof destination === "string" && /^https?:\/\//.test(destination) ? destination : undefined;
 }
+
+/** Setup-test clicks verify attribution only and must never reach a real provider. */
+export function isSetupTestClick(tokens: unknown): boolean {
+  return tokens !== null && typeof tokens === "object" && !Array.isArray(tokens)
+    && (tokens as Record<string, unknown>)._setupTest === true;
+}
