@@ -23,7 +23,6 @@ ALTER TABLE "offers" ADD CONSTRAINT "offers_owner_id_fkey" FOREIGN KEY ("owner_i
 ALTER TABLE "traffic_sources" ADD CONSTRAINT "traffic_sources_owner_id_fkey" FOREIGN KEY ("owner_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 DROP INDEX IF EXISTS "traffic_sources_name_lower_unique";
-CREATE UNIQUE INDEX "campaigns_slug_lower_unique" ON "campaigns"(lower("slug"));
 CREATE UNIQUE INDEX "offers_owner_id_name_key" ON "offers"("owner_id", "name");
 CREATE UNIQUE INDEX "traffic_sources_owner_id_name_key" ON "traffic_sources"("owner_id", lower("name"));
 CREATE INDEX "campaigns_owner_id_idx" ON "campaigns"("owner_id");
