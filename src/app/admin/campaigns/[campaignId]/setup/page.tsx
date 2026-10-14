@@ -13,8 +13,9 @@ import { requireCurrentUser } from "@/lib/auth/current-user";
 export const metadata: Metadata = { title: "Campaign setup | Trakio", description: "Private campaign tracking and GTM setup." };
 export const dynamic = "force-dynamic";
 
-export default async function CampaignSetupPage({ params }: { params: Promise<{ campaignId: string }> }) {
-  const { campaignId } = await params;
+export default async function CampaignSetupPage({ params, searchParams }: { params: Promise<{ campaignId: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  const [{ campaignId }, input] = await Promise.all([params, searchParams]);
+  const embedded = input.embedded === "1";
   const user = await requireCurrentUser();
   const campaign = await prisma.campaign.findUnique({ where: { id: campaignId, ownerId: user.id }, select: { id: true, slug: true, name: true, status: true, trackingMode: true, destinationUrl: true, offerId: true, defaultCurrency: true, allowedTrackingParameters: true, trafficSource: { select: { type: true, enabled: true, configuration: true } } } });
   if (!campaign) return <main className="min-h-screen bg-[#F0F0F0] px-5 py-10 text-[#121212]"><Link href="/admin/campaigns" className="text-sm text-[#D02020] hover:underline">Back to campaigns</Link><h1 className="mt-5 text-2xl font-semibold">Campaign not found.</h1></main>;
@@ -25,10 +26,10 @@ export default async function CampaignSetupPage({ params }: { params: Promise<{ 
   const setupEnabled = process.env.TRACK_IN_ALLOW_TEST_SETUP === "1";
 
   return (
-    <main className="min-h-screen bg-[#F0F0F0] text-[#121212]">
-      <AdminNavigation pathname="/admin/campaigns" />
+    <main className={`${embedded ? "min-h-full" : "min-h-screen"} bg-[#F0F0F0] text-[#121212]`}>
+      {!embedded ? <AdminNavigation pathname="/admin/campaigns" /> : null}
       <div className="mx-auto max-w-6xl px-5 py-8 sm:px-8 lg:px-12 lg:py-12">
-        <Link href={`/admin/campaigns/${campaign.id}`} className="text-xs font-bold uppercase tracking-[0.18em] text-[#D02020] hover:underline">← Campaign detail</Link>
+        {!embedded ? <Link href={`/admin/campaigns/${campaign.id}`} className="text-xs font-bold uppercase tracking-[0.18em] text-[#D02020] hover:underline">← Campaign detail</Link> : null}
         <header className="mt-4 border-b-2 border-[#121212] pb-8">
           <p className="font-mono text-sm text-[#121212]">{report.campaign.slug}</p>
           <h1 className="mt-2 text-4xl font-black tracking-[-0.05em]">Campaign setup</h1>
@@ -55,7 +56,7 @@ export default async function CampaignSetupPage({ params }: { params: Promise<{ 
           <h2 id="tracking-url-heading" className="text-xl font-bold">Tracking URL</h2>
           <p className="mt-1 text-xs font-semibold uppercase tracking-[0.12em] text-[#D02020]">Mode: {report.trackingMode}</p>
           <p className="mt-1 text-sm text-[#121212]">Use the URL for the configured traffic source. Provider macros are preserved for expansion by the ad platform.</p>
-          {Object.entries(report.trackingUrls).map(([provider, url]) => <div key={provider} className="mt-4 border-2 border-[#121212] bg-[#FFFFFF] p-4"><p className="text-xs font-bold uppercase tracking-[0.1em] text-[#121212]">{provider}</p><code className="mt-2 block break-all text-xs">{url}</code></div>)}
+          {Object.entries(report.trackingUrls).map(([provider, url]) => <div key={provider} className="mt-4"><div className="border-2 border-[#121212] bg-[#FFFFFF] p-4"><p className="text-xs font-bold uppercase tracking-[0.1em] text-[#121212]">{provider}</p><code className="mt-2 block break-all text-xs">{url}</code></div><CopyableSnippet value={url} title={`${provider} tracking URL`} buttonLabel="Copy URL" /></div>)}
           {Object.keys(report.trackingUrls).length === 0 ? <p className="mt-4 text-sm text-[#D02020]">Add a supported traffic source before generating a provider URL.</p> : null}
         </section>
 
@@ -63,7 +64,7 @@ export default async function CampaignSetupPage({ params }: { params: Promise<{ 
           <h2 id="postback-heading" className="text-xl font-bold">GTM conversion tags</h2>
           <p className="mt-1 text-sm text-[#121212]">These image tags target the Voluum-compatible /postback endpoint and contain no credentials.</p>
           {report.trackingMode === "direct" ? <p className="mt-2 text-xs text-[#3e4855]">Keep the usual Page View flow: run the tracking script when the page URL contains <code>cpid=</code>. For conversion tags on pages such as <code>register-done</code>, use a GTM First-Party Cookie variable named <code>trackin_cid</code> for the postback <code>cid</code> value.</p> : null}
-          {report.gtm.snippets.map((snippet) => <CopyableSnippet key={snippet.eventType} value={snippet.html} />)}
+          {report.gtm.snippets.map((snippet) => <CopyableSnippet key={snippet.eventType} value={snippet.imageUrl} title={`${snippet.label} image URL`} buttonLabel="Copy URL" />)}
         </section>
 
         <section className="mt-10"><SetupTestButton campaignId={campaign.id} enabled={setupEnabled} /></section>

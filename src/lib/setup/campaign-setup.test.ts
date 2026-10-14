@@ -20,7 +20,7 @@ describe("campaign setup report", () => {
   it("generates the provider URL and GTM snippets without network work", () => {
     const report = buildCampaignSetupReport(campaign, "https://tracker.example.test");
     expect(report.trackingUrls.propeller).toContain("/t/client-offer");
-    expect(report.trackingUrls.propeller).toContain("%24%7BSUBID%7D");
+    expect(report.trackingUrls.propeller).toContain("subid=${SUBID}");
     expect(report.gtm.snippets.map((snippet) => snippet.eventType)).toEqual(["reg", "ftd"]);
     expect(report.checks.externalCalls).toBe(false);
     expect(report.checks.providerConfigured).toBe(true);
@@ -58,7 +58,7 @@ describe("campaign setup report", () => {
 
     expect(report.trackingUrls.propeller).toContain("cpid=35a1009f-15e3-40ff-a359-7ed6326d7e19");
     expect(report.trackingUrls.propeller).toContain("oid=f7fc0d84-3b1c-4568-a6a4-18d412309b68");
-    expect(report.trackingUrls.propeller).toContain("ACLID=%7BACLID%7D");
-    expect(report.trackingUrls.propeller).toContain("CampaignID=%7BCampaignID%7D");
+    expect(report.trackingUrls.propeller).toContain("ACLID={ACLID}");
+    expect(report.trackingUrls.propeller).toContain("CampaignID={CampaignID}");
   });
 });

@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { adminNavigation, isAdminNavigationActive } from "@/lib/admin/navigation";
 import SignOutButton from "@/app/admin/sign-out-button";
+import TimezoneSelector from "@/app/admin/timezone-selector";
 
 export default function AdminNavigation({ pathname }: { pathname: string }) {
   return (
@@ -26,6 +27,7 @@ export default function AdminNavigation({ pathname }: { pathname: string }) {
             </Link>
           );
         })}
+        <TimezoneSelector />
         <Link
           href="/admin/profile"
           aria-current={pathname === "/admin/profile" ? "page" : undefined}

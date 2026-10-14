@@ -172,7 +172,7 @@ model Campaign {
   ownerId                   String         @map("owner_id") @db.Uuid
   slug                      String
   name                      String
-  status                    CampaignStatus @default(paused)
+  status                    CampaignStatus @default(active)
   trackingMode              CampaignTrackingMode @default(redirect) @map("tracking_mode")
   destinationUrl            String         @map("destination_url")
   trafficSourceId           String?        @map("traffic_source_id") @db.Uuid

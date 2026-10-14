@@ -29,7 +29,7 @@ export default function TrafficSourcesTable({ rows }: Props) {
   const filteredRows = useMemo(() => {
     const term = search.trim().toLowerCase();
     return rows.filter((row) => {
-      const matchesSearch = !term || `${row.name} ${row.type}`.toLowerCase().includes(term);
+      const matchesSearch = !term || row.name.toLowerCase().includes(term);
       const matchesStatus = status === "all" || (status === "active" ? row.enabled : !row.enabled);
       return matchesSearch && matchesStatus;
     });
@@ -40,14 +40,14 @@ export default function TrafficSourcesTable({ rows }: Props) {
     <section className="mt-8 border-2 border-[#121212] bg-white" aria-label="Traffic source workspace">
       <div className="border-b-2 border-[#121212] bg-[#E0E0E0] px-4 py-4 sm:px-5">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div><p className="text-xs font-semibold uppercase tracking-[0.12em]">Traffic source performance</p><p className="mt-1 text-sm">Select one source to edit or duplicate it. Search by name or platform type.</p></div>
+          <div><p className="text-xs font-semibold uppercase tracking-[0.12em]">Traffic source performance</p><p className="mt-1 text-sm">Select one source to edit or duplicate it. Search by name.</p></div>
           <div className="flex gap-2" aria-label="Traffic source actions">
         <button type="button" disabled={!selected} onClick={() => { if (selected) setAction("edit"); }} className="border-2 border-[#121212] bg-white px-4 py-2.5 text-sm font-semibold text-[#121212] hover:border-[#1040C0] hover:text-[#1040C0] disabled:cursor-not-allowed disabled:opacity-40">Edit</button>
         <button type="button" disabled={!selected} onClick={() => { if (selected) setAction("duplicate"); }} className="border-2 border-[#121212] bg-white px-4 py-2.5 text-sm font-semibold text-[#121212] hover:border-[#1040C0] hover:text-[#1040C0] disabled:cursor-not-allowed disabled:opacity-40">Duplicate</button>
           </div>
         </div>
         <div className="mt-4 grid gap-2 sm:grid-cols-[minmax(220px,1fr)_150px_auto]">
-          <label className="sr-only" htmlFor="traffic-source-search">Search traffic sources</label><input id="traffic-source-search" type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search by name or type" className="border-2 border-[#121212] bg-white px-3 py-2 text-sm" />
+          <label className="sr-only" htmlFor="traffic-source-search">Search traffic sources</label><input id="traffic-source-search" type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search by name" className="border-2 border-[#121212] bg-white px-3 py-2 text-sm" />
           <label className="sr-only" htmlFor="traffic-source-status">Filter by status</label><select id="traffic-source-status" value={status} onChange={(event) => setStatus(event.target.value as typeof status)} className="border-2 border-[#121212] bg-white px-3 py-2 text-sm"><option value="all">All statuses</option><option value="active">Active only</option><option value="paused">Paused only</option></select>
           <p className="flex items-center px-1 text-xs">Showing {filteredRows.length} of {rows.length}</p>
         </div>
@@ -58,7 +58,7 @@ export default function TrafficSourcesTable({ rows }: Props) {
         <thead className="bg-[#6C7A96] text-xs uppercase tracking-[0.1em] text-white"><tr><th className="w-12 px-4 py-3"><span className="sr-only">Select</span></th>{["Traffic source", "Status", "Visits", "Conversions", "Errors", "Registration", "FTD", "Configuration"].map((heading) => <th key={heading} className="border-l border-white/40 px-4 py-3 font-semibold">{heading}</th>)}</tr></thead>
         <tbody>{filteredRows.length === 0 ? <tr><td colSpan={9} className="px-4 py-12 text-center text-sm text-[#121212]">{rows.length === 0 ? "No traffic sources configured yet." : "No traffic sources match these filters."}</td></tr> : filteredRows.map((row) => <tr key={row.id} className={`border-t border-[#C9CDD5] ${selectedId === row.id ? "bg-[#C9D8F8]" : "odd:bg-white even:bg-[#F4F5F7] hover:bg-[#FFF4C2]"}`}>
           <td className="px-4 py-4"><input type="radio" name="selected-traffic-source" checked={selectedId === row.id} onChange={() => setSelectedId(row.id)} aria-label={`Select ${row.name}`} className="h-4 w-4 accent-[#1040C0]" /></td>
-          <td className="px-4 py-3"><p className="font-semibold">{row.name}</p><p className="mt-1 text-xs text-[#545454]">{row.type}</p></td>
+          <td className="px-4 py-3"><p className="font-semibold">{row.name}</p></td>
           <td className="border-l border-[#C9CDD5] px-4 py-3"><span className={`inline-flex px-2 py-1 text-xs font-semibold ${row.enabled ? "bg-[#F0C020] text-[#121212]" : "bg-[#E0E0E0] text-[#121212]"}`}>{row.enabled ? "Active" : "Paused"}</span></td>
           <td className="border-l border-[#C9CDD5] px-4 py-3">{row.visits.toLocaleString()}</td><td className="border-l border-[#C9CDD5] px-4 py-3">{row.conversions.toLocaleString()}</td><td className="border-l border-[#C9CDD5] px-4 py-3 text-[#545454]">—</td><td className="border-l border-[#C9CDD5] px-4 py-3">{row.registration.toLocaleString()} {row.registrationCustom ? <span className="ml-1 text-xs text-[#D02020]">custom</span> : null}</td><td className="border-l border-[#C9CDD5] px-4 py-3">{row.ftd.toLocaleString()} {row.ftdCustom ? <span className="ml-1 text-xs text-[#D02020]">custom</span> : null}</td><td className="border-l border-[#C9CDD5] px-4 py-3 text-xs text-[#545454]">{row.enabled ? "Ready" : "Paused"}</td>
         </tr>)}</tbody>

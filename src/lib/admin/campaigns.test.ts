@@ -15,7 +15,7 @@ describe("parseCreateCampaignInput", () => {
     expect(parseCreateCampaignInput(validCampaign)).toEqual({
       ...validCampaign,
       defaultCurrency: "IDR",
-      status: "paused",
+      status: "active",
       trackingMode: "redirect",
       trafficSourceId: undefined,
       offerId: undefined,

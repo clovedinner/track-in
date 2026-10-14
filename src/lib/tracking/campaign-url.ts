@@ -83,6 +83,20 @@ function validateMacro(value: string, name: string): void {
   }
 }
 
+function encodeQueryPart(value: string): string {
+  // Provider macros must remain visible to the ad platform. Encoding the
+  // braces turns {click_id} into a literal value for several platforms.
+  if (/^(?:\$)?\{[^{}]{1,512}\}$/.test(value)) return value;
+  return encodeURIComponent(value);
+}
+
+function buildUrlWithQuery(url: URL, parameters: ReadonlyArray<readonly [string, string]>): string {
+  const query = parameters
+    .map(([name, value]) => `${encodeURIComponent(name)}=${encodeQueryPart(value)}`)
+    .join("&");
+  return `${url.origin}${url.pathname}${query ? `?${query}` : ""}${url.hash}`;
+}
+
 /**
  * Build the URL an operator pastes into an ad platform campaign.
  *
@@ -120,9 +134,10 @@ export function buildCampaignTrackingUrl(input: BuildCampaignTrackingUrlInput): 
   }
 
   const endpoint = new URL(`/t/${encodeURIComponent(slug)}`, baseUrl);
-  endpoint.searchParams.set(definition.tokenParameter, definition.tokenMacro);
-  for (const [name, value] of Object.entries(additional)) endpoint.searchParams.set(name, value);
-  return endpoint.toString();
+  return buildUrlWithQuery(endpoint, [
+    [definition.tokenParameter, definition.tokenMacro],
+    ...Object.entries(additional),
+  ]);
 }
 
 export function buildAllCampaignTrackingUrls(
@@ -143,14 +158,15 @@ export function buildDirectCampaignUrl(input: {
   parameters?: ReadonlyArray<{ parameter?: string; token?: string; enabled?: boolean }>;
 }): string {
   const destination = new URL(input.offerUrl);
-  if (input.campaignId) destination.searchParams.set("cpid", input.campaignId);
-  if (input.offerId) destination.searchParams.set("oid", input.offerId);
+  const parameterMap = new Map<string, string>(destination.searchParams.entries());
+  if (input.campaignId) parameterMap.set("cpid", input.campaignId);
+  if (input.offerId) parameterMap.set("oid", input.offerId);
   const entries = [input.externalId, ...(input.parameters ?? [])];
   for (const entry of entries) {
     if (!entry?.enabled || !entry.parameter || !entry.token) continue;
     validateParameterName(entry.parameter);
     validateMacro(entry.token, entry.parameter);
-    destination.searchParams.set(entry.parameter, entry.token);
+    parameterMap.set(entry.parameter, entry.token);
   }
-  return destination.toString();
+  return buildUrlWithQuery(destination, [...parameterMap.entries()]);
 }

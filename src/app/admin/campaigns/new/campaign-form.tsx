@@ -63,7 +63,7 @@ export default function CampaignForm() {
       trafficSourceId,
       offerId,
       trackingMode,
-      status: "paused",
+      status: "active",
       defaultCurrency: "USD",
       destinationUrl: "https://pending.invalid/",
       allowedTrackingParameters: [],
@@ -86,7 +86,7 @@ export default function CampaignForm() {
         <div className="w-full max-w-xl border-2 border-[#121212] bg-white p-7 shadow-2xl">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#121212]">Campaign created</p>
           <h2 id="campaign-created-title" className="mt-3 text-2xl font-semibold text-[#121212]">{success.name}</h2>
-          <p className="mt-2 text-sm leading-6 text-[#121212]">The campaign is paused until its destination and tracking setup are completed.</p>
+          <p className="mt-2 text-sm leading-6 text-[#121212]">The campaign is active and ready to receive visits.</p>
           <div className="mt-6 flex flex-wrap justify-end gap-3 text-sm font-semibold">
             <Link href={`/admin/campaigns/${success.id}/setup`} className="bg-[#1040C0] px-4 py-2.5 text-white hover:bg-[#1040C0] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1040C0]">Open setup</Link>
             <Link href="/admin/campaigns" className="border-2 border-[#121212] px-4 py-2.5 text-[#121212] hover:bg-[#E0E0E0] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1040C0]">Back to campaigns</Link>

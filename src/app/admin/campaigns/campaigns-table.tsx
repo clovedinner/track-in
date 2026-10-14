@@ -40,7 +40,7 @@ export default function CampaignsTable({ rows }: { rows: CampaignListRow[] }) {
         body: JSON.stringify({
           name: `${selected.name} copy`,
           slug: slugify(`${selected.name} copy`),
-          status: "paused",
+          status: "active",
           trackingMode: selected.trackingMode,
           destinationUrl: selected.destinationUrl,
           trafficSourceId: selected.trafficSourceId,

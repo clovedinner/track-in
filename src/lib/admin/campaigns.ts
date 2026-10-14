@@ -96,7 +96,7 @@ export function parseCreateCampaignInput(body: unknown): CreateCampaignInput {
   }
 
   const name = requireString(input.name, "name", 200);
-  const statusValue = input.status === undefined ? CampaignStatus.paused : input.status;
+  const statusValue = input.status === undefined ? CampaignStatus.active : input.status;
   if (typeof statusValue !== "string" || !campaignStatuses.has(statusValue)) {
     throw new CampaignInputError("status", "status must be active, paused, or archived.");
   }
