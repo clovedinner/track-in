@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title>Trakio</title>
+  <rect width="64" height="64" fill="#fff"/>
+  <circle cx="14" cy="32" r="8" fill="#D02020"/>
+  <rect x="27" y="24" width="16" height="16" fill="#1040C0"/>
+  <path d="M50 40 58 24l8 16Z" fill="#F0C020" transform="translate(-2)"/>
+</svg>
