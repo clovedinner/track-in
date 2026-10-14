@@ -3,9 +3,9 @@ import { createHash, createHmac, timingSafeEqual, randomUUID } from "node:crypto
 import { prisma } from "@/lib/database/prisma";
 
 export const BILLING_PLANS = {
-  Starter: { amountMinor: 30_000, currency: "USD" },
-  Operator: { amountMinor: 50_000, currency: "USD" },
-  Expanded: { amountMinor: 100_000, currency: "USD" },
+  Starter: { amountMinor: 30_000, currency: "USDT" },
+  Operator: { amountMinor: 50_000, currency: "USDT" },
+  Expanded: { amountMinor: 100_000, currency: "USDT" },
 } as const;
 
 export type BillingPlan = keyof typeof BILLING_PLANS;
