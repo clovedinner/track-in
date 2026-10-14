@@ -9,7 +9,12 @@ export async function POST(request: Request) {
   const email = normalizeEmail(body?.email);
   const password = typeof body?.password === "string" ? body.password : "";
   const user = email ? await prisma.user.findUnique({ where: { email }, select: { id: true, email: true, passwordHash: true } }) : null;
-  if (!user || !(await verifyPassword(password, user.passwordHash))) return NextResponse.json({ error: "Email or password is incorrect." }, { status: 401 });
+  if (!user) {
+    return NextResponse.json({ error: "Account not found. Please sign up first.", code: "account_not_found" }, { status: 401 });
+  }
+  if (!(await verifyPassword(password, user.passwordHash))) {
+    return NextResponse.json({ error: "Incorrect password.", code: "invalid_password" }, { status: 401 });
+  }
   const response = NextResponse.json({ status: "signed_in" });
   response.cookies.set(sessionCookieName(), await createSessionToken(user), sessionCookieOptions());
   return response;

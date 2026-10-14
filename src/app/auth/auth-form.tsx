@@ -10,6 +10,7 @@ export default function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [errorCode, setErrorCode] = useState<string | null>(null);
   const [working, setWorking] = useState(false);
   const router = useRouter();
   const isSignUp = mode === "sign-up";
@@ -24,6 +25,7 @@ export default function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
+    setErrorCode(null);
     setWorking(true);
     try {
       const response = await fetch(`/api/auth/${mode === "sign-up" ? "signup" : "signin"}`, {
@@ -31,8 +33,11 @@ export default function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-      const payload = await response.json().catch(() => null) as { error?: string } | null;
-      if (!response.ok) throw new Error(payload?.error ?? "Authentication failed.");
+      const payload = await response.json().catch(() => null) as { error?: string; code?: string } | null;
+      if (!response.ok) {
+        setErrorCode(payload?.code ?? null);
+        throw new Error(payload?.error ?? "Authentication failed.");
+      }
       const next = new URLSearchParams(window.location.search).get("next");
       const destination = next?.startsWith("/") && !next.startsWith("//") ? next : "/admin/dashboard";
       router.push(destination);
@@ -60,7 +65,7 @@ export default function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
               </span>
               {isSignUp && password.length > 0 && !passwordComplete ? <span role="alert" className="mt-2 block border-2 border-[#D02020] bg-[#FFF4F0] px-3 py-2 text-xs font-normal text-[#D02020]">Password needs {passwordRequirements.filter((requirement) => !requirement.met).map((requirement) => requirement.label).join(", ")}.</span> : null}
             </label>
-            {error ? <p role="alert" className="border-2 border-[#D02020] bg-[#F0F0F0] px-3 py-3 text-sm text-[#D02020]">{error}</p> : null}
+            {error ? <div role="alert" className="border-2 border-[#D02020] bg-[#F0F0F0] px-3 py-3 text-sm text-[#D02020]"><p>{error}</p>{errorCode === "account_not_found" ? <Link href="/auth/sign-up" className="mt-2 inline-block font-bold underline underline-offset-4">Create an account</Link> : null}</div> : null}
             <button type="submit" disabled={working} className="min-h-11 w-full bg-[#1040C0] px-5 py-3 text-sm font-bold text-[#FFFFFF] hover:bg-[#D02020] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1040C0]">{working ? "Please wait" : isSignUp ? "Create account" : "Sign in"}</button>
           </form>
           <p className="mt-6 border-t-2 border-[#121212] pt-5 text-sm">{isSignUp ? "Already have an account?" : "Need an account?"} <Link href={isSignUp ? "/auth/sign-in" : "/auth/sign-up"} className="font-bold text-[#D02020] underline underline-offset-4">{isSignUp ? "Sign in" : "Sign up"}</Link></p>
