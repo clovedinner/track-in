@@ -1,6 +1,6 @@
 # Minimal Conversion Tracker: Development Guide
 
-This project is a self-hosted, personal-use conversion tracker. It records ad clicks, preserves attribution through a money site, receives server-to-server conversion events, and reports those conversions back to supported ad platforms. The dashboard exists to answer practical questions about campaign performance.
+This project is a self-hosted conversion tracker with isolated client accounts. It records ad clicks, preserves attribution through a money site, receives server-to-server conversion events, and reports those conversions back to supported ad platforms. The dashboard exists to answer practical questions about campaign performance.
 
 This is intentionally not a full Voluum clone. Build the smallest reliable system that reproduces the client's existing Voluum tracking workflow and produces trustworthy attribution and useful metrics.
 
@@ -14,13 +14,13 @@ This is intentionally not a full Voluum clone. Build the smallest reliable syste
 - Accept authenticated conversion events from the money site and Voluum-compatible browser/postback events, attributing each event to its original click.
 - Send an idempotent outbound postback or conversion-API request to the configured ad platform when a conversion is accepted.
 - Show useful campaign, click, conversion in a private dashboard.
-- Be easy for one operator to deploy, inspect, and repair.
+- Be easy for an operator to deploy, inspect, and repair for each isolated client account.
 
 ### Non-goals
 
 Do not add these unless the owner explicitly changes this document:
 
-- Affiliate-network offers, marketplaces, team workspaces, billing, or subscriptions.
+- Affiliate-network offers, marketplaces, team workspaces, billing, or subscriptions. Account isolation is required; teams and billing remain future work.
 - Rule-based traffic routing, traffic distribution, funnels, paths, rotators, or landing-page hosting.
 - Bot detection, anti-fraud scoring, device fingerprinting, or cloaking.
 - A generic integration catalog, visual workflow builder, report builder, or campaign automation.

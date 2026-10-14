@@ -6,6 +6,7 @@ import { prisma } from "@/lib/database/prisma";
 import { ApiError, apiErrorResponse } from "@/lib/http/api-error";
 import { getCorrelationId } from "@/lib/observability/correlation-id";
 import { logger } from "@/lib/observability/logger";
+import { requireCurrentUser } from "@/lib/auth/current-user";
 
 type Source = { id: string; name: string; type: string; enabled: boolean; credentialSecretRef: string | null; configuration: unknown; retryPolicy: unknown; createdAt: Date; updatedAt: Date };
 const select = { id: true, name: true, type: true, enabled: true, credentialSecretRef: true, configuration: true, retryPolicy: true, createdAt: true, updatedAt: true } as const;
@@ -14,6 +15,8 @@ function inputError(error: TrafficSourceInputError, id: string) { return apiErro
 
 export async function PUT(request: Request, context: { params: Promise<{ id: string }> }): Promise<NextResponse> {
   const correlationId = getCorrelationId(request);
+  let user;
+  try { user = await requireCurrentUser(); } catch { return apiErrorResponse(new ApiError("unauthorized", 401, "Authentication required."), correlationId); }
   let id: string;
   try { id = parseTrafficSourceId((await context.params).id); } catch (error) { return inputError(error as TrafficSourceInputError, correlationId); }
   let body: unknown;
@@ -22,7 +25,7 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
   try { input = parseTrafficSourceInput(body); } catch (error) { return error instanceof TrafficSourceInputError ? inputError(error, correlationId) : apiErrorResponse(new ApiError("invalid_request", 400, "Invalid traffic source data."), correlationId); }
   try {
     const source = await prisma.trafficSource.update({
-      where: { id },
+      where: { id, ownerId: user.id },
       data: {
         ...input,
         configuration: input.configuration as Prisma.InputJsonValue,

@@ -10,6 +10,7 @@ import { prisma } from "@/lib/database/prisma";
 import { ApiError, apiErrorResponse } from "@/lib/http/api-error";
 import { getCorrelationId } from "@/lib/observability/correlation-id";
 import { logger } from "@/lib/observability/logger";
+import { requireCurrentUser } from "@/lib/auth/current-user";
 
 function errorResponse(error: TrafficSourceInputError, correlationId: string): NextResponse {
   return apiErrorResponse(new ApiError("invalid_request", 400, `${error.field}: ${error.message}`), correlationId);
@@ -40,7 +41,8 @@ const sourceSelect = {
 export async function GET(request: Request): Promise<NextResponse> {
   const correlationId = getCorrelationId(request);
   try {
-    const sources = await prisma.trafficSource.findMany({ orderBy: { createdAt: "desc" }, select: sourceSelect });
+    const user = await requireCurrentUser();
+    const sources = await prisma.trafficSource.findMany({ where: { ownerId: user.id }, orderBy: { createdAt: "desc" }, select: sourceSelect });
     return NextResponse.json({ trafficSources: sources.map(safeSource) }, { headers: { "x-request-id": correlationId } });
   } catch (error) {
     logger.error("admin.traffic_sources_list_failed", { errorName: error instanceof Error ? error.name : "UnknownError", requestId: correlationId });
@@ -50,6 +52,8 @@ export async function GET(request: Request): Promise<NextResponse> {
 
 export async function POST(request: Request): Promise<NextResponse> {
   const correlationId = getCorrelationId(request);
+  let user;
+  try { user = await requireCurrentUser(); } catch { return apiErrorResponse(new ApiError("unauthorized", 401, "Authentication required."), correlationId); }
   let body: unknown;
   try { body = await request.json(); } catch { return errorResponse(new TrafficSourceInputError("body", "Request body must be valid JSON."), correlationId); }
   let input;
@@ -59,6 +63,7 @@ export async function POST(request: Request): Promise<NextResponse> {
   try {
     const source = await prisma.trafficSource.create({
       data: {
+        ownerId: user.id,
         ...input,
         configuration: input.configuration as Prisma.InputJsonValue,
         retryPolicy: input.retryPolicy as Prisma.InputJsonValue,

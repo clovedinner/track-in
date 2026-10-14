@@ -11,6 +11,7 @@ import {
 import { ApiError, apiErrorResponse } from "@/lib/http/api-error";
 import { getCorrelationId } from "@/lib/observability/correlation-id";
 import { logger } from "@/lib/observability/logger";
+import { requireCurrentUser } from "@/lib/auth/current-user";
 
 export async function GET(request: Request): Promise<NextResponse> {
   const correlationId = getCorrelationId(request);
@@ -23,10 +24,12 @@ export async function GET(request: Request): Promise<NextResponse> {
   }
 
   let limit: number;
+  let user: Awaited<ReturnType<typeof requireCurrentUser>>;
   try {
+    user = await requireCurrentUser();
     limit = parseDeliveryHealthLimit(url.searchParams.get("limit"));
   } catch (error) {
-    return apiErrorResponse(new ApiError("invalid_request", 400, error instanceof Error ? error.message : "Invalid limit."), correlationId);
+    return apiErrorResponse(new ApiError(error instanceof Error && error.message === "Authentication required." ? "unauthorized" : "invalid_request", error instanceof Error && error.message === "Authentication required." ? 401 : 400, error instanceof Error ? error.message : "Invalid limit."), correlationId);
   }
 
   try {
@@ -34,11 +37,11 @@ export async function GET(request: Request): Promise<NextResponse> {
       Promise.all(
         deliveryHealthStatuses.map(async (currentStatus) => [
           currentStatus,
-          await prisma.outboundPostback.count({ where: { status: currentStatus } }),
+          await prisma.outboundPostback.count({ where: { status: currentStatus, conversion: { click: { campaign: { ownerId: user.id } } } } }),
         ] as const),
       ),
       prisma.outboundPostback.findMany({
-        where: status ? { status } : undefined,
+        where: status ? { status, conversion: { click: { campaign: { ownerId: user.id } } } } : { conversion: { click: { campaign: { ownerId: user.id } } } },
         orderBy: [{ createdAt: "desc" }],
         take: limit,
         select: {

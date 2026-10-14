@@ -33,10 +33,14 @@ describe("dashboard reconciliation against persisted facts", () => {
   let campaignId: string;
   let trafficSourceId: string;
   let conversionId: string;
+  let userId: string;
 
   beforeAll(async () => {
+    const user = await database.user.create({ data: { email: `reconciliation-${suffix}@example.test`, passwordHash: "test" } });
+    userId = user.id;
     const trafficSource = await database.trafficSource.create({
       data: {
+        ownerId: userId,
         name: `Dashboard reconciliation source ${suffix}`,
         type: "test",
         configuration: { postbackUrl: "https://ads.example.test/reconciliation" },
@@ -46,6 +50,7 @@ describe("dashboard reconciliation against persisted facts", () => {
 
     const campaign = await database.campaign.create({
       data: {
+        ownerId: userId,
         slug: `dashboard-reconciliation-${suffix}`,
         name: `Dashboard reconciliation ${suffix}`,
         status: "active",
@@ -117,6 +122,7 @@ describe("dashboard reconciliation against persisted facts", () => {
       await database.click.deleteMany({ where: { campaignId } });
       await database.campaign.deleteMany({ where: { id: campaignId } });
       await database.trafficSource.deleteMany({ where: { id: trafficSourceId } });
+    await database.user.deleteMany({ where: { id: userId } });
     }
     await database.$disconnect();
   });

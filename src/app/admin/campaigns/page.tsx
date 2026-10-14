@@ -4,15 +4,17 @@ import type { Metadata } from "next";
 import AdminNavigation from "@/app/admin/admin-navigation";
 import CampaignsTable from "@/app/admin/campaigns/campaigns-table";
 import { getCampaignList, parseCampaignListFilters, type CampaignListRow } from "@/lib/admin/campaign-views";
+import { requireCurrentUser } from "@/lib/auth/current-user";
 
 export const metadata: Metadata = { title: "Campaigns | Trakio", description: "Private campaign performance." };
 export const dynamic = "force-dynamic";
 
 export default async function CampaignsPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const input = await searchParams;
+  const user = await requireCurrentUser();
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(input)) if (typeof value === "string") params.set(key, value);
-  const filters = parseCampaignListFilters(params);
+  const filters = { ...parseCampaignListFilters(params), ownerId: user.id };
   let rows: CampaignListRow[] | null = null;
   try { rows = await getCampaignList(filters); } catch { rows = null; }
 

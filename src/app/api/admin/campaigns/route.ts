@@ -5,6 +5,7 @@ import { prisma } from "@/lib/database/prisma";
 import { ApiError, apiErrorResponse } from "@/lib/http/api-error";
 import { getCorrelationId } from "@/lib/observability/correlation-id";
 import { logger } from "@/lib/observability/logger";
+import { requireCurrentUser } from "@/lib/auth/current-user";
 
 function inputErrorResponse(error: CampaignInputError, correlationId: string): NextResponse {
   return apiErrorResponse(new ApiError("invalid_request", 400, `${error.field}: ${error.message}`), correlationId);
@@ -14,7 +15,9 @@ export async function GET(request: Request): Promise<NextResponse> {
   const correlationId = getCorrelationId(request);
 
   try {
+    const user = await requireCurrentUser();
     const campaigns = await prisma.campaign.findMany({
+      where: { ownerId: user.id },
       orderBy: { createdAt: "desc" },
       select: {
         id: true,
@@ -44,6 +47,8 @@ export async function GET(request: Request): Promise<NextResponse> {
 
 export async function POST(request: Request): Promise<NextResponse> {
   const correlationId = getCorrelationId(request);
+  let user;
+  try { user = await requireCurrentUser(); } catch { return apiErrorResponse(new ApiError("unauthorized", 401, "Authentication required."), correlationId); }
 
   let body: unknown;
   try {
@@ -66,10 +71,10 @@ export async function POST(request: Request): Promise<NextResponse> {
     if (input.trafficSourceId) {
       const trafficSource = await prisma.trafficSource.findUnique({
         where: { id: input.trafficSourceId },
-        select: { id: true, enabled: true },
+        select: { id: true, ownerId: true, enabled: true },
       });
 
-      if (!trafficSource || !trafficSource.enabled) {
+      if (!trafficSource || trafficSource.ownerId !== user.id || !trafficSource.enabled) {
         return apiErrorResponse(
           new ApiError("not_found", 404, "Traffic source not found or disabled."),
           correlationId,
@@ -79,8 +84,8 @@ export async function POST(request: Request): Promise<NextResponse> {
 
     let destinationUrl = input.destinationUrl;
     if (input.offerId) {
-      const offer = await prisma.offer.findUnique({ where: { id: input.offerId }, select: { id: true, offerUrl: true } });
-      if (!offer) return apiErrorResponse(new ApiError("not_found", 404, "Offer not found."), correlationId);
+      const offer = await prisma.offer.findUnique({ where: { id: input.offerId }, select: { id: true, ownerId: true, offerUrl: true } });
+      if (!offer || offer.ownerId !== user.id) return apiErrorResponse(new ApiError("not_found", 404, "Offer not found."), correlationId);
       if (!offer.offerUrl || !offer.offerUrl.startsWith("https://")) {
         return apiErrorResponse(
           new ApiError("invalid_request", 400, "Selected offer does not have an HTTPS offer URL."),
@@ -92,6 +97,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 
     const campaign = await prisma.campaign.create({
       data: {
+        ownerId: user.id,
         slug: input.slug,
         name: input.name,
         status: input.status,

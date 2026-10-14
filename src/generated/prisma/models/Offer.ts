@@ -26,6 +26,7 @@ export type AggregateOffer = {
 
 export type OfferMinAggregateOutputType = {
   id: string | null
+  ownerId: string | null
   name: string | null
   offerUrl: string | null
   createdAt: Date | null
@@ -34,6 +35,7 @@ export type OfferMinAggregateOutputType = {
 
 export type OfferMaxAggregateOutputType = {
   id: string | null
+  ownerId: string | null
   name: string | null
   offerUrl: string | null
   createdAt: Date | null
@@ -42,6 +44,7 @@ export type OfferMaxAggregateOutputType = {
 
 export type OfferCountAggregateOutputType = {
   id: number
+  ownerId: number
   name: number
   offerUrl: number
   createdAt: number
@@ -52,6 +55,7 @@ export type OfferCountAggregateOutputType = {
 
 export type OfferMinAggregateInputType = {
   id?: true
+  ownerId?: true
   name?: true
   offerUrl?: true
   createdAt?: true
@@ -60,6 +64,7 @@ export type OfferMinAggregateInputType = {
 
 export type OfferMaxAggregateInputType = {
   id?: true
+  ownerId?: true
   name?: true
   offerUrl?: true
   createdAt?: true
@@ -68,6 +73,7 @@ export type OfferMaxAggregateInputType = {
 
 export type OfferCountAggregateInputType = {
   id?: true
+  ownerId?: true
   name?: true
   offerUrl?: true
   createdAt?: true
@@ -149,6 +155,7 @@ export type OfferGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
 
 export type OfferGroupByOutputType = {
   id: string
+  ownerId: string
   name: string
   offerUrl: string | null
   createdAt: Date
@@ -178,36 +185,44 @@ export type OfferWhereInput = {
   OR?: Prisma.OfferWhereInput[]
   NOT?: Prisma.OfferWhereInput | Prisma.OfferWhereInput[]
   id?: Prisma.UuidFilter<"Offer"> | string
+  ownerId?: Prisma.UuidFilter<"Offer"> | string
   name?: Prisma.StringFilter<"Offer"> | string
   offerUrl?: Prisma.StringNullableFilter<"Offer"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Offer"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Offer"> | Date | string
   campaigns?: Prisma.CampaignListRelationFilter
+  owner?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
 export type OfferOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  ownerId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   offerUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   campaigns?: Prisma.CampaignOrderByRelationAggregateInput
+  owner?: Prisma.UserOrderByWithRelationInput
 }
 
 export type OfferWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  ownerId_name?: Prisma.OfferOwnerIdNameCompoundUniqueInput
   AND?: Prisma.OfferWhereInput | Prisma.OfferWhereInput[]
   OR?: Prisma.OfferWhereInput[]
   NOT?: Prisma.OfferWhereInput | Prisma.OfferWhereInput[]
+  ownerId?: Prisma.UuidFilter<"Offer"> | string
   name?: Prisma.StringFilter<"Offer"> | string
   offerUrl?: Prisma.StringNullableFilter<"Offer"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Offer"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Offer"> | Date | string
   campaigns?: Prisma.CampaignListRelationFilter
-}, "id">
+  owner?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+}, "id" | "ownerId_name">
 
 export type OfferOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  ownerId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   offerUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -222,6 +237,7 @@ export type OfferScalarWhereWithAggregatesInput = {
   OR?: Prisma.OfferScalarWhereWithAggregatesInput[]
   NOT?: Prisma.OfferScalarWhereWithAggregatesInput | Prisma.OfferScalarWhereWithAggregatesInput[]
   id?: Prisma.UuidWithAggregatesFilter<"Offer"> | string
+  ownerId?: Prisma.UuidWithAggregatesFilter<"Offer"> | string
   name?: Prisma.StringWithAggregatesFilter<"Offer"> | string
   offerUrl?: Prisma.StringNullableWithAggregatesFilter<"Offer"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Offer"> | Date | string
@@ -235,10 +251,12 @@ export type OfferCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   campaigns?: Prisma.CampaignCreateNestedManyWithoutOfferInput
+  owner: Prisma.UserCreateNestedOneWithoutOffersInput
 }
 
 export type OfferUncheckedCreateInput = {
   id?: string
+  ownerId: string
   name: string
   offerUrl?: string | null
   createdAt?: Date | string
@@ -253,10 +271,12 @@ export type OfferUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   campaigns?: Prisma.CampaignUpdateManyWithoutOfferNestedInput
+  owner?: Prisma.UserUpdateOneRequiredWithoutOffersNestedInput
 }
 
 export type OfferUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   offerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -266,6 +286,7 @@ export type OfferUncheckedUpdateInput = {
 
 export type OfferCreateManyInput = {
   id?: string
+  ownerId: string
   name: string
   offerUrl?: string | null
   createdAt?: Date | string
@@ -282,10 +303,21 @@ export type OfferUpdateManyMutationInput = {
 
 export type OfferUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   offerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type OfferListRelationFilter = {
+  every?: Prisma.OfferWhereInput
+  some?: Prisma.OfferWhereInput
+  none?: Prisma.OfferWhereInput
+}
+
+export type OfferOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type OfferNullableScalarRelationFilter = {
@@ -293,8 +325,14 @@ export type OfferNullableScalarRelationFilter = {
   isNot?: Prisma.OfferWhereInput | null
 }
 
+export type OfferOwnerIdNameCompoundUniqueInput = {
+  ownerId: string
+  name: string
+}
+
 export type OfferCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ownerId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   offerUrl?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -303,6 +341,7 @@ export type OfferCountOrderByAggregateInput = {
 
 export type OfferMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ownerId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   offerUrl?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -311,10 +350,53 @@ export type OfferMaxOrderByAggregateInput = {
 
 export type OfferMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ownerId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   offerUrl?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type OfferCreateNestedManyWithoutOwnerInput = {
+  create?: Prisma.XOR<Prisma.OfferCreateWithoutOwnerInput, Prisma.OfferUncheckedCreateWithoutOwnerInput> | Prisma.OfferCreateWithoutOwnerInput[] | Prisma.OfferUncheckedCreateWithoutOwnerInput[]
+  connectOrCreate?: Prisma.OfferCreateOrConnectWithoutOwnerInput | Prisma.OfferCreateOrConnectWithoutOwnerInput[]
+  createMany?: Prisma.OfferCreateManyOwnerInputEnvelope
+  connect?: Prisma.OfferWhereUniqueInput | Prisma.OfferWhereUniqueInput[]
+}
+
+export type OfferUncheckedCreateNestedManyWithoutOwnerInput = {
+  create?: Prisma.XOR<Prisma.OfferCreateWithoutOwnerInput, Prisma.OfferUncheckedCreateWithoutOwnerInput> | Prisma.OfferCreateWithoutOwnerInput[] | Prisma.OfferUncheckedCreateWithoutOwnerInput[]
+  connectOrCreate?: Prisma.OfferCreateOrConnectWithoutOwnerInput | Prisma.OfferCreateOrConnectWithoutOwnerInput[]
+  createMany?: Prisma.OfferCreateManyOwnerInputEnvelope
+  connect?: Prisma.OfferWhereUniqueInput | Prisma.OfferWhereUniqueInput[]
+}
+
+export type OfferUpdateManyWithoutOwnerNestedInput = {
+  create?: Prisma.XOR<Prisma.OfferCreateWithoutOwnerInput, Prisma.OfferUncheckedCreateWithoutOwnerInput> | Prisma.OfferCreateWithoutOwnerInput[] | Prisma.OfferUncheckedCreateWithoutOwnerInput[]
+  connectOrCreate?: Prisma.OfferCreateOrConnectWithoutOwnerInput | Prisma.OfferCreateOrConnectWithoutOwnerInput[]
+  upsert?: Prisma.OfferUpsertWithWhereUniqueWithoutOwnerInput | Prisma.OfferUpsertWithWhereUniqueWithoutOwnerInput[]
+  createMany?: Prisma.OfferCreateManyOwnerInputEnvelope
+  set?: Prisma.OfferWhereUniqueInput | Prisma.OfferWhereUniqueInput[]
+  disconnect?: Prisma.OfferWhereUniqueInput | Prisma.OfferWhereUniqueInput[]
+  delete?: Prisma.OfferWhereUniqueInput | Prisma.OfferWhereUniqueInput[]
+  connect?: Prisma.OfferWhereUniqueInput | Prisma.OfferWhereUniqueInput[]
+  update?: Prisma.OfferUpdateWithWhereUniqueWithoutOwnerInput | Prisma.OfferUpdateWithWhereUniqueWithoutOwnerInput[]
+  updateMany?: Prisma.OfferUpdateManyWithWhereWithoutOwnerInput | Prisma.OfferUpdateManyWithWhereWithoutOwnerInput[]
+  deleteMany?: Prisma.OfferScalarWhereInput | Prisma.OfferScalarWhereInput[]
+}
+
+export type OfferUncheckedUpdateManyWithoutOwnerNestedInput = {
+  create?: Prisma.XOR<Prisma.OfferCreateWithoutOwnerInput, Prisma.OfferUncheckedCreateWithoutOwnerInput> | Prisma.OfferCreateWithoutOwnerInput[] | Prisma.OfferUncheckedCreateWithoutOwnerInput[]
+  connectOrCreate?: Prisma.OfferCreateOrConnectWithoutOwnerInput | Prisma.OfferCreateOrConnectWithoutOwnerInput[]
+  upsert?: Prisma.OfferUpsertWithWhereUniqueWithoutOwnerInput | Prisma.OfferUpsertWithWhereUniqueWithoutOwnerInput[]
+  createMany?: Prisma.OfferCreateManyOwnerInputEnvelope
+  set?: Prisma.OfferWhereUniqueInput | Prisma.OfferWhereUniqueInput[]
+  disconnect?: Prisma.OfferWhereUniqueInput | Prisma.OfferWhereUniqueInput[]
+  delete?: Prisma.OfferWhereUniqueInput | Prisma.OfferWhereUniqueInput[]
+  connect?: Prisma.OfferWhereUniqueInput | Prisma.OfferWhereUniqueInput[]
+  update?: Prisma.OfferUpdateWithWhereUniqueWithoutOwnerInput | Prisma.OfferUpdateWithWhereUniqueWithoutOwnerInput[]
+  updateMany?: Prisma.OfferUpdateManyWithWhereWithoutOwnerInput | Prisma.OfferUpdateManyWithWhereWithoutOwnerInput[]
+  deleteMany?: Prisma.OfferScalarWhereInput | Prisma.OfferScalarWhereInput[]
 }
 
 export type OfferCreateNestedOneWithoutCampaignsInput = {
@@ -333,16 +415,74 @@ export type OfferUpdateOneWithoutCampaignsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.OfferUpdateToOneWithWhereWithoutCampaignsInput, Prisma.OfferUpdateWithoutCampaignsInput>, Prisma.OfferUncheckedUpdateWithoutCampaignsInput>
 }
 
+export type OfferCreateWithoutOwnerInput = {
+  id?: string
+  name: string
+  offerUrl?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  campaigns?: Prisma.CampaignCreateNestedManyWithoutOfferInput
+}
+
+export type OfferUncheckedCreateWithoutOwnerInput = {
+  id?: string
+  name: string
+  offerUrl?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  campaigns?: Prisma.CampaignUncheckedCreateNestedManyWithoutOfferInput
+}
+
+export type OfferCreateOrConnectWithoutOwnerInput = {
+  where: Prisma.OfferWhereUniqueInput
+  create: Prisma.XOR<Prisma.OfferCreateWithoutOwnerInput, Prisma.OfferUncheckedCreateWithoutOwnerInput>
+}
+
+export type OfferCreateManyOwnerInputEnvelope = {
+  data: Prisma.OfferCreateManyOwnerInput | Prisma.OfferCreateManyOwnerInput[]
+  skipDuplicates?: boolean
+}
+
+export type OfferUpsertWithWhereUniqueWithoutOwnerInput = {
+  where: Prisma.OfferWhereUniqueInput
+  update: Prisma.XOR<Prisma.OfferUpdateWithoutOwnerInput, Prisma.OfferUncheckedUpdateWithoutOwnerInput>
+  create: Prisma.XOR<Prisma.OfferCreateWithoutOwnerInput, Prisma.OfferUncheckedCreateWithoutOwnerInput>
+}
+
+export type OfferUpdateWithWhereUniqueWithoutOwnerInput = {
+  where: Prisma.OfferWhereUniqueInput
+  data: Prisma.XOR<Prisma.OfferUpdateWithoutOwnerInput, Prisma.OfferUncheckedUpdateWithoutOwnerInput>
+}
+
+export type OfferUpdateManyWithWhereWithoutOwnerInput = {
+  where: Prisma.OfferScalarWhereInput
+  data: Prisma.XOR<Prisma.OfferUpdateManyMutationInput, Prisma.OfferUncheckedUpdateManyWithoutOwnerInput>
+}
+
+export type OfferScalarWhereInput = {
+  AND?: Prisma.OfferScalarWhereInput | Prisma.OfferScalarWhereInput[]
+  OR?: Prisma.OfferScalarWhereInput[]
+  NOT?: Prisma.OfferScalarWhereInput | Prisma.OfferScalarWhereInput[]
+  id?: Prisma.UuidFilter<"Offer"> | string
+  ownerId?: Prisma.UuidFilter<"Offer"> | string
+  name?: Prisma.StringFilter<"Offer"> | string
+  offerUrl?: Prisma.StringNullableFilter<"Offer"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"Offer"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Offer"> | Date | string
+}
+
 export type OfferCreateWithoutCampaignsInput = {
   id?: string
   name: string
   offerUrl?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  owner: Prisma.UserCreateNestedOneWithoutOffersInput
 }
 
 export type OfferUncheckedCreateWithoutCampaignsInput = {
   id?: string
+  ownerId: string
   name: string
   offerUrl?: string | null
   createdAt?: Date | string
@@ -371,9 +511,45 @@ export type OfferUpdateWithoutCampaignsInput = {
   offerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  owner?: Prisma.UserUpdateOneRequiredWithoutOffersNestedInput
 }
 
 export type OfferUncheckedUpdateWithoutCampaignsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  offerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type OfferCreateManyOwnerInput = {
+  id?: string
+  name: string
+  offerUrl?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type OfferUpdateWithoutOwnerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  offerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  campaigns?: Prisma.CampaignUpdateManyWithoutOfferNestedInput
+}
+
+export type OfferUncheckedUpdateWithoutOwnerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  offerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  campaigns?: Prisma.CampaignUncheckedUpdateManyWithoutOfferNestedInput
+}
+
+export type OfferUncheckedUpdateManyWithoutOwnerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   offerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -414,53 +590,67 @@ export type OfferCountOutputTypeCountCampaignsArgs<ExtArgs extends runtime.Types
 
 export type OfferSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ownerId?: boolean
   name?: boolean
   offerUrl?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   campaigns?: boolean | Prisma.Offer$campaignsArgs<ExtArgs>
+  owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.OfferCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["offer"]>
 
 export type OfferSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ownerId?: boolean
   name?: boolean
   offerUrl?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["offer"]>
 
 export type OfferSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ownerId?: boolean
   name?: boolean
   offerUrl?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["offer"]>
 
 export type OfferSelectScalar = {
   id?: boolean
+  ownerId?: boolean
   name?: boolean
   offerUrl?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type OfferOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "offerUrl" | "createdAt" | "updatedAt", ExtArgs["result"]["offer"]>
+export type OfferOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ownerId" | "name" | "offerUrl" | "createdAt" | "updatedAt", ExtArgs["result"]["offer"]>
 export type OfferInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   campaigns?: boolean | Prisma.Offer$campaignsArgs<ExtArgs>
+  owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.OfferCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type OfferIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type OfferIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type OfferIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+}
+export type OfferIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+}
 
 export type $OfferPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Offer"
   objects: {
     campaigns: Prisma.$CampaignPayload<ExtArgs>[]
+    owner: Prisma.$UserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
+    ownerId: string
     name: string
     offerUrl: string | null
     createdAt: Date
@@ -860,6 +1050,7 @@ readonly fields: OfferFieldRefs;
 export interface Prisma__OfferClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   campaigns<T extends Prisma.Offer$campaignsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Offer$campaignsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CampaignPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  owner<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -890,6 +1081,7 @@ export interface Prisma__OfferClient<T, Null = never, ExtArgs extends runtime.Ty
  */
 export interface OfferFieldRefs {
   readonly id: Prisma.FieldRef<"Offer", 'String'>
+  readonly ownerId: Prisma.FieldRef<"Offer", 'String'>
   readonly name: Prisma.FieldRef<"Offer", 'String'>
   readonly offerUrl: Prisma.FieldRef<"Offer", 'String'>
   readonly createdAt: Prisma.FieldRef<"Offer", 'DateTime'>
@@ -1143,6 +1335,10 @@ export type OfferCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extension
    */
   data: Prisma.OfferCreateManyInput | Prisma.OfferCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.OfferIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1213,6 +1409,10 @@ export type OfferUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extension
    * Limit how many Offers to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.OfferIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**

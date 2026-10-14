@@ -88,6 +88,7 @@ export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof User
 
 export const TrafficSourceScalarFieldEnum = {
   id: 'id',
+  ownerId: 'ownerId',
   name: 'name',
   type: 'type',
   enabled: 'enabled',
@@ -103,6 +104,7 @@ export type TrafficSourceScalarFieldEnum = (typeof TrafficSourceScalarFieldEnum)
 
 export const CampaignScalarFieldEnum = {
   id: 'id',
+  ownerId: 'ownerId',
   slug: 'slug',
   name: 'name',
   status: 'status',
@@ -122,6 +124,7 @@ export type CampaignScalarFieldEnum = (typeof CampaignScalarFieldEnum)[keyof typ
 
 export const OfferScalarFieldEnum = {
   id: 'id',
+  ownerId: 'ownerId',
   name: 'name',
   offerUrl: 'offerUrl',
   createdAt: 'createdAt',

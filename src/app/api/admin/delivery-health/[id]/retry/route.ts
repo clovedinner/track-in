@@ -3,30 +3,27 @@ import { Prisma } from "@/generated/prisma/client";
 import { OutboundPostbackStatus } from "@/generated/prisma/enums";
 
 import { canManuallyRetry } from "@/lib/admin/delivery-health";
-import { parseTrafficSourceId } from "@/lib/admin/traffic-sources";
 import { prisma } from "@/lib/database/prisma";
 import { ApiError, apiErrorResponse } from "@/lib/http/api-error";
 import { getRuntimeEnvironment } from "@/lib/config/environment";
 import { getCorrelationId } from "@/lib/observability/correlation-id";
 import { logger } from "@/lib/observability/logger";
+import { requireCurrentUser } from "@/lib/auth/current-user";
 
 export async function POST(request: Request, context: { params: Promise<{ id: string }> }): Promise<NextResponse> {
   const correlationId = getCorrelationId(request);
   const id = (await context.params).id;
-  try {
-    parseTrafficSourceId(id);
-  } catch {
-    return apiErrorResponse(new ApiError("invalid_request", 400, "id must be a valid UUID."), correlationId);
-  }
+  let user;
+  try { user = await requireCurrentUser(); } catch { return apiErrorResponse(new ApiError("unauthorized", 401, "Authentication required."), correlationId); }
 
   const now = new Date();
   try {
     const result = await prisma.$transaction(async (transaction) => {
       const current = await transaction.outboundPostback.findUnique({
         where: { id },
-        select: { id: true, status: true, attemptCount: true },
+        select: { id: true, status: true, attemptCount: true, conversion: { select: { click: { select: { campaign: { select: { ownerId: true } } } } } } },
       });
-      if (current === null) throw new ApiError("not_found", 404, "Outbound postback not found.");
+      if (current === null || current.conversion.click.campaign.ownerId !== user.id) throw new ApiError("not_found", 404, "Outbound postback not found.");
       if (!canManuallyRetry(current.status)) {
         throw new ApiError("conflict", 409, "Only failed outbound postbacks can be retried.");
       }

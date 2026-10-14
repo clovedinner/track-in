@@ -6,6 +6,7 @@ import { getCampaignDailyMetrics, getOverviewMetrics, type DashboardFilters, typ
 export type CampaignListSort = "name" | "createdAt" | "clicks" | "conversions";
 
 export type CampaignListFilters = {
+  ownerId?: string;
   search?: string;
   status?: CampaignStatus;
   sort?: CampaignListSort;
@@ -95,6 +96,7 @@ function bigintToNumber(value: bigint): number {
 export async function getCampaignList(filters: CampaignListFilters = {}): Promise<CampaignListRow[]> {
   const campaignRows = await prisma.campaign.findMany({
     where: {
+      ...(filters.ownerId ? { ownerId: filters.ownerId } : {}),
       ...(filters.status ? { status: filters.status } : {}),
       ...(filters.search ? { OR: [{ name: { contains: filters.search, mode: "insensitive" } }, { slug: { contains: filters.search, mode: "insensitive" } }] } : {}),
     },
@@ -165,7 +167,7 @@ export function campaignDetailFilters(params: URLSearchParams): DashboardFilters
 
 export async function getCampaignDetail(campaignId: string, filters: DashboardFilters = {}): Promise<CampaignDetail | null> {
   const campaign = await prisma.campaign.findUnique({
-    where: { id: campaignId },
+    where: { id: campaignId, ...(filters.ownerId ? { ownerId: filters.ownerId } : {}) },
     select: {
       id: true,
       slug: true,
@@ -182,7 +184,7 @@ export async function getCampaignDetail(campaignId: string, filters: DashboardFi
     getOverviewMetrics({ ...filters, campaignId }),
     getCampaignDailyMetrics(campaignId, filters),
     prisma.click.findMany({
-      where: { campaignId, clickedAt: filters.from || filters.to ? { ...(filters.from ? { gte: filters.from } : {}), ...(filters.to ? { lt: filters.to } : {}) } : undefined },
+    where: { campaignId, clickedAt: filters.from || filters.to ? { ...(filters.from ? { gte: filters.from } : {}), ...(filters.to ? { lt: filters.to } : {}) } : undefined },
       orderBy: { clickedAt: "desc" },
       take: 25,
       select: { clickId: true, clickedAt: true, destinationUrl: true, trackingTokens: true },

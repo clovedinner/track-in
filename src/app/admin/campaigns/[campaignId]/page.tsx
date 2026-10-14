@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 
 import { campaignDetailFilters, getCampaignDetail } from "@/lib/admin/campaign-views";
 import AdminNavigation from "@/app/admin/admin-navigation";
+import { requireCurrentUser } from "@/lib/auth/current-user";
 import StatusControl from "./status-control";
 
 export const metadata: Metadata = { title: "Campaign detail | Trakio", description: "Private campaign detail." };
@@ -19,7 +20,7 @@ export default async function CampaignDetailPage({ params, searchParams }: { par
   const query = new URLSearchParams();
   for (const [key, value] of Object.entries(input)) if (typeof value === "string") query.set(key, value);
   let detail = null;
-  try { detail = await getCampaignDetail(campaignId, campaignDetailFilters(query)); } catch { detail = null; }
+  try { const user = await requireCurrentUser(); detail = await getCampaignDetail(campaignId, { ...campaignDetailFilters(query), ownerId: user.id }); } catch { detail = null; }
 
   if (!detail) return <main className="min-h-screen bg-[#F0F0F0] px-5 py-8 text-[#121212] sm:px-8 lg:px-12 lg:py-12"><div className="mx-auto max-w-2xl border-2 border-[#D02020] bg-[#FFFFFF] px-6 py-8"><Link href="/admin/campaigns" className="text-xs font-semibold uppercase tracking-[0.16em] text-[#D02020] hover:underline">← Campaigns</Link><h1 className="mt-5 text-2xl font-semibold">Campaign detail unavailable.</h1><p className="mt-3 text-sm leading-6 text-[#121212]">This campaign may not exist, or its data could not be loaded. Try again or return to the campaign list.</p></div></main>;
 

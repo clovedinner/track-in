@@ -5,6 +5,7 @@ import { prisma } from "@/lib/database/prisma";
 import { ApiError, apiErrorResponse } from "@/lib/http/api-error";
 import { getCorrelationId } from "@/lib/observability/correlation-id";
 import { logger } from "@/lib/observability/logger";
+import { requireCurrentUser } from "@/lib/auth/current-user";
 
 function testSetupEnabled(): boolean {
   return process.env.TRACK_IN_ALLOW_TEST_SETUP === "1";
@@ -13,9 +14,11 @@ function testSetupEnabled(): boolean {
 export async function POST(request: Request, context: { params: Promise<{ campaignId: string }> }): Promise<NextResponse> {
   const correlationId = getCorrelationId(request);
   if (!testSetupEnabled()) return apiErrorResponse(new ApiError("not_found", 404, "Setup test is unavailable."), correlationId);
+  let user;
+  try { user = await requireCurrentUser(); } catch { return apiErrorResponse(new ApiError("unauthorized", 401, "Authentication required."), correlationId); }
   const { campaignId } = await context.params;
-  const campaign = await prisma.campaign.findUnique({ where: { id: campaignId }, select: { id: true, status: true, destinationUrl: true, trafficSourceId: true } });
-  if (!campaign || campaign.status !== "active") return apiErrorResponse(new ApiError("not_found", 404, "Active campaign not found."), correlationId);
+  const campaign = await prisma.campaign.findUnique({ where: { id: campaignId }, select: { id: true, ownerId: true, status: true, destinationUrl: true, trafficSourceId: true } });
+  if (!campaign || campaign.ownerId !== user.id || campaign.status !== "active") return apiErrorResponse(new ApiError("not_found", 404, "Active campaign not found."), correlationId);
 
   const clickId = `setup_${randomBytes(18).toString("base64url")}`;
   const destination = new URL(campaign.destinationUrl);

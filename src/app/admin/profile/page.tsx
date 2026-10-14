@@ -2,13 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import AdminNavigation from "@/app/admin/admin-navigation";
+import { requireCurrentUser } from "@/lib/auth/current-user";
 
 export const metadata: Metadata = {
   title: "Profile | Trakio",
   description: "Private operator profile and subscription status.",
 };
 
-export default function ProfilePage() {
+export default async function ProfilePage() {
+  const user = await requireCurrentUser();
   return (
     <main className="min-h-screen bg-[#F0F0F0] text-[#121212]">
       <AdminNavigation pathname="/admin/profile" />
@@ -33,11 +35,11 @@ export default function ProfilePage() {
             <dl className="mt-5 space-y-4 text-sm">
               <div className="border-b-2 border-[#E0E0E0] pb-3">
                 <dt className="text-xs font-bold uppercase tracking-[0.14em] text-[#121212]">Access</dt>
-                <dd className="mt-1 font-semibold">Email and password protected</dd>
+                <dd className="mt-1 break-all font-semibold">{user.email}</dd>
               </div>
               <div>
                 <dt className="text-xs font-bold uppercase tracking-[0.14em] text-[#121212]">Workspace</dt>
-                <dd className="mt-1 font-semibold">Personal tracking workspace</dd>
+                <dd className="mt-1 font-semibold">Personal workspace · account-owned data</dd>
               </div>
             </dl>
           </section>

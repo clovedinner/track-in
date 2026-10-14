@@ -2,6 +2,7 @@ import { Prisma, type PrismaClient } from "@/generated/prisma/client";
 import { calculateDashboardMetrics, type DashboardMetrics } from "./formulas";
 
 export type DashboardFilters = {
+  ownerId?: string;
   from?: Date;
   to?: Date;
   campaignId?: string;
@@ -31,6 +32,7 @@ function clickWhere(filters: DashboardFilters): Prisma.ClickWhereInput {
     clickedAt: dateWhere(filters.from, filters.to),
     ...(filters.campaignId ? { campaignId: filters.campaignId } : {}),
     ...(filters.trafficSourceId ? { trafficSourceId: filters.trafficSourceId } : {}),
+    ...(filters.ownerId ? { campaign: { ownerId: filters.ownerId } } : {}),
   };
 }
 
@@ -41,6 +43,7 @@ function conversionWhere(filters: DashboardFilters): Prisma.ConversionWhereInput
     click: {
       ...(filters.campaignId ? { campaignId: filters.campaignId } : {}),
       ...(filters.trafficSourceId ? { trafficSourceId: filters.trafficSourceId } : {}),
+      ...(filters.ownerId ? { campaign: { ownerId: filters.ownerId } } : {}),
     },
   };
 }
@@ -65,9 +68,9 @@ export async function getOverviewMetrics(
     await Promise.all([
       database.click.count({ where: clickFilter }),
       database.conversion.aggregate({ where: conversionFilter, _count: { _all: true }, _sum: { valueMinor: true } }),
-      database.outboundPostback.count({ where: { status: { in: ["pending", "processing"] }, conversion: { occurredAt: dateWhere(filters.from, filters.to), click: { ...(filters.campaignId ? { campaignId: filters.campaignId } : {}), ...(filters.trafficSourceId ? { trafficSourceId: filters.trafficSourceId } : {}) } } } }),
-      database.outboundPostback.count({ where: { status: "retryable_failed", conversion: { occurredAt: dateWhere(filters.from, filters.to), click: { ...(filters.campaignId ? { campaignId: filters.campaignId } : {}), ...(filters.trafficSourceId ? { trafficSourceId: filters.trafficSourceId } : {}) } } } }),
-      database.outboundPostback.count({ where: { status: "permanently_failed", conversion: { occurredAt: dateWhere(filters.from, filters.to), click: { ...(filters.campaignId ? { campaignId: filters.campaignId } : {}), ...(filters.trafficSourceId ? { trafficSourceId: filters.trafficSourceId } : {}) } } } }),
+      database.outboundPostback.count({ where: { status: { in: ["pending", "processing"] }, conversion: { occurredAt: dateWhere(filters.from, filters.to), click: { ...(filters.campaignId ? { campaignId: filters.campaignId } : {}), ...(filters.trafficSourceId ? { trafficSourceId: filters.trafficSourceId } : {}), ...(filters.ownerId ? { campaign: { ownerId: filters.ownerId } } : {}) } } } }),
+      database.outboundPostback.count({ where: { status: "retryable_failed", conversion: { occurredAt: dateWhere(filters.from, filters.to), click: { ...(filters.campaignId ? { campaignId: filters.campaignId } : {}), ...(filters.trafficSourceId ? { trafficSourceId: filters.trafficSourceId } : {}), ...(filters.ownerId ? { campaign: { ownerId: filters.ownerId } } : {}) } } } }),
+      database.outboundPostback.count({ where: { status: "permanently_failed", conversion: { occurredAt: dateWhere(filters.from, filters.to), click: { ...(filters.campaignId ? { campaignId: filters.campaignId } : {}), ...(filters.trafficSourceId ? { trafficSourceId: filters.trafficSourceId } : {}), ...(filters.ownerId ? { campaign: { ownerId: filters.ownerId } } : {}) } } } }),
     ]);
   const metrics = calculateDashboardMetrics({
     clicks,

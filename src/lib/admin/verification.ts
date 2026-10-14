@@ -1,16 +1,18 @@
 import { prisma } from "@/lib/database/prisma";
 
-export async function getVerificationSnapshot() {
+export async function getVerificationSnapshot(ownerId?: string) {
   const [clickCount, conversionCount, pendingDeliveryCount, recentClicks, recentConversions] =
     await Promise.all([
-      prisma.click.count(),
-      prisma.conversion.count(),
+      prisma.click.count({ where: ownerId ? { campaign: { ownerId } } : undefined }),
+      prisma.conversion.count({ where: ownerId ? { click: { campaign: { ownerId } } } : undefined }),
       prisma.outboundPostback.count({
         where: {
           status: { in: ["pending", "processing", "retryable_failed"] },
+          ...(ownerId ? { conversion: { click: { campaign: { ownerId } } } } : {}),
         },
       }),
       prisma.click.findMany({
+        where: ownerId ? { campaign: { ownerId } } : undefined,
         orderBy: { clickedAt: "desc" },
         take: 12,
         select: {
@@ -21,6 +23,7 @@ export async function getVerificationSnapshot() {
         },
       }),
       prisma.conversion.findMany({
+        where: ownerId ? { click: { campaign: { ownerId } } } : undefined,
         orderBy: { receivedAt: "desc" },
         take: 12,
         select: {

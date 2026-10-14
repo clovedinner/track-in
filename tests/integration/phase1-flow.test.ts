@@ -36,10 +36,14 @@ describe("Phase 1 database-backed click-to-conversion flow", () => {
   let trafficSourceId: string;
   let clickId: string;
   let conversionId: string;
+  let userId: string;
 
   beforeAll(async () => {
+    const user = await database.user.create({ data: { email: `phase1-${suffix}@example.test`, passwordHash: "test" } });
+    userId = user.id;
     const trafficSource = await database.trafficSource.create({
       data: {
+        ownerId: userId,
         name: `Phase 1 test source ${suffix}`,
         type: "test",
         configuration: { postbackUrl: "https://ads.example.test/conversion" },
@@ -49,6 +53,7 @@ describe("Phase 1 database-backed click-to-conversion flow", () => {
 
     const campaign = await database.campaign.create({
       data: {
+        ownerId: userId,
         slug,
         name: `Phase 1 test campaign ${suffix}`,
         status: "active",
@@ -72,6 +77,7 @@ describe("Phase 1 database-backed click-to-conversion flow", () => {
     await database.click.deleteMany({ where: { campaignId } });
     await database.campaign.deleteMany({ where: { id: campaignId } });
     await database.trafficSource.deleteMany({ where: { id: trafficSourceId } });
+    await database.user.deleteMany({ where: { id: userId } });
     await database.$disconnect();
   });
 

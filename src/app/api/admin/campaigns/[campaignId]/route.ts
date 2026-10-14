@@ -3,12 +3,15 @@ import { CampaignStatus } from "@/generated/prisma/client";
 import { prisma } from "@/lib/database/prisma";
 import { ApiError, apiErrorResponse } from "@/lib/http/api-error";
 import { getCorrelationId } from "@/lib/observability/correlation-id";
+import { requireCurrentUser } from "@/lib/auth/current-user";
 
 type Context = { params: Promise<{ campaignId: string }> };
 
 export async function PATCH(request: Request, context: Context): Promise<NextResponse> {
   const correlationId = getCorrelationId(request);
   const { campaignId } = await context.params;
+  let user;
+  try { user = await requireCurrentUser(); } catch { return apiErrorResponse(new ApiError("unauthorized", 401, "Authentication required."), correlationId); }
   let body: unknown;
   try { body = await request.json(); } catch { return apiErrorResponse(new ApiError("invalid_request", 400, "Request body must be valid JSON."), correlationId); }
   const status = typeof body === "object" && body !== null && !Array.isArray(body) ? (body as Record<string, unknown>).status : undefined;
@@ -16,8 +19,8 @@ export async function PATCH(request: Request, context: Context): Promise<NextRes
     return apiErrorResponse(new ApiError("invalid_request", 400, "status must be active or paused."), correlationId);
   }
   try {
-    const campaign = await prisma.campaign.findUnique({ where: { id: campaignId }, select: { id: true, destinationUrl: true, trafficSource: { select: { enabled: true } } } });
-    if (!campaign) return apiErrorResponse(new ApiError("not_found", 404, "Campaign not found."), correlationId);
+    const campaign = await prisma.campaign.findUnique({ where: { id: campaignId }, select: { id: true, ownerId: true, destinationUrl: true, trafficSource: { select: { enabled: true } } } });
+    if (!campaign || campaign.ownerId !== user.id) return apiErrorResponse(new ApiError("not_found", 404, "Campaign not found."), correlationId);
     if (status === CampaignStatus.active && (!campaign.destinationUrl.startsWith("https://") || campaign.trafficSource?.enabled !== true)) {
       return apiErrorResponse(new ApiError("invalid_request", 400, "Campaign needs an HTTPS destination and an enabled traffic source before activation."), correlationId);
     }

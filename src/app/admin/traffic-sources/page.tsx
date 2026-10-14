@@ -4,12 +4,14 @@ import { prisma } from "@/lib/database/prisma";
 import AdminNavigation from "@/app/admin/admin-navigation";
 import TrafficSourceCreateModal from "./traffic-source-create-modal";
 import TrafficSourcesTable, { type TrafficSourceRow } from "./traffic-sources-table";
+import { requireCurrentUser } from "@/lib/auth/current-user";
 
 export const metadata: Metadata = { title: "Traffic sources | Trakio", description: "Configure ad-platform traffic sources." };
 export const dynamic = "force-dynamic";
 
 export default async function TrafficSourcesPage() {
-  const sources = await prisma.trafficSource.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true, type: true, enabled: true, configuration: true } });
+  const user = await requireCurrentUser();
+  const sources = await prisma.trafficSource.findMany({ where: { ownerId: user.id }, orderBy: { name: "asc" }, select: { id: true, name: true, type: true, enabled: true, configuration: true } });
   const rows = await Promise.all(sources.map(async (source) => {
     const [visits, conversions, registration, ftd] = await Promise.all([
       prisma.click.count({ where: { trafficSourceId: source.id } }),

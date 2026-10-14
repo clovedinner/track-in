@@ -26,6 +26,7 @@ export type AggregateTrafficSource = {
 
 export type TrafficSourceMinAggregateOutputType = {
   id: string | null
+  ownerId: string | null
   name: string | null
   type: string | null
   enabled: boolean | null
@@ -36,6 +37,7 @@ export type TrafficSourceMinAggregateOutputType = {
 
 export type TrafficSourceMaxAggregateOutputType = {
   id: string | null
+  ownerId: string | null
   name: string | null
   type: string | null
   enabled: boolean | null
@@ -46,6 +48,7 @@ export type TrafficSourceMaxAggregateOutputType = {
 
 export type TrafficSourceCountAggregateOutputType = {
   id: number
+  ownerId: number
   name: number
   type: number
   enabled: number
@@ -60,6 +63,7 @@ export type TrafficSourceCountAggregateOutputType = {
 
 export type TrafficSourceMinAggregateInputType = {
   id?: true
+  ownerId?: true
   name?: true
   type?: true
   enabled?: true
@@ -70,6 +74,7 @@ export type TrafficSourceMinAggregateInputType = {
 
 export type TrafficSourceMaxAggregateInputType = {
   id?: true
+  ownerId?: true
   name?: true
   type?: true
   enabled?: true
@@ -80,6 +85,7 @@ export type TrafficSourceMaxAggregateInputType = {
 
 export type TrafficSourceCountAggregateInputType = {
   id?: true
+  ownerId?: true
   name?: true
   type?: true
   enabled?: true
@@ -165,6 +171,7 @@ export type TrafficSourceGroupByArgs<ExtArgs extends runtime.Types.Extensions.In
 
 export type TrafficSourceGroupByOutputType = {
   id: string
+  ownerId: string
   name: string
   type: string
   enabled: boolean
@@ -198,6 +205,7 @@ export type TrafficSourceWhereInput = {
   OR?: Prisma.TrafficSourceWhereInput[]
   NOT?: Prisma.TrafficSourceWhereInput | Prisma.TrafficSourceWhereInput[]
   id?: Prisma.UuidFilter<"TrafficSource"> | string
+  ownerId?: Prisma.UuidFilter<"TrafficSource"> | string
   name?: Prisma.StringFilter<"TrafficSource"> | string
   type?: Prisma.StringFilter<"TrafficSource"> | string
   enabled?: Prisma.BoolFilter<"TrafficSource"> | boolean
@@ -209,10 +217,12 @@ export type TrafficSourceWhereInput = {
   campaigns?: Prisma.CampaignListRelationFilter
   clicks?: Prisma.ClickListRelationFilter
   outboundPostbacks?: Prisma.OutboundPostbackListRelationFilter
+  owner?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
 export type TrafficSourceOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  ownerId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   type?: Prisma.SortOrder
   enabled?: Prisma.SortOrder
@@ -224,13 +234,16 @@ export type TrafficSourceOrderByWithRelationInput = {
   campaigns?: Prisma.CampaignOrderByRelationAggregateInput
   clicks?: Prisma.ClickOrderByRelationAggregateInput
   outboundPostbacks?: Prisma.OutboundPostbackOrderByRelationAggregateInput
+  owner?: Prisma.UserOrderByWithRelationInput
 }
 
 export type TrafficSourceWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  ownerId_name?: Prisma.TrafficSourceOwnerIdNameCompoundUniqueInput
   AND?: Prisma.TrafficSourceWhereInput | Prisma.TrafficSourceWhereInput[]
   OR?: Prisma.TrafficSourceWhereInput[]
   NOT?: Prisma.TrafficSourceWhereInput | Prisma.TrafficSourceWhereInput[]
+  ownerId?: Prisma.UuidFilter<"TrafficSource"> | string
   name?: Prisma.StringFilter<"TrafficSource"> | string
   type?: Prisma.StringFilter<"TrafficSource"> | string
   enabled?: Prisma.BoolFilter<"TrafficSource"> | boolean
@@ -242,10 +255,12 @@ export type TrafficSourceWhereUniqueInput = Prisma.AtLeast<{
   campaigns?: Prisma.CampaignListRelationFilter
   clicks?: Prisma.ClickListRelationFilter
   outboundPostbacks?: Prisma.OutboundPostbackListRelationFilter
-}, "id">
+  owner?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+}, "id" | "ownerId_name">
 
 export type TrafficSourceOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  ownerId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   type?: Prisma.SortOrder
   enabled?: Prisma.SortOrder
@@ -264,6 +279,7 @@ export type TrafficSourceScalarWhereWithAggregatesInput = {
   OR?: Prisma.TrafficSourceScalarWhereWithAggregatesInput[]
   NOT?: Prisma.TrafficSourceScalarWhereWithAggregatesInput | Prisma.TrafficSourceScalarWhereWithAggregatesInput[]
   id?: Prisma.UuidWithAggregatesFilter<"TrafficSource"> | string
+  ownerId?: Prisma.UuidWithAggregatesFilter<"TrafficSource"> | string
   name?: Prisma.StringWithAggregatesFilter<"TrafficSource"> | string
   type?: Prisma.StringWithAggregatesFilter<"TrafficSource"> | string
   enabled?: Prisma.BoolWithAggregatesFilter<"TrafficSource"> | boolean
@@ -287,10 +303,12 @@ export type TrafficSourceCreateInput = {
   campaigns?: Prisma.CampaignCreateNestedManyWithoutTrafficSourceInput
   clicks?: Prisma.ClickCreateNestedManyWithoutTrafficSourceInput
   outboundPostbacks?: Prisma.OutboundPostbackCreateNestedManyWithoutTrafficSourceInput
+  owner: Prisma.UserCreateNestedOneWithoutTrafficSourcesInput
 }
 
 export type TrafficSourceUncheckedCreateInput = {
   id?: string
+  ownerId: string
   name: string
   type: string
   enabled?: boolean
@@ -317,10 +335,12 @@ export type TrafficSourceUpdateInput = {
   campaigns?: Prisma.CampaignUpdateManyWithoutTrafficSourceNestedInput
   clicks?: Prisma.ClickUpdateManyWithoutTrafficSourceNestedInput
   outboundPostbacks?: Prisma.OutboundPostbackUpdateManyWithoutTrafficSourceNestedInput
+  owner?: Prisma.UserUpdateOneRequiredWithoutTrafficSourcesNestedInput
 }
 
 export type TrafficSourceUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
   enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -336,6 +356,7 @@ export type TrafficSourceUncheckedUpdateInput = {
 
 export type TrafficSourceCreateManyInput = {
   id?: string
+  ownerId: string
   name: string
   type: string
   enabled?: boolean
@@ -360,6 +381,7 @@ export type TrafficSourceUpdateManyMutationInput = {
 
 export type TrafficSourceUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
   enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -370,8 +392,24 @@ export type TrafficSourceUncheckedUpdateManyInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+export type TrafficSourceListRelationFilter = {
+  every?: Prisma.TrafficSourceWhereInput
+  some?: Prisma.TrafficSourceWhereInput
+  none?: Prisma.TrafficSourceWhereInput
+}
+
+export type TrafficSourceOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
+}
+
+export type TrafficSourceOwnerIdNameCompoundUniqueInput = {
+  ownerId: string
+  name: string
+}
+
 export type TrafficSourceCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ownerId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   type?: Prisma.SortOrder
   enabled?: Prisma.SortOrder
@@ -384,6 +422,7 @@ export type TrafficSourceCountOrderByAggregateInput = {
 
 export type TrafficSourceMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ownerId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   type?: Prisma.SortOrder
   enabled?: Prisma.SortOrder
@@ -394,6 +433,7 @@ export type TrafficSourceMaxOrderByAggregateInput = {
 
 export type TrafficSourceMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ownerId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   type?: Prisma.SortOrder
   enabled?: Prisma.SortOrder
@@ -410,6 +450,48 @@ export type TrafficSourceNullableScalarRelationFilter = {
 export type TrafficSourceScalarRelationFilter = {
   is?: Prisma.TrafficSourceWhereInput
   isNot?: Prisma.TrafficSourceWhereInput
+}
+
+export type TrafficSourceCreateNestedManyWithoutOwnerInput = {
+  create?: Prisma.XOR<Prisma.TrafficSourceCreateWithoutOwnerInput, Prisma.TrafficSourceUncheckedCreateWithoutOwnerInput> | Prisma.TrafficSourceCreateWithoutOwnerInput[] | Prisma.TrafficSourceUncheckedCreateWithoutOwnerInput[]
+  connectOrCreate?: Prisma.TrafficSourceCreateOrConnectWithoutOwnerInput | Prisma.TrafficSourceCreateOrConnectWithoutOwnerInput[]
+  createMany?: Prisma.TrafficSourceCreateManyOwnerInputEnvelope
+  connect?: Prisma.TrafficSourceWhereUniqueInput | Prisma.TrafficSourceWhereUniqueInput[]
+}
+
+export type TrafficSourceUncheckedCreateNestedManyWithoutOwnerInput = {
+  create?: Prisma.XOR<Prisma.TrafficSourceCreateWithoutOwnerInput, Prisma.TrafficSourceUncheckedCreateWithoutOwnerInput> | Prisma.TrafficSourceCreateWithoutOwnerInput[] | Prisma.TrafficSourceUncheckedCreateWithoutOwnerInput[]
+  connectOrCreate?: Prisma.TrafficSourceCreateOrConnectWithoutOwnerInput | Prisma.TrafficSourceCreateOrConnectWithoutOwnerInput[]
+  createMany?: Prisma.TrafficSourceCreateManyOwnerInputEnvelope
+  connect?: Prisma.TrafficSourceWhereUniqueInput | Prisma.TrafficSourceWhereUniqueInput[]
+}
+
+export type TrafficSourceUpdateManyWithoutOwnerNestedInput = {
+  create?: Prisma.XOR<Prisma.TrafficSourceCreateWithoutOwnerInput, Prisma.TrafficSourceUncheckedCreateWithoutOwnerInput> | Prisma.TrafficSourceCreateWithoutOwnerInput[] | Prisma.TrafficSourceUncheckedCreateWithoutOwnerInput[]
+  connectOrCreate?: Prisma.TrafficSourceCreateOrConnectWithoutOwnerInput | Prisma.TrafficSourceCreateOrConnectWithoutOwnerInput[]
+  upsert?: Prisma.TrafficSourceUpsertWithWhereUniqueWithoutOwnerInput | Prisma.TrafficSourceUpsertWithWhereUniqueWithoutOwnerInput[]
+  createMany?: Prisma.TrafficSourceCreateManyOwnerInputEnvelope
+  set?: Prisma.TrafficSourceWhereUniqueInput | Prisma.TrafficSourceWhereUniqueInput[]
+  disconnect?: Prisma.TrafficSourceWhereUniqueInput | Prisma.TrafficSourceWhereUniqueInput[]
+  delete?: Prisma.TrafficSourceWhereUniqueInput | Prisma.TrafficSourceWhereUniqueInput[]
+  connect?: Prisma.TrafficSourceWhereUniqueInput | Prisma.TrafficSourceWhereUniqueInput[]
+  update?: Prisma.TrafficSourceUpdateWithWhereUniqueWithoutOwnerInput | Prisma.TrafficSourceUpdateWithWhereUniqueWithoutOwnerInput[]
+  updateMany?: Prisma.TrafficSourceUpdateManyWithWhereWithoutOwnerInput | Prisma.TrafficSourceUpdateManyWithWhereWithoutOwnerInput[]
+  deleteMany?: Prisma.TrafficSourceScalarWhereInput | Prisma.TrafficSourceScalarWhereInput[]
+}
+
+export type TrafficSourceUncheckedUpdateManyWithoutOwnerNestedInput = {
+  create?: Prisma.XOR<Prisma.TrafficSourceCreateWithoutOwnerInput, Prisma.TrafficSourceUncheckedCreateWithoutOwnerInput> | Prisma.TrafficSourceCreateWithoutOwnerInput[] | Prisma.TrafficSourceUncheckedCreateWithoutOwnerInput[]
+  connectOrCreate?: Prisma.TrafficSourceCreateOrConnectWithoutOwnerInput | Prisma.TrafficSourceCreateOrConnectWithoutOwnerInput[]
+  upsert?: Prisma.TrafficSourceUpsertWithWhereUniqueWithoutOwnerInput | Prisma.TrafficSourceUpsertWithWhereUniqueWithoutOwnerInput[]
+  createMany?: Prisma.TrafficSourceCreateManyOwnerInputEnvelope
+  set?: Prisma.TrafficSourceWhereUniqueInput | Prisma.TrafficSourceWhereUniqueInput[]
+  disconnect?: Prisma.TrafficSourceWhereUniqueInput | Prisma.TrafficSourceWhereUniqueInput[]
+  delete?: Prisma.TrafficSourceWhereUniqueInput | Prisma.TrafficSourceWhereUniqueInput[]
+  connect?: Prisma.TrafficSourceWhereUniqueInput | Prisma.TrafficSourceWhereUniqueInput[]
+  update?: Prisma.TrafficSourceUpdateWithWhereUniqueWithoutOwnerInput | Prisma.TrafficSourceUpdateWithWhereUniqueWithoutOwnerInput[]
+  updateMany?: Prisma.TrafficSourceUpdateManyWithWhereWithoutOwnerInput | Prisma.TrafficSourceUpdateManyWithWhereWithoutOwnerInput[]
+  deleteMany?: Prisma.TrafficSourceScalarWhereInput | Prisma.TrafficSourceScalarWhereInput[]
 }
 
 export type BoolFieldUpdateOperationsInput = {
@@ -466,6 +548,78 @@ export type TrafficSourceUpdateOneRequiredWithoutOutboundPostbacksNestedInput = 
   update?: Prisma.XOR<Prisma.XOR<Prisma.TrafficSourceUpdateToOneWithWhereWithoutOutboundPostbacksInput, Prisma.TrafficSourceUpdateWithoutOutboundPostbacksInput>, Prisma.TrafficSourceUncheckedUpdateWithoutOutboundPostbacksInput>
 }
 
+export type TrafficSourceCreateWithoutOwnerInput = {
+  id?: string
+  name: string
+  type: string
+  enabled?: boolean
+  credentialSecretRef?: string | null
+  configuration?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  retryPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  campaigns?: Prisma.CampaignCreateNestedManyWithoutTrafficSourceInput
+  clicks?: Prisma.ClickCreateNestedManyWithoutTrafficSourceInput
+  outboundPostbacks?: Prisma.OutboundPostbackCreateNestedManyWithoutTrafficSourceInput
+}
+
+export type TrafficSourceUncheckedCreateWithoutOwnerInput = {
+  id?: string
+  name: string
+  type: string
+  enabled?: boolean
+  credentialSecretRef?: string | null
+  configuration?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  retryPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  campaigns?: Prisma.CampaignUncheckedCreateNestedManyWithoutTrafficSourceInput
+  clicks?: Prisma.ClickUncheckedCreateNestedManyWithoutTrafficSourceInput
+  outboundPostbacks?: Prisma.OutboundPostbackUncheckedCreateNestedManyWithoutTrafficSourceInput
+}
+
+export type TrafficSourceCreateOrConnectWithoutOwnerInput = {
+  where: Prisma.TrafficSourceWhereUniqueInput
+  create: Prisma.XOR<Prisma.TrafficSourceCreateWithoutOwnerInput, Prisma.TrafficSourceUncheckedCreateWithoutOwnerInput>
+}
+
+export type TrafficSourceCreateManyOwnerInputEnvelope = {
+  data: Prisma.TrafficSourceCreateManyOwnerInput | Prisma.TrafficSourceCreateManyOwnerInput[]
+  skipDuplicates?: boolean
+}
+
+export type TrafficSourceUpsertWithWhereUniqueWithoutOwnerInput = {
+  where: Prisma.TrafficSourceWhereUniqueInput
+  update: Prisma.XOR<Prisma.TrafficSourceUpdateWithoutOwnerInput, Prisma.TrafficSourceUncheckedUpdateWithoutOwnerInput>
+  create: Prisma.XOR<Prisma.TrafficSourceCreateWithoutOwnerInput, Prisma.TrafficSourceUncheckedCreateWithoutOwnerInput>
+}
+
+export type TrafficSourceUpdateWithWhereUniqueWithoutOwnerInput = {
+  where: Prisma.TrafficSourceWhereUniqueInput
+  data: Prisma.XOR<Prisma.TrafficSourceUpdateWithoutOwnerInput, Prisma.TrafficSourceUncheckedUpdateWithoutOwnerInput>
+}
+
+export type TrafficSourceUpdateManyWithWhereWithoutOwnerInput = {
+  where: Prisma.TrafficSourceScalarWhereInput
+  data: Prisma.XOR<Prisma.TrafficSourceUpdateManyMutationInput, Prisma.TrafficSourceUncheckedUpdateManyWithoutOwnerInput>
+}
+
+export type TrafficSourceScalarWhereInput = {
+  AND?: Prisma.TrafficSourceScalarWhereInput | Prisma.TrafficSourceScalarWhereInput[]
+  OR?: Prisma.TrafficSourceScalarWhereInput[]
+  NOT?: Prisma.TrafficSourceScalarWhereInput | Prisma.TrafficSourceScalarWhereInput[]
+  id?: Prisma.UuidFilter<"TrafficSource"> | string
+  ownerId?: Prisma.UuidFilter<"TrafficSource"> | string
+  name?: Prisma.StringFilter<"TrafficSource"> | string
+  type?: Prisma.StringFilter<"TrafficSource"> | string
+  enabled?: Prisma.BoolFilter<"TrafficSource"> | boolean
+  credentialSecretRef?: Prisma.StringNullableFilter<"TrafficSource"> | string | null
+  configuration?: Prisma.JsonFilter<"TrafficSource">
+  retryPolicy?: Prisma.JsonFilter<"TrafficSource">
+  createdAt?: Prisma.DateTimeFilter<"TrafficSource"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"TrafficSource"> | Date | string
+}
+
 export type TrafficSourceCreateWithoutCampaignsInput = {
   id?: string
   name: string
@@ -478,10 +632,12 @@ export type TrafficSourceCreateWithoutCampaignsInput = {
   updatedAt?: Date | string
   clicks?: Prisma.ClickCreateNestedManyWithoutTrafficSourceInput
   outboundPostbacks?: Prisma.OutboundPostbackCreateNestedManyWithoutTrafficSourceInput
+  owner: Prisma.UserCreateNestedOneWithoutTrafficSourcesInput
 }
 
 export type TrafficSourceUncheckedCreateWithoutCampaignsInput = {
   id?: string
+  ownerId: string
   name: string
   type: string
   enabled?: boolean
@@ -522,10 +678,12 @@ export type TrafficSourceUpdateWithoutCampaignsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clicks?: Prisma.ClickUpdateManyWithoutTrafficSourceNestedInput
   outboundPostbacks?: Prisma.OutboundPostbackUpdateManyWithoutTrafficSourceNestedInput
+  owner?: Prisma.UserUpdateOneRequiredWithoutTrafficSourcesNestedInput
 }
 
 export type TrafficSourceUncheckedUpdateWithoutCampaignsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
   enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -550,10 +708,12 @@ export type TrafficSourceCreateWithoutClicksInput = {
   updatedAt?: Date | string
   campaigns?: Prisma.CampaignCreateNestedManyWithoutTrafficSourceInput
   outboundPostbacks?: Prisma.OutboundPostbackCreateNestedManyWithoutTrafficSourceInput
+  owner: Prisma.UserCreateNestedOneWithoutTrafficSourcesInput
 }
 
 export type TrafficSourceUncheckedCreateWithoutClicksInput = {
   id?: string
+  ownerId: string
   name: string
   type: string
   enabled?: boolean
@@ -594,10 +754,12 @@ export type TrafficSourceUpdateWithoutClicksInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   campaigns?: Prisma.CampaignUpdateManyWithoutTrafficSourceNestedInput
   outboundPostbacks?: Prisma.OutboundPostbackUpdateManyWithoutTrafficSourceNestedInput
+  owner?: Prisma.UserUpdateOneRequiredWithoutTrafficSourcesNestedInput
 }
 
 export type TrafficSourceUncheckedUpdateWithoutClicksInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
   enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -622,10 +784,12 @@ export type TrafficSourceCreateWithoutOutboundPostbacksInput = {
   updatedAt?: Date | string
   campaigns?: Prisma.CampaignCreateNestedManyWithoutTrafficSourceInput
   clicks?: Prisma.ClickCreateNestedManyWithoutTrafficSourceInput
+  owner: Prisma.UserCreateNestedOneWithoutTrafficSourcesInput
 }
 
 export type TrafficSourceUncheckedCreateWithoutOutboundPostbacksInput = {
   id?: string
+  ownerId: string
   name: string
   type: string
   enabled?: boolean
@@ -666,9 +830,52 @@ export type TrafficSourceUpdateWithoutOutboundPostbacksInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   campaigns?: Prisma.CampaignUpdateManyWithoutTrafficSourceNestedInput
   clicks?: Prisma.ClickUpdateManyWithoutTrafficSourceNestedInput
+  owner?: Prisma.UserUpdateOneRequiredWithoutTrafficSourcesNestedInput
 }
 
 export type TrafficSourceUncheckedUpdateWithoutOutboundPostbacksInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  credentialSecretRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  configuration?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  retryPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  campaigns?: Prisma.CampaignUncheckedUpdateManyWithoutTrafficSourceNestedInput
+  clicks?: Prisma.ClickUncheckedUpdateManyWithoutTrafficSourceNestedInput
+}
+
+export type TrafficSourceCreateManyOwnerInput = {
+  id?: string
+  name: string
+  type: string
+  enabled?: boolean
+  credentialSecretRef?: string | null
+  configuration?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  retryPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type TrafficSourceUpdateWithoutOwnerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  credentialSecretRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  configuration?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  retryPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  campaigns?: Prisma.CampaignUpdateManyWithoutTrafficSourceNestedInput
+  clicks?: Prisma.ClickUpdateManyWithoutTrafficSourceNestedInput
+  outboundPostbacks?: Prisma.OutboundPostbackUpdateManyWithoutTrafficSourceNestedInput
+}
+
+export type TrafficSourceUncheckedUpdateWithoutOwnerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
@@ -680,6 +887,19 @@ export type TrafficSourceUncheckedUpdateWithoutOutboundPostbacksInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   campaigns?: Prisma.CampaignUncheckedUpdateManyWithoutTrafficSourceNestedInput
   clicks?: Prisma.ClickUncheckedUpdateManyWithoutTrafficSourceNestedInput
+  outboundPostbacks?: Prisma.OutboundPostbackUncheckedUpdateManyWithoutTrafficSourceNestedInput
+}
+
+export type TrafficSourceUncheckedUpdateManyWithoutOwnerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  credentialSecretRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  configuration?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  retryPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -733,6 +953,7 @@ export type TrafficSourceCountOutputTypeCountOutboundPostbacksArgs<ExtArgs exten
 
 export type TrafficSourceSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ownerId?: boolean
   name?: boolean
   type?: boolean
   enabled?: boolean
@@ -744,11 +965,13 @@ export type TrafficSourceSelect<ExtArgs extends runtime.Types.Extensions.Interna
   campaigns?: boolean | Prisma.TrafficSource$campaignsArgs<ExtArgs>
   clicks?: boolean | Prisma.TrafficSource$clicksArgs<ExtArgs>
   outboundPostbacks?: boolean | Prisma.TrafficSource$outboundPostbacksArgs<ExtArgs>
+  owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.TrafficSourceCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["trafficSource"]>
 
 export type TrafficSourceSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ownerId?: boolean
   name?: boolean
   type?: boolean
   enabled?: boolean
@@ -757,10 +980,12 @@ export type TrafficSourceSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   retryPolicy?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["trafficSource"]>
 
 export type TrafficSourceSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ownerId?: boolean
   name?: boolean
   type?: boolean
   enabled?: boolean
@@ -769,10 +994,12 @@ export type TrafficSourceSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   retryPolicy?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["trafficSource"]>
 
 export type TrafficSourceSelectScalar = {
   id?: boolean
+  ownerId?: boolean
   name?: boolean
   type?: boolean
   enabled?: boolean
@@ -783,15 +1010,20 @@ export type TrafficSourceSelectScalar = {
   updatedAt?: boolean
 }
 
-export type TrafficSourceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "type" | "enabled" | "credentialSecretRef" | "configuration" | "retryPolicy" | "createdAt" | "updatedAt", ExtArgs["result"]["trafficSource"]>
+export type TrafficSourceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ownerId" | "name" | "type" | "enabled" | "credentialSecretRef" | "configuration" | "retryPolicy" | "createdAt" | "updatedAt", ExtArgs["result"]["trafficSource"]>
 export type TrafficSourceInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   campaigns?: boolean | Prisma.TrafficSource$campaignsArgs<ExtArgs>
   clicks?: boolean | Prisma.TrafficSource$clicksArgs<ExtArgs>
   outboundPostbacks?: boolean | Prisma.TrafficSource$outboundPostbacksArgs<ExtArgs>
+  owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.TrafficSourceCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type TrafficSourceIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type TrafficSourceIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type TrafficSourceIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+}
+export type TrafficSourceIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+}
 
 export type $TrafficSourcePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "TrafficSource"
@@ -799,9 +1031,11 @@ export type $TrafficSourcePayload<ExtArgs extends runtime.Types.Extensions.Inter
     campaigns: Prisma.$CampaignPayload<ExtArgs>[]
     clicks: Prisma.$ClickPayload<ExtArgs>[]
     outboundPostbacks: Prisma.$OutboundPostbackPayload<ExtArgs>[]
+    owner: Prisma.$UserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
+    ownerId: string
     name: string
     type: string
     enabled: boolean
@@ -1207,6 +1441,7 @@ export interface Prisma__TrafficSourceClient<T, Null = never, ExtArgs extends ru
   campaigns<T extends Prisma.TrafficSource$campaignsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TrafficSource$campaignsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CampaignPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   clicks<T extends Prisma.TrafficSource$clicksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TrafficSource$clicksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClickPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   outboundPostbacks<T extends Prisma.TrafficSource$outboundPostbacksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TrafficSource$outboundPostbacksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OutboundPostbackPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  owner<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1237,6 +1472,7 @@ export interface Prisma__TrafficSourceClient<T, Null = never, ExtArgs extends ru
  */
 export interface TrafficSourceFieldRefs {
   readonly id: Prisma.FieldRef<"TrafficSource", 'String'>
+  readonly ownerId: Prisma.FieldRef<"TrafficSource", 'String'>
   readonly name: Prisma.FieldRef<"TrafficSource", 'String'>
   readonly type: Prisma.FieldRef<"TrafficSource", 'String'>
   readonly enabled: Prisma.FieldRef<"TrafficSource", 'Boolean'>
@@ -1494,6 +1730,10 @@ export type TrafficSourceCreateManyAndReturnArgs<ExtArgs extends runtime.Types.E
    */
   data: Prisma.TrafficSourceCreateManyInput | Prisma.TrafficSourceCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TrafficSourceIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1564,6 +1804,10 @@ export type TrafficSourceUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.E
    * Limit how many TrafficSources to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TrafficSourceIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**

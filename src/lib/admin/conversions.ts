@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/database/prisma";
 
 export type ConversionFilters = {
+  ownerId?: string;
   from?: Date;
   to?: Date;
   campaignId?: string;
@@ -21,6 +22,7 @@ export async function getConversionWorkspace(filters: ConversionFilters = {}) {
       ...(filters.from || filters.to ? { receivedAt: { ...(filters.from ? { gte: filters.from } : {}), ...(filters.to ? { lt: filters.to } : {}) } } : {}),
       ...(eventType ? { eventType: { equals: eventType, mode: "insensitive" } } : {}),
       click: {
+        ...(filters.ownerId ? { campaign: { ownerId: filters.ownerId } } : {}),
         ...(filters.campaignId ? { campaignId: filters.campaignId } : {}),
         ...(filters.trafficSourceId ? { trafficSourceId: filters.trafficSourceId } : {}),
         ...(query ? { OR: [{ clickId: { contains: query, mode: "insensitive" } }, { campaign: { name: { contains: query, mode: "insensitive" } } }] } : {}),

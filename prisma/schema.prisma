@@ -41,12 +41,16 @@ model User {
   passwordHash String   @map("password_hash")
   createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt    DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+  campaigns    Campaign[]
+  offers       Offer[]
+  trafficSources TrafficSource[]
 
   @@map("users")
 }
 
 model TrafficSource {
   id                  String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ownerId             String             @map("owner_id") @db.Uuid
   name                String
   type                String
   enabled             Boolean            @default(true)
@@ -58,12 +62,16 @@ model TrafficSource {
   campaigns           Campaign[]
   clicks              Click[]
   outboundPostbacks   OutboundPostback[]
+  owner               User               @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
+  @@index([ownerId])
+  @@unique([ownerId, name])
   @@map("traffic_sources")
 }
 
 model Campaign {
   id                        String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ownerId                   String         @map("owner_id") @db.Uuid
   slug                      String
   name                      String
   status                    CampaignStatus @default(paused)
@@ -79,7 +87,10 @@ model Campaign {
   trafficSource             TrafficSource? @relation(fields: [trafficSourceId], references: [id], onDelete: Restrict)
   offer                     Offer?         @relation(fields: [offerId], references: [id], onDelete: SetNull)
   clicks                    Click[]
+  owner                     User           @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
+  @@index([ownerId])
+  @@unique([slug])
   @@index([trafficSourceId])
   @@index([offerId])
   @@map("campaigns")
@@ -87,12 +98,16 @@ model Campaign {
 
 model Offer {
   id                String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ownerId           String     @map("owner_id") @db.Uuid
   name              String
   offerUrl          String?    @map("offer_url")
   createdAt         DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt         DateTime   @default(now()) @map("updated_at") @db.Timestamptz(6)
   campaigns         Campaign[]
+  owner             User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
+  @@index([ownerId])
+  @@unique([ownerId, name])
   @@map("offers")
 }
 

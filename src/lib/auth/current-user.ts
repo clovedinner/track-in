@@ -1,0 +1,17 @@
+import { cookies } from "next/headers";
+
+import { prisma } from "@/lib/database/prisma";
+import { sessionCookieName, verifySessionToken } from "@/lib/auth/session";
+
+export async function getCurrentUser() {
+  const cookieStore = await cookies();
+  const session = await verifySessionToken(cookieStore.get(sessionCookieName())?.value);
+  if (!session) return null;
+  return prisma.user.findUnique({ where: { id: session.userId }, select: { id: true, email: true, createdAt: true } });
+}
+
+export async function requireCurrentUser() {
+  const user = await getCurrentUser();
+  if (!user) throw new Error("Authentication required.");
+  return user;
+}

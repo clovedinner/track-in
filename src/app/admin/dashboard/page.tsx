@@ -5,6 +5,7 @@ import { getOverviewMetrics, type DashboardFilters } from "@/lib/metrics/queries
 import { getVerificationSnapshot } from "@/lib/admin/verification";
 import { logger } from "@/lib/observability/logger";
 import AdminNavigation from "@/app/admin/admin-navigation";
+import { requireCurrentUser } from "@/lib/auth/current-user";
 
 export const metadata: Metadata = {
   title: "Dashboard | Trakio",
@@ -47,9 +48,9 @@ function filterValue(value: string | string[] | undefined) {
   return first(value) ?? "";
 }
 
-async function loadVerificationSnapshot() {
+async function loadVerificationSnapshot(ownerId: string) {
   try {
-    return await getVerificationSnapshot();
+    return await getVerificationSnapshot(ownerId);
   } catch (error) {
     logger.error("admin.dashboard_activity_failed", {
       error: error instanceof Error ? error.message : "unknown",
@@ -80,14 +81,16 @@ export default async function AdminDashboardPage({
   searchParams?: Promise<SearchParams>;
 }) {
   const params = (await searchParams) ?? {};
+  const user = await requireCurrentUser();
   const filters = buildFilters(params);
+  filters.ownerId = user.id;
 
   const [metrics, campaigns, trafficSources, eventRows, snapshot] = await Promise.all([
     getOverviewMetrics(filters),
-    prisma.campaign.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true, slug: true } }),
-    prisma.trafficSource.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true, type: true } }),
-    prisma.conversion.findMany({ distinct: ["eventType"], orderBy: { eventType: "asc" }, select: { eventType: true } }),
-    loadVerificationSnapshot(),
+    prisma.campaign.findMany({ where: { ownerId: user.id }, orderBy: { name: "asc" }, select: { id: true, name: true, slug: true } }),
+    prisma.trafficSource.findMany({ where: { ownerId: user.id }, orderBy: { name: "asc" }, select: { id: true, name: true, type: true } }),
+    prisma.conversion.findMany({ where: { click: { campaign: { ownerId: user.id } } }, distinct: ["eventType"], orderBy: { eventType: "asc" }, select: { eventType: true } }),
+    loadVerificationSnapshot(user.id),
   ]);
 
   const hasData = metrics.clicks > 0 || metrics.conversions > 0;
