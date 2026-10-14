@@ -20,7 +20,7 @@ This is intentionally not a full Voluum clone. Build the smallest reliable syste
 
 Do not add these unless the owner explicitly changes this document:
 
-- Affiliate-network offers, marketplaces, team workspaces, billing, or subscriptions. Account isolation is required; teams and billing remain future work.
+- Affiliate-network offers, marketplaces, or team workspaces. Account isolation and subscription billing are now in scope for the client-facing product; teams remain future work.
 - Rule-based traffic routing, traffic distribution, funnels, paths, rotators, or landing-page hosting.
 - Bot detection, anti-fraud scoring, device fingerprinting, or cloaking.
 - A generic integration catalog, visual workflow builder, report builder, or campaign automation.

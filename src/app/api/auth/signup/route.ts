@@ -12,8 +12,8 @@ export async function POST(request: Request) {
   const password = body?.password as string;
   const existing = await prisma.user.findUnique({ where: { email }, select: { id: true } });
   if (existing) return NextResponse.json({ error: "An account with that email already exists." }, { status: 409 });
-  const user = await prisma.user.create({ data: { email, passwordHash: await hashPassword(password) }, select: { id: true, email: true } });
-  const response = NextResponse.json({ status: "created" }, { status: 201 });
+  const user = await prisma.user.create({ data: { email, passwordHash: await hashPassword(password) }, select: { id: true, email: true, accountStatus: true } });
+  const response = NextResponse.json({ status: "created", accountStatus: user.accountStatus }, { status: 201 });
   response.cookies.set(sessionCookieName(), await createSessionToken(user), sessionCookieOptions());
   return response;
 }

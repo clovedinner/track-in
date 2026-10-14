@@ -498,10 +498,6 @@ export type BoolFieldUpdateOperationsInput = {
   set?: boolean
 }
 
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
-}
-
 export type TrafficSourceCreateNestedOneWithoutCampaignsInput = {
   create?: Prisma.XOR<Prisma.TrafficSourceCreateWithoutCampaignsInput, Prisma.TrafficSourceUncheckedCreateWithoutCampaignsInput>
   connectOrCreate?: Prisma.TrafficSourceCreateOrConnectWithoutCampaignsInput

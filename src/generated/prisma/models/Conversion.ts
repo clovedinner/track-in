@@ -597,14 +597,6 @@ export type ConversionUncheckedUpdateManyWithoutClickNestedInput = {
   deleteMany?: Prisma.ConversionScalarWhereInput | Prisma.ConversionScalarWhereInput[]
 }
 
-export type BigIntFieldUpdateOperationsInput = {
-  set?: bigint | number
-  increment?: bigint | number
-  decrement?: bigint | number
-  multiply?: bigint | number
-  divide?: bigint | number
-}
-
 export type ConversionCreateNestedOneWithoutOutboundPostbacksInput = {
   create?: Prisma.XOR<Prisma.ConversionCreateWithoutOutboundPostbacksInput, Prisma.ConversionUncheckedCreateWithoutOutboundPostbacksInput>
   connectOrCreate?: Prisma.ConversionCreateOrConnectWithoutOutboundPostbacksInput

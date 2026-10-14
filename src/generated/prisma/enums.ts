@@ -36,3 +36,34 @@ export const OutboundPostbackStatus = {
 } as const
 
 export type OutboundPostbackStatus = (typeof OutboundPostbackStatus)[keyof typeof OutboundPostbackStatus]
+
+
+export const AccountStatus = {
+  payment_required: 'payment_required',
+  active: 'active',
+  past_due: 'past_due',
+  suspended: 'suspended',
+  canceled: 'canceled'
+} as const
+
+export type AccountStatus = (typeof AccountStatus)[keyof typeof AccountStatus]
+
+
+export const SubscriptionStatus = {
+  active: 'active',
+  past_due: 'past_due',
+  canceled: 'canceled',
+  expired: 'expired'
+} as const
+
+export type SubscriptionStatus = (typeof SubscriptionStatus)[keyof typeof SubscriptionStatus]
+
+
+export const BillingPaymentStatus = {
+  pending: 'pending',
+  confirmed: 'confirmed',
+  failed: 'failed',
+  refunded: 'refunded'
+} as const
+
+export type BillingPaymentStatus = (typeof BillingPaymentStatus)[keyof typeof BillingPaymentStatus]

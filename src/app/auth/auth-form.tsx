@@ -33,13 +33,15 @@ export default function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-      const payload = await response.json().catch(() => null) as { error?: string; code?: string } | null;
+      const payload = await response.json().catch(() => null) as { error?: string; code?: string; accountStatus?: string } | null;
       if (!response.ok) {
         setErrorCode(payload?.code ?? null);
         throw new Error(payload?.error ?? "Authentication failed.");
       }
       const next = new URLSearchParams(window.location.search).get("next");
-      const destination = next?.startsWith("/") && !next.startsWith("//") ? next : "/admin/dashboard";
+      const destination = payload?.accountStatus !== "active"
+        ? "/admin/subscribe"
+        : next?.startsWith("/") && !next.startsWith("//") ? next : "/admin/dashboard";
       router.push(destination);
       router.refresh();
     } catch (submissionError) {

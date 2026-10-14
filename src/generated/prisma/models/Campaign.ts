@@ -617,10 +617,6 @@ export type EnumCampaignTrackingModeFieldUpdateOperationsInput = {
   set?: $Enums.CampaignTrackingMode
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
 export type CampaignCreateNestedManyWithoutOfferInput = {
   create?: Prisma.XOR<Prisma.CampaignCreateWithoutOfferInput, Prisma.CampaignUncheckedCreateWithoutOfferInput> | Prisma.CampaignCreateWithoutOfferInput[] | Prisma.CampaignUncheckedCreateWithoutOfferInput[]
   connectOrCreate?: Prisma.CampaignCreateOrConnectWithoutOfferInput | Prisma.CampaignCreateOrConnectWithoutOfferInput[]
