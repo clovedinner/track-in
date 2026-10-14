@@ -28,6 +28,7 @@ CREATE TABLE "billing_payments" (
   "subscription_id" UUID,
   "invoice_id" TEXT NOT NULL,
   "provider" TEXT NOT NULL,
+  "plan" TEXT NOT NULL,
   "amount_minor" BIGINT NOT NULL,
   "currency" CHAR(3) NOT NULL,
   "network" TEXT,

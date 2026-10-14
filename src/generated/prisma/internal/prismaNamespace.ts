@@ -1309,6 +1309,7 @@ export const BillingPaymentScalarFieldEnum = {
   subscriptionId: 'subscriptionId',
   invoiceId: 'invoiceId',
   provider: 'provider',
+  plan: 'plan',
   amountMinor: 'amountMinor',
   currency: 'currency',
   network: 'network',
