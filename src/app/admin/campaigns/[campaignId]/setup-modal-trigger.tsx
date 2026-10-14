@@ -17,7 +17,7 @@ export default function SetupModalTrigger({ children }: { children: ReactNode })
             <div><p className="text-xs font-bold uppercase tracking-[0.16em] text-[#D02020]">Campaign workspace</p><h2 id="campaign-setup-dialog-title" className="mt-1 text-xl font-semibold text-[#121212] sm:text-2xl">Setup and tracking instructions</h2></div>
             <button type="button" onClick={() => setOpen(false)} aria-label="Close campaign setup" className="min-h-11 min-w-11 border-2 border-[#121212] bg-white text-2xl leading-none text-[#1040C0] shadow-[3px_3px_0_#121212] hover:bg-[#F0C020] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1040C0]">×</button>
           </header>
-          <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
+          <div className="min-h-0 flex-1 overflow-y-auto text-left">{children}</div>
         </div>
       </section> : null}
     </>
