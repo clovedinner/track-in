@@ -62,7 +62,15 @@ export function createProviderOutboxDelivery(fetchImpl: FetchLike = fetch): Outb
   return async (job) => {
     try {
       const providerId = parseProviderId(job.providerId);
-      const config = validateProviderConfiguration(providerId, job.providerConfiguration);
+      if (job.providerConfiguration === null || typeof job.providerConfiguration !== "object" || Array.isArray(job.providerConfiguration)) {
+        throw new Error("Provider configuration is invalid.");
+      }
+      // The destination is snapshotted onto the durable outbox row at conversion
+      // acceptance, so retries keep using that event's original configured URL.
+      const config = validateProviderConfiguration(providerId, {
+        ...(job.providerConfiguration as Record<string, unknown>),
+        postbackUrl: job.destination,
+      });
       const conversion = conversionFor(job);
 
       if (providerId === "trafficstars") {

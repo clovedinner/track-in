@@ -77,6 +77,7 @@ model User {
   subscriptions Subscription[]
   payments      BillingPayment[]
   billingEvents BillingEvent[]
+  customConversions CustomConversion[]
 
   @@map("users")
 }
@@ -208,6 +209,24 @@ model Offer {
   @@index([ownerId])
   @@unique([ownerId, name])
   @@map("offers")
+}
+
+model CustomConversion {
+  id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ownerId            String   @map("owner_id") @db.Uuid
+  name               String
+  eventValues        String[] @default([]) @map("event_values")
+  includeInConversions Boolean @default(true) @map("include_in_conversions")
+  includeInRevenue   Boolean  @default(false) @map("include_in_revenue")
+  sendPostbackToTrafficSource Boolean @default(false) @map("send_postback_to_traffic_source")
+  includeInCost       Boolean  @default(false) @map("include_in_cost")
+  createdAt           DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+  owner               User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@index([ownerId, createdAt(sort: Desc)])
+  @@unique([ownerId, name])
+  @@map("custom_conversions")
 }
 
 model Click {

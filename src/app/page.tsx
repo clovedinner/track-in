@@ -1,43 +1,359 @@
 import Link from "next/link";
 
 const workflow = [
-  { number: "01", title: "Record the ad click", text: "Trakio gives every visitor a unique click ID and saves the campaign details that matter." },
-  { number: "02", title: "Send the visitor to your site", text: "The visitor arrives at your money site with the click ID attached, so the visit can be matched later." },
-  { number: "03", title: "Match the conversion", text: "When someone registers or buys, Trakio links that event to the original click and reports it back." },
+  {
+    number: "01",
+    title: "Record the ad click",
+    text: "Trakio gives every visitor a unique click ID and saves the campaign details that matter.",
+  },
+  {
+    number: "02",
+    title: "Send the visitor to your site",
+    text: "The visitor arrives at your money site with the click ID attached, so the visit can be matched later.",
+  },
+  {
+    number: "03",
+    title: "Match the conversion",
+    text: "When someone registers or buys, Trakio links that event to the original click and reports it back.",
+  },
 ];
 
 const plans = [
-  { name: "Starter", price: "$300", note: "A clear starting point", features: ["Click and conversion tracking", "One campaign workspace", "Essential dashboard metrics"], featured: true },
-  { name: "Operator", price: "$500", note: "For managing campaigns every day", features: ["Everything in Starter", "Campaign, offer, and traffic-source setup", "S2S conversion postbacks", "Delivery health and retries"], featured: false },
-  { name: "Expanded", price: "$1000", note: "For a larger active setup", features: ["Everything in Operator", "More campaign configurations", "More traffic-source connections", "The same focused interface"], featured: false },
+  {
+    name: "Starter",
+    price: "$300",
+    note: "A clear starting point",
+    features: [
+      "Click and conversion tracking",
+      "One campaign workspace",
+      "Essential dashboard metrics",
+    ],
+    featured: true,
+  },
+  {
+    name: "Operator",
+    price: "$500",
+    note: "For managing campaigns every day",
+    features: [
+      "Everything in Starter",
+      "Campaign, offer, and traffic-source setup",
+      "S2S conversion postbacks",
+      "Delivery health and retries",
+    ],
+    featured: false,
+  },
+  {
+    name: "Expanded",
+    price: "$1000",
+    note: "For a larger active setup",
+    features: [
+      "Everything in Operator",
+      "More campaign configurations",
+      "More traffic-source connections",
+      "The same focused interface",
+    ],
+    featured: false,
+  },
 ];
 
 export default function Home() {
   return (
     <main className="min-h-screen overflow-hidden bg-[#F0F0F0] text-[#121212]">
-      <nav className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-5 py-5 sm:px-8 lg:px-12" aria-label="Main navigation">
-        <Link href="/" className="flex shrink-0 items-center gap-1 border-2 border-[#121212] bg-[#FFFFFF] px-2 py-1 text-lg font-black tracking-[-0.03em] shadow-[3px_3px_0_#121212]"><span aria-hidden="true" className="h-3 w-3 rounded-full bg-[#D02020]" /><span aria-hidden="true" className="h-3 w-3 bg-[#1040C0]" /><span aria-hidden="true" className="h-0 w-0 border-x-[6px] border-b-[10px] border-x-transparent border-b-[#F0C020]" /><span className="ml-1">Trakio</span></Link>
-        <div className="flex items-center gap-4 text-sm font-semibold sm:gap-6"><a href="#how-it-works" className="hidden text-[#121212] hover:underline hover:underline-offset-4 sm:inline">How it works</a><a href="#pricing" className="text-[#121212] hover:underline hover:underline-offset-4">Pricing</a><Link href="/auth/sign-in" className="hidden text-[#D02020] hover:underline hover:underline-offset-4 sm:inline">Sign in</Link><Link href="/auth/sign-up" className="border-2 border-[#121212] bg-[#1040C0] px-4 py-2 text-white shadow-[3px_3px_0_#121212] hover:bg-[#D02020] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D02020]">Start free</Link></div>
+      <nav
+        className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-5 py-5 sm:px-8 lg:px-12"
+        aria-label="Main navigation"
+      >
+        <Link
+          href="/"
+          className="flex shrink-0 items-center gap-1 border-2 border-[#121212] bg-[#FFFFFF] px-2 py-1 text-lg font-black tracking-[-0.03em] shadow-[3px_3px_0_#121212]"
+        >
+          <span
+            aria-hidden="true"
+            className="h-3 w-3 rounded-full bg-[#D02020]"
+          />
+          <span aria-hidden="true" className="h-3 w-3 bg-[#1040C0]" />
+          <span
+            aria-hidden="true"
+            className="h-0 w-0 border-x-[6px] border-b-[10px] border-x-transparent border-b-[#F0C020]"
+          />
+          <span className="ml-1">Trakio</span>
+        </Link>
+        <div className="flex items-center gap-4 text-sm font-semibold sm:gap-6">
+          <a
+            href="#how-it-works"
+            className="hidden text-[#121212] hover:underline hover:underline-offset-4 sm:inline"
+          >
+            How it works
+          </a>
+          <a
+            href="#pricing"
+            className="text-[#121212] hover:underline hover:underline-offset-4"
+          >
+            Pricing
+          </a>
+          <Link
+            href="/auth/sign-in"
+            className="hidden text-[#D02020] hover:underline hover:underline-offset-4 sm:inline"
+          >
+            Sign in
+          </Link>
+          <Link
+            href="/auth/sign-up"
+            className="border-2 border-[#121212] bg-[#1040C0] px-4 py-2 text-white shadow-[3px_3px_0_#121212] hover:bg-[#D02020] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D02020]"
+          >
+            Start free
+          </Link>
+        </div>
       </nav>
 
       <section className="mx-auto grid max-w-7xl gap-12 px-5 pb-20 pt-16 sm:px-8 sm:pt-24 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:px-12 lg:pb-28">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#D02020]">Simple tracking for paid traffic</p>
-          <h1 className="mt-5 max-w-3xl text-5xl font-semibold leading-[0.98] tracking-[-0.06em] sm:text-7xl">See which ads bring conversions.</h1>
-          <p className="mt-7 max-w-xl text-lg leading-8 text-[#121212]">Trakio connects an ad click to what happens on your money site. It saves a unique click ID, records the conversion, and sends the result back to your traffic source.</p>
-          <div className="mt-9 flex flex-wrap items-center gap-4"><Link href="/auth/sign-up" className="bg-[#1040C0] px-5 py-3 text-sm font-semibold text-white shadow-[4px_4px_0_#121212] hover:bg-[#D02020] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1040C0]">Start free</Link>
-          {/* <Link href="/auth/sign-in" className="border-b-2 border-[#D02020] pb-1 text-sm font-semibold text-[#121212] hover:text-[#D02020]">Sign in</Link> */}
-          <a href="#how-it-works" className="text-sm font-semibold text-[#1040C0] underline decoration-[#121212] underline-offset-4 hover:text-[#121212]">See how it works</a>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#D02020]">
+            Simple tracking for paid traffic
+          </p>
+          <h1 className="mt-5 max-w-3xl text-5xl font-semibold leading-[0.98] tracking-[-0.06em] sm:text-7xl">
+            See which ads bring conversions.
+          </h1>
+          <p className="mt-7 max-w-xl text-lg leading-8 text-[#121212]">
+            Trakio connects an ad click to what happens on your money site. It
+            saves a unique click ID, records the conversion, and sends the
+            result back to your traffic source.
+          </p>
+          <div className="mt-9 flex flex-wrap items-center gap-4">
+            <Link
+              href="/auth/sign-up"
+              className="bg-[#1040C0] px-5 py-3 text-sm font-semibold text-white shadow-[4px_4px_0_#121212] hover:bg-[#D02020] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1040C0]"
+            >
+              Start free
+            </Link>
+            {/* <Link href="/auth/sign-in" className="border-b-2 border-[#D02020] pb-1 text-sm font-semibold text-[#121212] hover:text-[#D02020]">Sign in</Link> */}
+            <a
+              href="#how-it-works"
+              className="text-sm font-semibold text-[#1040C0] underline decoration-[#121212] underline-offset-4 hover:text-[#121212]"
+            >
+              See how it works
+            </a>
           </div>
         </div>
-        <div className="relative border-2 border-[#121212] bg-[#FFFFFF] p-5 sm:p-7"><div className="flex items-center justify-between border-b-2 border-[#121212] pb-4"><p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#121212]">One clear path</p><span className="text-xs font-semibold text-[#D02020]">Trakio</span></div><div className="py-7"><p className="font-mono text-xs text-[#121212]">ad click</p><div className="my-3 h-px w-full bg-[#121212]" /><p className="font-mono text-xs text-[#121212]">unique click ID</p><div className="my-3 h-px w-3/4 bg-[#121212]" /><p className="font-mono text-xs text-[#121212]">your money site</p><div className="my-3 h-px w-1/2 bg-[#D02020]" /><p className="font-mono text-xs font-semibold text-[#1040C0]">conversion reported</p></div><p className="border-t-2 border-[#121212] pt-4 text-sm leading-6 text-[#121212]">One click record, one matched conversion, and a dashboard you can understand.</p></div>
+        <div className="relative border-2 border-[#121212] bg-[#FFFFFF] p-5 sm:p-7">
+          <div className="flex items-center justify-between border-b-2 border-[#121212] pb-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#121212]">
+              One clear path
+            </p>
+            <span className="text-xs font-semibold text-[#D02020]">Trakio</span>
+          </div>
+          <div className="py-7">
+            <p className="font-mono text-xs text-[#121212]">ad click</p>
+            <div className="my-3 h-px w-full bg-[#121212]" />
+            <p className="font-mono text-xs text-[#121212]">unique click ID</p>
+            <div className="my-3 h-px w-3/4 bg-[#121212]" />
+            <p className="font-mono text-xs text-[#121212]">your money site</p>
+            <div className="my-3 h-px w-1/2 bg-[#D02020]" />
+            <p className="font-mono text-xs font-semibold text-[#1040C0]">
+              conversion reported
+            </p>
+          </div>
+          <p className="border-t-2 border-[#121212] pt-4 text-sm leading-6 text-[#121212]">
+            One click record, one matched conversion, and a dashboard you can
+            understand.
+          </p>
+        </div>
       </section>
 
-      <section id="how-it-works" className="border-y-2 border-[#121212] bg-[#FFFFFF]"><div className="mx-auto max-w-7xl px-5 py-16 sm:px-8 lg:px-12 lg:py-20"><div className="max-w-xl"><p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#D02020]">How it works</p><h2 className="mt-4 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">Start with the click. End with the answer.</h2><p className="mt-4 text-base leading-7 text-[#121212]">You choose a traffic source and a money-site offer. Trakio handles the click ID and gives you a private view of visits, registrations, first deposits, and other conversion events. It supports TrafficStars, PropellerAds, and TrafficJunky.</p></div><div className="mt-12 grid gap-0 border-y-2 border-[#121212] md:grid-cols-3">{workflow.map((item) => <article key={item.number} className="border-b-2 border-[#121212] py-7 md:border-b-0 md:border-r md:px-7 md:first:pl-0 md:last:border-r-0 md:last:pr-0"><p className="font-mono text-sm text-[#D02020]">{item.number}</p><h3 className="mt-7 text-xl font-semibold">{item.title}</h3><p className="mt-3 text-sm leading-6 text-[#121212]">{item.text}</p></article>)}</div></div></section>
+      <section
+        id="how-it-works"
+        className="border-y-2 border-[#121212] bg-[#FFFFFF]"
+      >
+        <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8 lg:px-12 lg:py-20">
+          <div className="max-w-xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#D02020]">
+              How it works
+            </p>
+            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">
+              Start with the click. End with the answer.
+            </h2>
+            <p className="mt-4 text-base leading-7 text-[#121212]">
+              You choose a traffic source and a money-site offer. Trakio handles
+              the click ID and gives you a private view of visits,
+              registrations, first deposits, and other conversion events. It
+              supports TrafficStars, PropellerAds, and TrafficJunky.
+            </p>
+          </div>
+          <div className="mt-12 grid gap-0 border-y-2 border-[#121212] md:grid-cols-3">
+            {workflow.map((item) => (
+              <article
+                key={item.number}
+                className="border-b-2 border-[#121212] py-7 md:border-b-0 md:border-r md:px-7 md:first:pl-0 md:last:border-r-0 md:last:pr-0"
+              >
+                <p className="font-mono text-sm text-[#D02020]">
+                  {item.number}
+                </p>
+                <h3 className="mt-7 text-xl font-semibold">{item.title}</h3>
+                <p className="mt-3 text-sm leading-6 text-[#121212]">
+                  {item.text}
+                </p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
 
-      <section id="pricing" className="mx-auto max-w-7xl px-5 py-16 sm:px-8 lg:px-12 lg:py-24"><div className="flex flex-col gap-5 border-b-2 border-[#121212] pb-10 sm:flex-row sm:items-end sm:justify-between"><div><p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#D02020]">Pricing</p><h2 className="mt-4 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">Choose the tracking setup that fits.</h2></div><p className="max-w-sm text-sm leading-6 text-[#121212]">Start at $300/month for the core click-to-conversion loop. Move up only when you need more campaign and traffic-source capacity.</p></div><div className="mt-10 grid gap-4 lg:grid-cols-3">{plans.map((plan) => <article key={plan.name} className={`flex flex-col border-2 p-6 ${plan.featured ? "border-[#1040C0] bg-[#1040C0] text-white shadow-[0_12px_0_#121212]" : "border-[#121212] bg-[#FFFFFF]"}`}><div className="flex items-start justify-between gap-4"><h3 className="text-xl font-semibold">{plan.name}</h3>{plan.featured ? <span className="border-2 border-white/50 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em]">Best fit</span> : null}</div><p className={`mt-3 text-sm ${plan.featured ? "text-[#FFFFFF]" : "text-[#121212]"}`}>{plan.note}</p><p className="mt-8 text-4xl font-semibold tracking-[-0.05em]">{plan.price}<span className={`ml-1 text-sm font-normal ${plan.featured ? "text-[#FFFFFF]" : "text-[#121212]"}`}>/month</span></p><ul className={`mt-8 space-y-3 border-t-2 pt-6 text-sm leading-6 ${plan.featured ? "border-white/25 text-[#FFFFFF]" : "border-[#121212] text-[#121212]"}`}>{plan.features.map((feature) => <li key={feature} className="flex gap-3"><span aria-hidden="true" className={plan.featured ? "text-[#F0C020]" : "text-[#D02020]"}>•</span>{feature}</li>)}</ul><Link href="/auth/sign-up" className={`mt-10 border-2 px-4 py-3 text-center text-sm font-semibold transition ${plan.featured ? "border-white bg-white text-[#1040C0] hover:bg-[#FFFFFF]" : "border-[#121212] text-[#121212] hover:bg-[#121212] hover:text-white"}`}>{plan.featured ? "Start with Starter" : `Choose ${plan.name}`}</Link></article>)}</div></section>
+      <section
+        id="pricing"
+        className="mx-auto max-w-7xl px-5 py-16 sm:px-8 lg:px-12 lg:py-24"
+      >
+        <div className="flex flex-col gap-5 border-b-2 border-[#121212] pb-10 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#D02020]">
+              Pricing
+            </p>
+            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">
+              Choose the tracking setup that fits.
+            </h2>
+          </div>
+          <p className="max-w-sm text-sm leading-6 text-[#121212]">
+            Start at $300/month for the core click-to-conversion loop. Move up
+            only when you need more campaign and traffic-source capacity.
+          </p>
+        </div>
+        <div className="mt-10 grid gap-4 lg:grid-cols-3">
+          {plans.map((plan) => (
+            <article
+              key={plan.name}
+              className={`flex flex-col border-2 p-6 ${plan.featured ? "border-[#1040C0] bg-[#1040C0] text-white shadow-[0_12px_0_#121212]" : "border-[#121212] bg-[#FFFFFF]"}`}
+            >
+              <div className="flex items-start justify-between gap-4">
+                <h3 className="text-xl font-semibold">{plan.name}</h3>
+                {plan.featured ? (
+                  <span className="border-2 border-white/50 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em]">
+                    Best fit
+                  </span>
+                ) : null}
+              </div>
+              <p
+                className={`mt-3 text-sm ${plan.featured ? "text-[#FFFFFF]" : "text-[#121212]"}`}
+              >
+                {plan.note}
+              </p>
+              <p className="mt-8 text-4xl font-semibold tracking-[-0.05em]">
+                {plan.price}
+                <span
+                  className={`ml-1 text-sm font-normal ${plan.featured ? "text-[#FFFFFF]" : "text-[#121212]"}`}
+                >
+                  /month
+                </span>
+              </p>
+              <ul
+                className={`mt-8 space-y-3 border-t-2 pt-6 text-sm leading-6 ${plan.featured ? "border-white/25 text-[#FFFFFF]" : "border-[#121212] text-[#121212]"}`}
+              >
+                {plan.features.map((feature) => (
+                  <li key={feature} className="flex gap-3">
+                    <span
+                      aria-hidden="true"
+                      className={
+                        plan.featured ? "text-[#F0C020]" : "text-[#D02020]"
+                      }
+                    >
+                      •
+                    </span>
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="/auth/sign-up"
+                className={`mt-10 border-2 px-4 py-3 text-center text-sm font-semibold transition ${plan.featured ? "border-white bg-white text-[#1040C0] hover:bg-[#FFFFFF]" : "border-[#121212] text-[#121212] hover:bg-[#121212] hover:text-white"}`}
+              >
+                {plan.featured ? "Start with Starter" : `Choose ${plan.name}`}
+              </Link>
+            </article>
+          ))}
+        </div>
+      </section>
 
-      <footer className="border-t-2 border-[#121212] bg-[#121212] text-white" aria-label="Footer"><div className="mx-auto max-w-7xl px-5 py-12 sm:px-8 lg:px-12 lg:py-16"><div className="grid gap-10 border-b border-white/30 pb-12 sm:grid-cols-[1.5fr_1fr_1fr] sm:gap-8"><div><Link href="/" className="inline-flex items-center gap-1 border-2 border-white bg-white px-2 py-1 text-lg font-black tracking-[-0.03em] text-[#121212] shadow-[3px_3px_0_#F0C020]"><span aria-hidden="true" className="h-3 w-3 rounded-full bg-[#D02020]" /><span aria-hidden="true" className="h-3 w-3 bg-[#1040C0]" /><span aria-hidden="true" className="h-0 w-0 border-x-[6px] border-b-[10px] border-x-transparent border-b-[#F0C020]" /><span className="ml-1">Trakio</span></Link><p className="mt-6 max-w-sm text-sm leading-6 text-white/75">Simple click-to-conversion tracking for teams that want useful answers without a complicated analytics stack.</p></div><div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#F0C020]">Explore</p><div className="mt-5 flex flex-col items-start gap-3 text-sm"><a href="#how-it-works" className="text-white/80 hover:text-white hover:underline hover:underline-offset-4">How it works</a><a href="#pricing" className="text-white/80 hover:text-white hover:underline hover:underline-offset-4">Pricing</a></div></div><div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#F0C020]">Account</p><div className="mt-5 flex flex-col items-start gap-3 text-sm"><Link href="/auth/sign-in" className="text-white/80 hover:text-white hover:underline hover:underline-offset-4">Sign in</Link><Link href="/auth/sign-up" className="text-white/80 hover:text-white hover:underline hover:underline-offset-4">Create an account</Link><Link href="/admin" className="text-white/80 hover:text-white hover:underline hover:underline-offset-4">Open dashboard</Link></div></div></div><div className="flex flex-col gap-4 pt-7 text-xs text-white/60 sm:flex-row sm:items-center sm:justify-between"><p>© {new Date().getFullYear()} Trakio. Built for clearer campaign decisions.</p><p className="font-mono uppercase tracking-[0.12em] text-[#F0C020]">Track the click. Know the outcome.</p></div></div></footer>
+      <footer
+        className="border-t-2 border-[#121212] bg-[#121212] text-white"
+        aria-label="Footer"
+      >
+        <div className="mx-auto max-w-7xl px-5 py-12 sm:px-8 lg:px-12 lg:py-16">
+          <div className="grid gap-10 border-b border-white/30 pb-12 sm:grid-cols-[1.5fr_1fr_1fr] sm:gap-8">
+            <div>
+              <Link
+                href="/"
+                className="inline-flex items-center gap-1 border-2 border-white bg-white px-2 py-1 text-lg font-black tracking-[-0.03em] text-[#121212] shadow-[3px_3px_0_#F0C020]"
+              >
+                <span
+                  aria-hidden="true"
+                  className="h-3 w-3 rounded-full bg-[#D02020]"
+                />
+                <span aria-hidden="true" className="h-3 w-3 bg-[#1040C0]" />
+                <span
+                  aria-hidden="true"
+                  className="h-0 w-0 border-x-[6px] border-b-[10px] border-x-transparent border-b-[#F0C020]"
+                />
+                <span className="ml-1">Trakio</span>
+              </Link>
+              <p className="mt-6 max-w-sm text-sm leading-6 text-white/75">
+                Simple click-to-conversion tracking for teams that want useful
+                answers without a complicated analytics stack.
+              </p>
+            </div>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#F0C020]">
+                Explore
+              </p>
+              <div className="mt-5 flex flex-col items-start gap-3 text-sm">
+                <a
+                  href="#how-it-works"
+                  className="text-white/80 hover:text-white hover:underline hover:underline-offset-4"
+                >
+                  How it works
+                </a>
+                <a
+                  href="#pricing"
+                  className="text-white/80 hover:text-white hover:underline hover:underline-offset-4"
+                >
+                  Pricing
+                </a>
+              </div>
+            </div>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#F0C020]">
+                Account
+              </p>
+              <div className="mt-5 flex flex-col items-start gap-3 text-sm">
+                <Link
+                  href="/auth/sign-in"
+                  className="text-white/80 hover:text-white hover:underline hover:underline-offset-4"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  href="/auth/sign-up"
+                  className="text-white/80 hover:text-white hover:underline hover:underline-offset-4"
+                >
+                  Create an account
+                </Link>
+                {/* <Link
+                  href="/admin"
+                  className="text-white/80 hover:text-white hover:underline hover:underline-offset-4"
+                >
+                  Open dashboard
+                </Link> */}
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col gap-4 pt-7 text-xs text-white/60 sm:flex-row sm:items-center sm:justify-between">
+            <p>
+              © {new Date().getFullYear()} Trakio. Built for clearer campaign
+              decisions.
+            </p>
+            <p className="font-mono uppercase tracking-[0.12em] text-[#F0C020]">
+              Track the click. Know the outcome.
+            </p>
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }

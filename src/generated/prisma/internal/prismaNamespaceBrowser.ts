@@ -56,6 +56,7 @@ export const ModelName = {
   TrafficSource: 'TrafficSource',
   Campaign: 'Campaign',
   Offer: 'Offer',
+  CustomConversion: 'CustomConversion',
   Click: 'Click',
   Conversion: 'Conversion',
   OutboundPostback: 'OutboundPostback',
@@ -193,6 +194,22 @@ export const OfferScalarFieldEnum = {
 } as const
 
 export type OfferScalarFieldEnum = (typeof OfferScalarFieldEnum)[keyof typeof OfferScalarFieldEnum]
+
+
+export const CustomConversionScalarFieldEnum = {
+  id: 'id',
+  ownerId: 'ownerId',
+  name: 'name',
+  eventValues: 'eventValues',
+  includeInConversions: 'includeInConversions',
+  includeInRevenue: 'includeInRevenue',
+  sendPostbackToTrafficSource: 'sendPostbackToTrafficSource',
+  includeInCost: 'includeInCost',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CustomConversionScalarFieldEnum = (typeof CustomConversionScalarFieldEnum)[keyof typeof CustomConversionScalarFieldEnum]
 
 
 export const ClickScalarFieldEnum = {

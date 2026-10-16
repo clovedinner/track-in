@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { Prisma } from "@/generated/prisma/client";
 
-import { parseTrafficSourceId, parseTrafficSourceInput, safeTrafficSourceConfiguration, TrafficSourceInputError } from "@/lib/admin/traffic-sources";
+import { parseTrafficSourceId, parseTrafficSourceInput, postbackEventConversionIds, safeTrafficSourceConfiguration, TrafficSourceInputError } from "@/lib/admin/traffic-sources";
 import { prisma } from "@/lib/database/prisma";
 import { ApiError, apiErrorResponse } from "@/lib/http/api-error";
 import { getCorrelationId } from "@/lib/observability/correlation-id";
@@ -23,6 +23,11 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
   try { body = await request.json(); } catch { return inputError(new TrafficSourceInputError("body", "Request body must be valid JSON."), correlationId); }
   let input;
   try { input = parseTrafficSourceInput(body); } catch (error) { return error instanceof TrafficSourceInputError ? inputError(error, correlationId) : apiErrorResponse(new ApiError("invalid_request", 400, "Invalid traffic source data."), correlationId); }
+  const eventConversionIds = postbackEventConversionIds(input.configuration);
+  if (eventConversionIds.length > 0) {
+    const available = await prisma.customConversion.findMany({ where: { ownerId: user.id, id: { in: eventConversionIds }, sendPostbackToTrafficSource: true }, select: { id: true } });
+    if (available.length !== eventConversionIds.length) return inputError(new TrafficSourceInputError("configuration", "Every event postback must reference an enabled custom conversion in this account."), correlationId);
+  }
   try {
     const source = await prisma.trafficSource.update({
       where: { id, ownerId: user.id },

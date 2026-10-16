@@ -85,9 +85,14 @@ const SECRET_QUERY_KEYS = new Set([
 ]);
 
 function endpointFromConfiguration(configuration: ProviderConfiguration): string {
-  const candidate = "postbackUrl" in configuration
-    ? (configuration.postbackUrl ?? ("endpoint" in configuration ? configuration.endpoint : undefined))
-    : configuration.endpoint;
+  const record = configuration as Record<string, unknown>;
+  const candidate = typeof record.postbackUrl === "string"
+    ? record.postbackUrl
+    : typeof record.endpoint === "string"
+      ? record.endpoint
+      : Array.isArray(record.eventPostbacks) && record.eventPostbacks[0] !== null && typeof record.eventPostbacks[0] === "object"
+        ? (record.eventPostbacks[0] as Record<string, unknown>).url
+        : undefined;
   if (typeof candidate !== "string") throw new Error("Provider postback URL is required.");
   return candidate;
 }

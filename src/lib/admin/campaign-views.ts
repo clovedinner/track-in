@@ -2,6 +2,7 @@ import { Prisma, type CampaignStatus } from "@/generated/prisma/client";
 
 import { prisma } from "@/lib/database/prisma";
 import { getCampaignDailyMetrics, getOverviewMetrics, type DashboardFilters, type DailyMetric, type OverviewMetrics } from "@/lib/metrics/queries";
+import { getCustomConversionCounts, includedCustomConversionColumns, type CustomConversionColumn } from "@/lib/admin/custom-conversion-metrics";
 
 export type CampaignListSort = "name" | "createdAt" | "clicks" | "conversions";
 
@@ -31,6 +32,7 @@ export type CampaignListRow = {
   revenueMinor: number;
   registrations: number;
   ftds: number;
+  customConversionCounts: Record<string, number>;
 };
 
 export type CampaignDetail = {
@@ -94,6 +96,9 @@ function bigintToNumber(value: bigint): number {
 }
 
 export async function getCampaignList(filters: CampaignListFilters = {}): Promise<CampaignListRow[]> {
+  const customConversions: CustomConversionColumn[] = filters.ownerId
+    ? await prisma.customConversion.findMany({ where: { ownerId: filters.ownerId, includeInConversions: true }, select: { id: true, name: true, eventValues: true, includeInConversions: true } })
+    : [];
   const campaignRows = await prisma.campaign.findMany({
     where: {
       ...(filters.ownerId ? { ownerId: filters.ownerId } : {}),
@@ -138,6 +143,7 @@ export async function getCampaignList(filters: CampaignListFilters = {}): Promis
       revenueMinor: conversions.reduce((total, conversion) => total + bigintToNumber(conversion.valueMinor), 0),
       registrations: conversions.filter((conversion) => conversion.eventType.toLowerCase() === "registration").length,
       ftds: conversions.filter((conversion) => ["ftd", "first_deposit", "first-deposit"].includes(conversion.eventType.toLowerCase())).length,
+      customConversionCounts: getCustomConversionCounts(conversions, includedCustomConversionColumns(customConversions)),
     } satisfies CampaignListRow;
   });
 

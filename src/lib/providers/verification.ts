@@ -1,13 +1,11 @@
-import { buildPropellerAdsRequest } from "@/lib/providers/propeller-ads";
-import { buildTrafficJunkyRequest } from "@/lib/providers/trafficjunky";
+import { buildPropellerAdsRequest, type PropellerAdsConfig } from "@/lib/providers/propeller-ads";
+import { buildTrafficJunkyRequest, type TrafficJunkyConfig } from "@/lib/providers/trafficjunky";
 import { buildTrafficStarsRequest } from "@/lib/providers/trafficstars";
 import {
   parseProviderId,
   validateProviderConfiguration,
   type ProviderConfiguration,
   type ProviderId,
-  type PropellerProviderConfiguration,
-  type TrafficJunkyProviderConfiguration,
 } from "@/lib/providers/config";
 
 export type ProviderVerificationInput = {
@@ -60,14 +58,14 @@ function buildRequest(input: ProviderVerificationInput, provider: ProviderId, co
     const token = firstToken(input.sampleTokens, ["subid", "SUBID", "clickid", "CLICKID", "click_id", "CLICK_ID"]);
     if (token === undefined) throw new Error("PropellerAds verification requires a sample SUBID/clickid token.");
     return {
-      url: buildPropellerAdsRequest(config as PropellerProviderConfiguration, input.sampleTokens, { eventType, valueMinor: input.valueMinor, currency: input.currency }).url,
+      url: buildPropellerAdsRequest({ ...config, postbackUrl: config.postbackUrl ?? config.eventPostbacks?.[0]?.url ?? "" } as PropellerAdsConfig, input.sampleTokens, { eventType, valueMinor: input.valueMinor, currency: input.currency }).url,
       token,
     };
   }
   const token = firstToken(input.sampleTokens, ["ACLID", "aclid", "clickid", "click_id"]);
   if (token === undefined) throw new Error("TrafficJunky verification requires a sample ACLID token.");
   return {
-    url: buildTrafficJunkyRequest(config as TrafficJunkyProviderConfiguration, input.sampleTokens, { eventId, eventType, valueMinor: input.valueMinor, currency: input.currency }).url,
+    url: buildTrafficJunkyRequest({ ...config, postbackUrl: config.postbackUrl ?? config.eventPostbacks?.[0]?.url ?? "" } as TrafficJunkyConfig, input.sampleTokens, { eventId, eventType, valueMinor: input.valueMinor, currency: input.currency }).url,
     token,
   };
 }

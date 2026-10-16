@@ -4,6 +4,7 @@ export const adminNavigation = [
   { href: "/admin/offers", label: "Offers" },
   { href: "/admin/traffic-sources", label: "Traffic sources" },
   { href: "/admin/conversions", label: "Conversions" },
+  { href: "/admin/custom-conversions", label: "Custom conversions" },
   { href: "/admin/delivery-health", label: "Delivery health" },
 ] as const;
 

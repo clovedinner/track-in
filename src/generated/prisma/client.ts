@@ -77,6 +77,11 @@ export type Campaign = Prisma.CampaignModel
  */
 export type Offer = Prisma.OfferModel
 /**
+ * Model CustomConversion
+ * 
+ */
+export type CustomConversion = Prisma.CustomConversionModel
+/**
  * Model Click
  * 
  */

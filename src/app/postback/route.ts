@@ -4,7 +4,7 @@ import { prisma } from "@/lib/database/prisma";
 import { getCorrelationId } from "@/lib/observability/correlation-id";
 import { logger } from "@/lib/observability/logger";
 import {
-  getPostbackDestination,
+  getConversionPostbackDestination,
   hashConversionPayload,
   isSetupTestClick,
   parsePublicPostback,
@@ -48,7 +48,7 @@ export async function GET(request: Request): Promise<Response> {
         id: true,
         trafficSourceId: true,
         trackingTokens: true,
-        campaign: { select: { defaultCurrency: true } },
+        campaign: { select: { defaultCurrency: true, ownerId: true } },
         trafficSource: { select: { enabled: true, configuration: true } },
       },
     });
@@ -72,8 +72,12 @@ export async function GET(request: Request): Promise<Response> {
         select: { id: true },
       });
 
+      const conversionDefinitions = await transaction.customConversion.findMany({
+        where: { ownerId: click.campaign.ownerId },
+        select: { id: true, eventValues: true, sendPostbackToTrafficSource: true },
+      });
       const destination = click.trafficSource?.enabled
-        ? getPostbackDestination(click.trafficSource.configuration)
+        ? getConversionPostbackDestination(click.trafficSource.configuration, input.eventType, conversionDefinitions)
         : undefined;
       if (!isSetupTestClick(click.trackingTokens) && click.trafficSourceId !== null && click.trafficSource?.enabled && destination !== undefined) {
         await transaction.outboundPostback.create({

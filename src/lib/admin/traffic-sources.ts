@@ -23,6 +23,12 @@ export type TrafficSourceInput = {
   retryPolicy: Record<string, unknown>;
 };
 
+export function postbackEventConversionIds(configuration: ProviderConfiguration): string[] {
+  return configuration.postbackMode === "per_event"
+    ? (configuration.eventPostbacks ?? []).map((entry) => entry.customConversionId)
+    : [];
+}
+
 function requiredString(value: unknown, field: string, maxLength: number): string {
   if (typeof value !== "string") throw new TrafficSourceInputError(field, `${field} must be a string.`);
   const result = value.trim();
@@ -96,20 +102,32 @@ export function safeTrafficSourceConfiguration(value: unknown): Record<string, u
   if (typeof value !== "object" || value === null || Array.isArray(value)) return {};
   const safe: Record<string, unknown> = {};
   const secretKeys = new Set(["key", "token", "secret", "password", "authorization", "apiKey", "api_key"]);
+  const safeUrl = (candidate: string): string => {
+    try {
+      const url = new URL(candidate);
+      for (const secret of ["key", "token", "secret", "api_key", "apiKey", "a", "member_id"]) {
+        if (url.searchParams.has(secret)) url.searchParams.set(secret, "[redacted]");
+      }
+      return url.toString().replace(/%7B/gi, "{").replace(/%7D/gi, "}");
+    } catch {
+      return "[redacted]";
+    }
+  };
   for (const [key, candidate] of Object.entries(value as Record<string, unknown>)) {
     if (secretKeys.has(key.toLowerCase())) continue;
     if (key === "postbackUrl" || key === "endpoint") {
-      if (typeof candidate === "string") {
-        try {
-          const url = new URL(candidate);
-          for (const secret of ["key", "token", "secret", "api_key", "apiKey", "a", "member_id"]) {
-            if (url.searchParams.has(secret)) url.searchParams.set(secret, "[redacted]");
-          }
-          safe[key] = url.toString();
-        } catch {
-          safe[key] = "[redacted]";
-        }
-      }
+      if (typeof candidate === "string") safe[key] = safeUrl(candidate);
+      continue;
+    }
+    if (key === "eventPostbacks" && Array.isArray(candidate)) {
+      safe[key] = candidate.map((entry) => {
+        if (typeof entry !== "object" || entry === null || Array.isArray(entry)) return {};
+        const mapping = entry as Record<string, unknown>;
+        return {
+          customConversionId: mapping.customConversionId,
+          ...(typeof mapping.url === "string" ? { url: safeUrl(mapping.url) } : {}),
+        };
+      });
       continue;
     }
     safe[key] = candidate;

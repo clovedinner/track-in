@@ -14,6 +14,8 @@ export type ProviderId = (typeof SUPPORTED_PROVIDER_IDS)[number];
 export type TrafficStarsProviderConfiguration = {
   postbackUrl?: string;
   endpoint?: string;
+  postbackMode?: "single" | "per_event";
+  eventPostbacks?: Array<{ customConversionId: string; url: string }>;
   key?: string;
   allowDuplicates?: boolean;
   goalId?: string;
@@ -24,7 +26,9 @@ export type TrafficStarsProviderConfiguration = {
 };
 
 export type PropellerProviderConfiguration = {
-  postbackUrl: string;
+  postbackUrl?: string;
+  postbackMode?: "single" | "per_event";
+  eventPostbacks?: Array<{ customConversionId: string; url: string }>;
   aid?: string;
   pid?: string;
   tid?: string;
@@ -36,7 +40,9 @@ export type PropellerProviderConfiguration = {
 };
 
 export type TrafficJunkyProviderConfiguration = {
-  postbackUrl: string;
+  postbackUrl?: string;
+  postbackMode?: "single" | "per_event";
+  eventPostbacks?: Array<{ customConversionId: string; url: string }>;
   descriptionByEventType?: Record<string, string | undefined>;
   parameters?: Array<{ name: string; parameter?: string; token: string; enabled?: boolean }>;
   costCurrency?: "USD";
@@ -107,6 +113,46 @@ function validateUrl(value: string, key: string): string {
   return value;
 }
 
+const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function optionalPostbackConfiguration(record: Record<string, unknown>): {
+  postbackMode?: "single" | "per_event";
+  eventPostbacks?: Array<{ customConversionId: string; url: string }>;
+} {
+  const rawMode = record.postbackMode;
+  if (rawMode !== undefined && rawMode !== "single" && rawMode !== "per_event") {
+    throw new Error("postbackMode must be single or per_event.");
+  }
+  const postbackMode = rawMode as "single" | "per_event" | undefined;
+  const rawMappings = record.eventPostbacks;
+  if (rawMappings === undefined) return { postbackMode };
+  if (!Array.isArray(rawMappings) || rawMappings.length > 10) {
+    throw new Error("eventPostbacks must contain at most 10 entries.");
+  }
+  const seen = new Set<string>();
+  const eventPostbacks = rawMappings.map((entry, index) => {
+    if (!isRecord(entry)) throw new Error(`eventPostbacks[${index}] must be an object.`);
+    const customConversionId = requiredString(entry, "customConversionId");
+    if (!uuidPattern.test(customConversionId)) throw new Error(`eventPostbacks[${index}].customConversionId must be a UUID.`);
+    if (seen.has(customConversionId)) throw new Error("Each custom conversion can only have one postback URL.");
+    seen.add(customConversionId);
+    const url = validateUrl(requiredString(entry, "url"), `eventPostbacks[${index}].url`);
+    return { customConversionId, url };
+  });
+  return { postbackMode, eventPostbacks };
+}
+
+function validatePostbackMode(mode: "single" | "per_event" | undefined, eventPostbacks: Array<{ customConversionId: string; url: string }> | undefined, destination: string | undefined): void {
+  if (mode === "per_event") {
+    if (eventPostbacks === undefined || eventPostbacks.length === 0) throw new Error("At least one event postback URL is required when per-event mode is selected.");
+    return;
+  }
+  if (eventPostbacks !== undefined && eventPostbacks.length > 0) {
+    throw new Error("Event postback URLs can only be used in per-event mode.");
+  }
+  if (destination === undefined) throw new Error("postbackUrl is required when single postback mode is selected.");
+}
+
 function optionalStringRecord(record: Record<string, unknown>, key: string): Record<string, string | undefined> | undefined {
   const value = record[key];
   if (value === undefined) return undefined;
@@ -164,18 +210,17 @@ function optionalParameters(record: Record<string, unknown>): Array<{ name: stri
 function optionalCommonConfiguration(record: Record<string, unknown>) {
   const costCurrency = record.costCurrency === undefined ? undefined : record.costCurrency;
   if (costCurrency !== undefined && costCurrency !== "USD") throw new Error("costCurrency must be USD.");
-  return { parameters: optionalParameters(record), costCurrency: costCurrency as "USD" | undefined, postbackByEventType: optionalEventPostbacks(record), externalId: optionalExternalId(record) };
+  return { parameters: optionalParameters(record), costCurrency: costCurrency as "USD" | undefined, postbackByEventType: optionalEventPostbacks(record), externalId: optionalExternalId(record), ...optionalPostbackConfiguration(record) };
 }
 
 function validateTrafficStarsConfiguration(value: unknown): TrafficStarsProviderConfiguration {
   if (!isRecord(value)) throw new Error("TrafficStars configuration must be an object.");
   const postbackUrl = optionalString(value, "postbackUrl");
   const endpoint = optionalString(value, "endpoint");
-  if (postbackUrl === undefined && endpoint === undefined) {
-    throw new Error("TrafficStars configuration requires postbackUrl or endpoint.");
-  }
   const destination = postbackUrl ?? endpoint;
   if (destination !== undefined) validateUrl(destination, postbackUrl === undefined ? "endpoint" : "postbackUrl");
+  const postback = optionalPostbackConfiguration(value);
+  validatePostbackMode(postback.postbackMode, postback.eventPostbacks, destination);
   const key = optionalString(value, "key");
   const goalId = optionalString(value, "goalId");
   const allowDuplicates = value.allowDuplicates;
@@ -187,7 +232,10 @@ function validateTrafficStarsConfiguration(value: unknown): TrafficStarsProvider
 
 function validatePropellerConfiguration(value: unknown): PropellerProviderConfiguration {
   if (!isRecord(value)) throw new Error("PropellerAds configuration must be an object.");
-  const postbackUrl = validateUrl(requiredString(value, "postbackUrl"), "postbackUrl");
+  const postbackUrl = optionalString(value, "postbackUrl");
+  if (postbackUrl !== undefined) validateUrl(postbackUrl, "postbackUrl");
+  const postback = optionalPostbackConfiguration(value);
+  validatePostbackMode(postback.postbackMode, postback.eventPostbacks, postbackUrl);
   const aid = optionalString(value, "aid");
   const pid = optionalString(value, "pid");
   const tid = optionalString(value, "tid");
@@ -208,7 +256,10 @@ function validatePropellerConfiguration(value: unknown): PropellerProviderConfig
 
 function validateTrafficJunkyConfiguration(value: unknown): TrafficJunkyProviderConfiguration {
   if (!isRecord(value)) throw new Error("TrafficJunky configuration must be an object.");
-  const postbackUrl = validateUrl(requiredString(value, "postbackUrl"), "postbackUrl");
+  const postbackUrl = optionalString(value, "postbackUrl");
+  if (postbackUrl !== undefined) validateUrl(postbackUrl, "postbackUrl");
+  const postback = optionalPostbackConfiguration(value);
+  validatePostbackMode(postback.postbackMode, postback.eventPostbacks, postbackUrl);
   return {
     postbackUrl,
     descriptionByEventType: optionalStringRecord(value, "descriptionByEventType"),

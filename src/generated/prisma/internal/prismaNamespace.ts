@@ -397,6 +397,7 @@ export const ModelName = {
   TrafficSource: 'TrafficSource',
   Campaign: 'Campaign',
   Offer: 'Offer',
+  CustomConversion: 'CustomConversion',
   Click: 'Click',
   Conversion: 'Conversion',
   OutboundPostback: 'OutboundPostback',
@@ -416,7 +417,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "subscription" | "billingPayment" | "billingEvent" | "trafficSource" | "campaign" | "offer" | "click" | "conversion" | "outboundPostback" | "auditEntry"
+    modelProps: "user" | "subscription" | "billingPayment" | "billingEvent" | "trafficSource" | "campaign" | "offer" | "customConversion" | "click" | "conversion" | "outboundPostback" | "auditEntry"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -938,6 +939,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    CustomConversion: {
+      payload: Prisma.$CustomConversionPayload<ExtArgs>
+      fields: Prisma.CustomConversionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CustomConversionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomConversionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CustomConversionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomConversionPayload>
+        }
+        findFirst: {
+          args: Prisma.CustomConversionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomConversionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CustomConversionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomConversionPayload>
+        }
+        findMany: {
+          args: Prisma.CustomConversionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomConversionPayload>[]
+        }
+        create: {
+          args: Prisma.CustomConversionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomConversionPayload>
+        }
+        createMany: {
+          args: Prisma.CustomConversionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CustomConversionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomConversionPayload>[]
+        }
+        delete: {
+          args: Prisma.CustomConversionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomConversionPayload>
+        }
+        update: {
+          args: Prisma.CustomConversionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomConversionPayload>
+        }
+        deleteMany: {
+          args: Prisma.CustomConversionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CustomConversionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CustomConversionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomConversionPayload>[]
+        }
+        upsert: {
+          args: Prisma.CustomConversionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomConversionPayload>
+        }
+        aggregate: {
+          args: Prisma.CustomConversionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCustomConversion>
+        }
+        groupBy: {
+          args: Prisma.CustomConversionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CustomConversionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CustomConversionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CustomConversionCountAggregateOutputType> | number
+        }
+      }
+    }
     Click: {
       payload: Prisma.$ClickPayload<ExtArgs>
       fields: Prisma.ClickFieldRefs
@@ -1390,6 +1465,22 @@ export const OfferScalarFieldEnum = {
 export type OfferScalarFieldEnum = (typeof OfferScalarFieldEnum)[keyof typeof OfferScalarFieldEnum]
 
 
+export const CustomConversionScalarFieldEnum = {
+  id: 'id',
+  ownerId: 'ownerId',
+  name: 'name',
+  eventValues: 'eventValues',
+  includeInConversions: 'includeInConversions',
+  includeInRevenue: 'includeInRevenue',
+  sendPostbackToTrafficSource: 'sendPostbackToTrafficSource',
+  includeInCost: 'includeInCost',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CustomConversionScalarFieldEnum = (typeof CustomConversionScalarFieldEnum)[keyof typeof CustomConversionScalarFieldEnum]
+
+
 export const ClickScalarFieldEnum = {
   id: 'id',
   clickId: 'clickId',
@@ -1777,6 +1868,7 @@ export type GlobalOmitConfig = {
   trafficSource?: Prisma.TrafficSourceOmit
   campaign?: Prisma.CampaignOmit
   offer?: Prisma.OfferOmit
+  customConversion?: Prisma.CustomConversionOmit
   click?: Prisma.ClickOmit
   conversion?: Prisma.ConversionOmit
   outboundPostback?: Prisma.OutboundPostbackOmit

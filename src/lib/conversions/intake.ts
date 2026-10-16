@@ -150,6 +150,34 @@ export function getPostbackDestination(configuration: unknown): string | undefin
   return typeof destination === "string" && /^https?:\/\//.test(destination) ? destination : undefined;
 }
 
+export type ConversionPostbackDefinition = {
+  id: string;
+  eventValues: string[];
+  sendPostbackToTrafficSource: boolean;
+};
+
+/** Resolve the one configured destination for an event, preserving legacy single-URL configurations. */
+export function getConversionPostbackDestination(
+  configuration: unknown,
+  eventType: string,
+  definitions: readonly ConversionPostbackDefinition[],
+): string | undefined {
+  if (configuration === null || typeof configuration !== "object" || Array.isArray(configuration)) return undefined;
+  const record = configuration as Record<string, unknown>;
+  if (record.postbackMode !== "per_event") return getPostbackDestination(configuration);
+  if (!Array.isArray(record.eventPostbacks)) return undefined;
+
+  const normalizedEventType = eventType.trim().toLowerCase();
+  const matches = definitions.filter((definition) => definition.sendPostbackToTrafficSource
+    && definition.eventValues.some((value) => value.trim().toLowerCase() === normalizedEventType));
+  if (matches.length !== 1) return undefined;
+  const mapping = record.eventPostbacks.find((entry) => entry !== null && typeof entry === "object"
+    && !Array.isArray(entry) && (entry as Record<string, unknown>).customConversionId === matches[0].id);
+  if (mapping === undefined || mapping === null || typeof mapping !== "object" || Array.isArray(mapping)) return undefined;
+  const destination = (mapping as Record<string, unknown>).url;
+  return typeof destination === "string" && /^https?:\/\//.test(destination) ? destination : undefined;
+}
+
 /** Setup-test clicks verify attribution only and must never reach a real provider. */
 export function isSetupTestClick(tokens: unknown): boolean {
   return tokens !== null && typeof tokens === "object" && !Array.isArray(tokens)

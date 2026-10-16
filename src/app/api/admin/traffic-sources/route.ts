@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { Prisma } from "@/generated/prisma/client";
 
 import {
+  postbackEventConversionIds,
   parseTrafficSourceInput,
   safeTrafficSourceConfiguration,
   TrafficSourceInputError,
@@ -59,6 +60,11 @@ export async function POST(request: Request): Promise<NextResponse> {
   let input;
   try { input = parseTrafficSourceInput(body); } catch (error) {
     return error instanceof TrafficSourceInputError ? errorResponse(error, correlationId) : apiErrorResponse(new ApiError("invalid_request", 400, "Invalid traffic source data."), correlationId);
+  }
+  const eventConversionIds = postbackEventConversionIds(input.configuration);
+  if (eventConversionIds.length > 0) {
+    const available = await prisma.customConversion.findMany({ where: { ownerId: user.id, id: { in: eventConversionIds }, sendPostbackToTrafficSource: true }, select: { id: true } });
+    if (available.length !== eventConversionIds.length) return errorResponse(new TrafficSourceInputError("configuration", "Every event postback must reference an enabled custom conversion in this account."), correlationId);
   }
   try {
     const source = await prisma.trafficSource.create({

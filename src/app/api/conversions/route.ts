@@ -6,7 +6,7 @@ import { ApiError, apiErrorResponse } from "@/lib/http/api-error";
 import { getCorrelationId } from "@/lib/observability/correlation-id";
 import { logger } from "@/lib/observability/logger";
 import {
-  getPostbackDestination,
+  getConversionPostbackDestination,
   hasValidBearerSecret,
   hashConversionPayload,
   isSetupTestClick,
@@ -64,7 +64,7 @@ export async function POST(request: Request): Promise<Response> {
 
     const click = await prisma.click.findUnique({
       where: { clickId: input.cid },
-      select: { id: true, trafficSourceId: true, trackingTokens: true, trafficSource: { select: { id: true, enabled: true, configuration: true } } },
+      select: { id: true, trafficSourceId: true, trackingTokens: true, campaign: { select: { ownerId: true } }, trafficSource: { select: { id: true, enabled: true, configuration: true } } },
     });
     if (!click) {
       return apiErrorResponse(new ApiError("not_found", 404, "Unknown click ID."), correlationId);
@@ -88,8 +88,12 @@ export async function POST(request: Request): Promise<Response> {
         select: { id: true },
       });
 
+      const conversionDefinitions = await transaction.customConversion.findMany({
+        where: { ownerId: click.campaign.ownerId },
+        select: { id: true, eventValues: true, sendPostbackToTrafficSource: true },
+      });
       const destination = click.trafficSource?.enabled
-        ? getPostbackDestination(click.trafficSource.configuration)
+        ? getConversionPostbackDestination(click.trafficSource.configuration, input.event_type, conversionDefinitions)
         : undefined;
       if (!isSetupTestClick(click.trackingTokens) && click.trafficSourceId !== null && click.trafficSource?.enabled && destination !== undefined) {
         await transaction.outboundPostback.create({
