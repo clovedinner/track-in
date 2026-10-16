@@ -6,6 +6,7 @@ import { getVerificationSnapshot } from "@/lib/admin/verification";
 import { logger } from "@/lib/observability/logger";
 import AdminNavigation from "@/app/admin/admin-navigation";
 import { requireCurrentUser } from "@/lib/auth/current-user";
+import { parseDateInTimezone } from "@/lib/timezone";
 
 export const metadata: Metadata = {
   title: "Dashboard | Trakio",
@@ -19,20 +20,12 @@ type SearchParams = Record<string, string | string[] | undefined>;
 function first(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
 }
-function parseDate(value: string | undefined, endOfDay = false) {
-  if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return undefined;
-  const date = new Date(`${value}T00:00:00.000Z`);
-  if (Number.isNaN(date.getTime())) return undefined;
-  if (endOfDay) date.setUTCDate(date.getUTCDate() + 1);
-  return date;
-}
-
-function buildFilters(params: SearchParams): DashboardFilters {
+function buildFilters(params: SearchParams, timezone: string): DashboardFilters {
   const fromValue = first(params.from);
   const toValue = first(params.to);
   return {
-    from: parseDate(fromValue),
-    to: parseDate(toValue, true),
+    from: parseDateInTimezone(fromValue, timezone),
+    to: parseDateInTimezone(toValue, timezone, true),
     campaignId: first(params.campaign),
     trafficSourceId: first(params.source),
     eventType: first(params.event),
@@ -81,7 +74,7 @@ export default async function AdminDashboardPage({
 }) {
   const params = (await searchParams) ?? {};
   const user = await requireCurrentUser();
-  const filters = buildFilters(params);
+  const filters = buildFilters(params, user.timezone);
   filters.ownerId = user.id;
 
   const [metrics, campaigns, trafficSources, eventRows, snapshot] = await Promise.all([

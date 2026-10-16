@@ -5,27 +5,20 @@ import { prisma } from "@/lib/database/prisma";
 import { getConversionWorkspace, type ConversionFilters } from "@/lib/admin/conversions";
 import ConversionsClient from "./conversions-client";
 import { requireCurrentUser } from "@/lib/auth/current-user";
+import { parseDateInTimezone } from "@/lib/timezone";
 
 export const metadata: Metadata = { title: "Conversions | Trakio", description: "Inspect conversion events and captured attribution data." };
 export const dynamic = "force-dynamic";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 function first(value: string | string[] | undefined) { return Array.isArray(value) ? value[0] : value; }
-function parseDate(value: string | undefined, endOfDay = false) {
-  if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return undefined;
-  const date = new Date(`${value}T00:00:00.000Z`);
-  if (Number.isNaN(date.getTime())) return undefined;
-  if (endOfDay) date.setUTCDate(date.getUTCDate() + 1);
-  return date;
-}
-
 export default async function ConversionsPage({ searchParams }: { searchParams?: Promise<SearchParams> }) {
   const params = (await searchParams) ?? {};
   const user = await requireCurrentUser();
   const filters: ConversionFilters = {
     ownerId: user.id,
-    from: parseDate(first(params.from)),
-    to: parseDate(first(params.to), true),
+    from: parseDateInTimezone(first(params.from), user.timezone),
+    to: parseDateInTimezone(first(params.to), user.timezone, true),
     campaignId: first(params.campaign),
     trafficSourceId: first(params.source),
     eventType: first(params.event),
