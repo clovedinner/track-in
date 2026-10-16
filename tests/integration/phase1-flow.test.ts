@@ -140,7 +140,7 @@ describe("Phase 1 database-backed click-to-conversion flow", () => {
     expect(await database.outboundPostback.count({ where: { conversionId } })).toBe(1);
   });
 
-  it("accepts Voluum-compatible registration and FTD postbacks with txid idempotency", async () => {
+  it("accepts public registration and FTD postbacks with txid idempotency", async () => {
     expect(clickId).toBeTruthy();
 
     const registrationUrl = new URL("https://tracker.example.test/postback");
@@ -170,7 +170,7 @@ describe("Phase 1 database-backed click-to-conversion flow", () => {
     expect(duplicateFtd.status).toBe(200);
 
     const conversions = await database.conversion.findMany({
-      where: { source: "voluum_compat", eventId: { startsWith: `voluum:${clickId}:` } },
+      where: { source: "public_postback", eventId: { startsWith: `postback:${clickId}:` } },
       orderBy: { receivedAt: "asc" },
       select: { eventType: true, eventId: true, transactionReference: true, id: true },
     });

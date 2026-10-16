@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { buildCampaignTrackingScript } from "./campaign-tracking-script";
 
 describe("campaign tracking install script", () => {
-  it("points the Voluum-compatible loader at the configured tracker origin", () => {
+  it("points the tracking loader at the configured tracker origin", () => {
     const script = buildCampaignTrackingScript("https://tracker.example.test/");
     expect(script).toContain("https://tracker.example.test/g/.js");
     expect(script).toContain("/g/click?cpid=");

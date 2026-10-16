@@ -7,8 +7,8 @@ import {
   getPostbackDestination,
   hashConversionPayload,
   isSetupTestClick,
-  parseVoluumPostback,
-  VOLUUM_COMPAT_SOURCE,
+  parsePublicPostback,
+  PUBLIC_POSTBACK_SOURCE,
 } from "@/lib/conversions/intake";
 
 const PIXEL = Uint8Array.from(Buffer.from("R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==", "base64"));
@@ -30,14 +30,14 @@ export async function GET(request: Request): Promise<Response> {
 
   let input;
   try {
-    input = parseVoluumPostback(url);
+    input = parsePublicPostback(url);
   } catch {
     return pixelResponse(correlationId, 400);
   }
 
   try {
     const existing = await prisma.conversion.findUnique({
-      where: { source_eventId: { source: VOLUUM_COMPAT_SOURCE, eventId: input.eventId } },
+      where: { source_eventId: { source: PUBLIC_POSTBACK_SOURCE, eventId: input.eventId } },
       select: { id: true },
     });
     if (existing) return pixelResponse(correlationId);
@@ -58,7 +58,7 @@ export async function GET(request: Request): Promise<Response> {
       const created = await transaction.conversion.create({
         data: {
           clickRecordId: click.id,
-          source: VOLUUM_COMPAT_SOURCE,
+          source: PUBLIC_POSTBACK_SOURCE,
           eventId: input.eventId,
           eventType: input.eventType,
           occurredAt: input.occurredAt,
@@ -88,7 +88,7 @@ export async function GET(request: Request): Promise<Response> {
       return created;
     });
 
-    logger.info("voluum_postback.accepted", {
+    logger.info("public_postback.accepted", {
       correlationId,
       conversionId: conversion.id,
       eventType: input.eventType,
@@ -98,7 +98,7 @@ export async function GET(request: Request): Promise<Response> {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
       return pixelResponse(correlationId);
     }
-    logger.error("voluum_postback.failed", {
+    logger.error("public_postback.failed", {
       correlationId,
       error: error instanceof Error ? error.message : "unknown",
     });

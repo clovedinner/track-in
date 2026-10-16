@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { generateDefaultGtmSnippets, generateGtmSnippets } from "./gtm-snippets";
 
-describe("GTM Voluum-compatible snippet generation", () => {
+describe("GTM postback snippet generation", () => {
   it("generates copyable registration and FTD image/HTML snippets", () => {
     const result = generateDefaultGtmSnippets("https://tracker.example.test/");
 

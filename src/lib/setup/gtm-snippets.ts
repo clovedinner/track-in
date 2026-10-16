@@ -1,5 +1,5 @@
 /**
- * Voluum-compatible Google Tag Manager snippets.
+ * Public Google Tag Manager postback snippets.
  *
  * The generated values deliberately use GTM variable placeholders. They are
  * not credentials and must be resolved by GTM at event time. Keep this module
@@ -9,7 +9,7 @@
 export type GtmSnippetEvent = {
   /** Human-readable name shown next to the generated snippet. */
   label: string;
-  /** Value sent as the Voluum-compatible `et` parameter. */
+  /** Value sent as the public `et` parameter. */
   eventType: string;
   /** Optional GTM variable for a unique later transaction. */
   txidVariable?: string;

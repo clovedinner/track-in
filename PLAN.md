@@ -148,13 +148,13 @@ Goal: make campaign decisions using data whose definitions are stable and tracea
 - [ ] Zero or missing cost displays ROI as unavailable, not infinite or zero.
 - [ ] Dashboard totals match direct database reconciliation for a test dataset.
 
-### Voluum-like campaign setup workflow
+### Legacy-compatible campaign setup workflow
 
 Goal: let the operator configure a campaign and copy the exact URLs, GTM snippets, and platform postbacks needed for the client's existing workflow.
 
 - [x] Add a private campaign creation/edit form with destination URL, currency, event types, and allowlisted tracking parameters.
 - [x] Generate a copyable campaign tracking URL for TrafficStars, PropellerAds, and TrafficJunky using each platform's original click-token macros.
-- [x] Generate copyable GTM Custom HTML/Image snippets for registration, FTD, and optional `txid` events using the Voluum-compatible `/postback` contract.
+- [x] Generate copyable GTM Custom HTML/Image snippets for registration, FTD, and optional `txid` events using the public `/postback` contract.
 - [x] Generate copyable outbound postback templates for TrafficStars, PropellerAds, and TrafficJunky from saved traffic-source configuration.
 - [x] Add a setup/test view that sends a controlled click and verifies click capture, conversion attribution, and outbound delivery preparation.
 - [x] Document the operator handoff from campaign creation to ad-platform configuration and GTM publishing.
@@ -289,17 +289,17 @@ Add this after each implementation session when useful:
 - Blockers: The first outbound ad platform is still unselected; production deployment remains disabled.
 - Next task: Select the first provider and implement its adapter contract before expanding dashboard scope.
 
-### 2026-10-04: Voluum compatibility decision
+### 2026-10-04: Legacy compatibility decision
 
-- Completed: Changed the product contract to reproduce the client's existing Voluum behavior, including a narrow public `/postback` endpoint for GTM registration/FTD events alongside the authenticated backend conversion API.
-- Verified: The compatibility contract requires valid recorded click IDs, Voluum-style `et`/`txid` handling, duplicate suppression, and the same durable outbound work as authenticated conversions.
+- Completed: Changed the product contract to reproduce the client's existing tracking behavior, including a narrow public `/postback` endpoint for GTM registration/FTD events alongside the authenticated backend conversion API.
+- Verified: The compatibility contract requires valid recorded click IDs, `et`/`txid` handling, duplicate suppression, and the same durable outbound work as authenticated conversions.
 - Decisions: Do not block browser/GTM postbacks with bearer authentication that the browser cannot keep private; use rate limits, strict bounds, click validation, and idempotency as the compatibility safeguards.
 - Blockers: The `/postback` route is not implemented yet; traffic-source adapter details still need to be configured from the client's TrafficStars, PropellerAds, and TrafficJunky accounts.
 - Next task: implement and test `GET /postback`, then add source-specific token mappings and outbound URL templates.
 
-### 2026-10-04: Voluum-compatible postback foundation
+### 2026-10-04: Public postback foundation
 
-- Completed: Added `GET /postback` with Voluum-style `cid`, `et`, optional `txid`, value, and currency parsing; valid click matching; duplicate suppression; registration/FTD event identity; image-friendly responses; and transactional outbound-postback creation.
+- Completed: Added `GET /postback` with `cid`, `et`, optional `txid`, value, and currency parsing; valid click matching; duplicate suppression; registration/FTD event identity; image-friendly responses; and transactional outbound-postback creation.
 - Verified: `npm run check`, `npm run test:unit -- --run` (31 tests), and `npm run build` pass. The generated route is available at `/postback`.
 - Decisions: Registration and FTD without `txid` are distinct event identities; repeated events for the same click/event are ignored; `txid` identifies later unique conversions.
 - Blockers: Route-level database contract coverage and live source-specific templates remain pending.
@@ -337,7 +337,7 @@ Add this after each implementation session when useful:
 - Blockers: The new dashboard reconciliation integration test and restore rehearsal still require operator-run disposable database environments; live provider conversion and deployment host remain unconfigured.
 - Next task: run `npm run test:integration` from the configured PowerShell, complete a disposable restore rehearsal, then choose the deployment host.
 
-### 2026-10-04: Voluum-like setup workflow added to plan
+### 2026-10-04: Legacy-compatible setup workflow added to plan
 
 - Completed: Expanded the active plan with the missing operator workflow: campaign form, platform-specific tracking URLs, GTM registration/FTD snippets, copyable platform postbacks, and a controlled setup test.
 - Verified: Existing APIs and adapters provide the backend primitives, but the copyable setup UI and generated snippets/templates are not implemented yet.
@@ -345,7 +345,7 @@ Add this after each implementation session when useful:
 - Blockers: None beyond implementation; platform-specific macro details must be confirmed during the controlled setup test.
 - Next task: implement the campaign setup form and generators in small, testable slices.
 
-### 2026-10-04: Voluum-like setup workflow implementation
+### 2026-10-04: Legacy-compatible setup workflow implementation
 
 - Completed: Added private campaign creation, provider-specific tracking URL generation, GTM registration/FTD snippet generation, outbound postback template generation, and a guarded campaign setup verification page with a test-click action.
 - Verified: `npm run check`, `npm run test:unit -- --run` (24 test files, 99 tests), and `npm run build` pass.

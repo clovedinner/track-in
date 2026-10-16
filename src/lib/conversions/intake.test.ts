@@ -5,7 +5,7 @@ import {
   hasValidBearerSecret,
   isSetupTestClick,
   parseConversionPayload,
-  parseVoluumPostback,
+  parsePublicPostback,
 } from "./intake";
 
 describe("conversion intake", () => {
@@ -57,22 +57,22 @@ describe("conversion intake", () => {
     expect(isSetupTestClick(null)).toBe(false);
   });
 
-  it("parses Voluum-compatible registration and FTD events", () => {
-    const registration = parseVoluumPostback(
+  it("parses public registration and FTD events", () => {
+    const registration = parsePublicPostback(
       new URL("https://tracker.example.test/postback?cid=click-123&et=reg"),
     );
-    const ftd = parseVoluumPostback(
+    const ftd = parsePublicPostback(
       new URL("https://tracker.example.test/postback?cid=click-123&et=ftd&txid=deposit-1&payout=500000&currency=idr"),
     );
 
-    expect(registration.eventId).toBe("voluum:click-123:reg");
-    expect(ftd.eventId).toBe("voluum:click-123:deposit-1");
+    expect(registration.eventId).toBe("postback:click-123:reg");
+    expect(ftd.eventId).toBe("postback:click-123:deposit-1");
     expect(ftd.valueMinor).toBe(BigInt(500000));
     expect(ftd.currency).toBe("IDR");
   });
 
-  it("rejects malformed Voluum-compatible values", () => {
-    expect(() => parseVoluumPostback(new URL("https://tracker.test/postback?et=reg"))).toThrow();
-    expect(() => parseVoluumPostback(new URL("https://tracker.test/postback?cid=click&et=ftd&payout=-1"))).toThrow();
+  it("rejects malformed public postback values", () => {
+    expect(() => parsePublicPostback(new URL("https://tracker.test/postback?et=reg"))).toThrow();
+    expect(() => parsePublicPostback(new URL("https://tracker.test/postback?cid=click&et=ftd&payout=-1"))).toThrow();
   });
 });

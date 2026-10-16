@@ -1,7 +1,7 @@
 import { createHash, timingSafeEqual } from "node:crypto";
 
 export const MONEY_SITE_SOURCE = "primary_money_site";
-export const VOLUUM_COMPAT_SOURCE = "voluum_compat";
+export const PUBLIC_POSTBACK_SOURCE = "public_postback";
 export const MAX_CONVERSION_BODY_BYTES = 32 * 1024;
 
 export type ConversionInput = {
@@ -16,7 +16,7 @@ export type ConversionInput = {
 
 export type ConversionPayload = Record<string, unknown>;
 
-export type VoluumPostbackInput = {
+export type PublicPostbackInput = {
   cid: string;
   eventType: string;
   eventId: string;
@@ -98,7 +98,7 @@ export function parseConversionPayload(payload: unknown): ConversionInput {
   };
 }
 
-export function parseVoluumPostback(url: URL, now = new Date()): VoluumPostbackInput {
+export function parsePublicPostback(url: URL, now = new Date()): PublicPostbackInput {
   const cid = url.searchParams.get("cid")?.trim();
   const eventType = (url.searchParams.get("et") ?? "conversion").trim().toLowerCase();
   const transactionId = url.searchParams.get("txid")?.trim();
@@ -129,7 +129,7 @@ export function parseVoluumPostback(url: URL, now = new Date()): VoluumPostbackI
   return {
     cid,
     eventType,
-    eventId: `voluum:${cid}:${transactionId ?? eventType}`,
+    eventId: `postback:${cid}:${transactionId ?? eventType}`,
     occurredAt: now,
     valueMinor,
     ...(currency === undefined ? {} : { currency }),
