@@ -3,8 +3,10 @@ import Link from "next/link";
 import { adminNavigation, isAdminNavigationActive } from "@/lib/admin/navigation";
 import SignOutButton from "@/app/admin/sign-out-button";
 import TimezoneSelector from "@/app/admin/timezone-selector";
+import { getCurrentUser } from "@/lib/auth/current-user";
 
-export default function AdminNavigation({ pathname }: { pathname: string }) {
+export default async function AdminNavigation({ pathname }: { pathname: string }) {
+  const user = await getCurrentUser();
   return (
     <nav aria-label="Private navigation" className="border-b-2 border-[#121212] bg-[#FFFFFF]">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-5 gap-y-2 px-5 py-3 sm:px-8 lg:px-12">
@@ -27,7 +29,7 @@ export default function AdminNavigation({ pathname }: { pathname: string }) {
             </Link>
           );
         })}
-        <TimezoneSelector />
+        <TimezoneSelector initialTimezone={user?.timezone ?? "UTC"} />
         <Link
           href="/admin/profile"
           aria-current={pathname === "/admin/profile" ? "page" : undefined}

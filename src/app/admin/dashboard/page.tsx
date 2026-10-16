@@ -19,7 +19,6 @@ type SearchParams = Record<string, string | string[] | undefined>;
 function first(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
 }
-
 function parseDate(value: string | undefined, endOfDay = false) {
   if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return undefined;
   const date = new Date(`${value}T00:00:00.000Z`);
@@ -60,8 +59,8 @@ async function loadVerificationSnapshot(ownerId: string) {
   }
 }
 
-function formatDate(value: Date) {
-  return `${new Intl.DateTimeFormat("en", { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" }).format(value)} UTC`;
+function formatDate(value: Date, timezone: string) {
+  return `${new Intl.DateTimeFormat("en", { dateStyle: "medium", timeStyle: "short", timeZone: timezone }).format(value)} ${timezone}`;
 }
 
 function shortId(value: string) {
@@ -142,7 +141,7 @@ export default async function AdminDashboardPage({
             <p className="mt-2 max-w-xl text-sm leading-6 text-[#121212]">{hasFilters ? "Try a wider date range or clear one of the filters." : "Send a test click through an active campaign, then complete a controlled conversion. The metrics will appear here from the persisted records."}</p>
           </section>
         ) : (
-          <Activity snapshot={snapshot} />
+          <Activity snapshot={snapshot} timezone={user.timezone} />
         )}
       </div>
     </main>
@@ -153,12 +152,12 @@ function Metric({ label, value }: { label: string; value: string }) {
   return <div className="bg-[#FFFFFF] px-5 py-5 sm:px-6"><p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#121212]">{label}</p><p className="mt-3 text-2xl font-semibold tracking-[-0.04em] sm:text-3xl">{value}</p></div>;
 }
 
-function Activity({ snapshot }: { snapshot: Awaited<ReturnType<typeof getVerificationSnapshot>> | null }) {
+function Activity({ snapshot, timezone }: { snapshot: Awaited<ReturnType<typeof getVerificationSnapshot>> | null; timezone: string }) {
   if (!snapshot || (snapshot.recentClicks.length === 0 && snapshot.recentConversions.length === 0)) {
     return <section className="mt-10 border-2 border-dashed border-[#121212] bg-[#FFFFFF] px-6 py-10"><h2 className="text-lg font-semibold">No recent activity to inspect.</h2><p className="mt-2 max-w-xl text-sm leading-6">Send a test visit through an active campaign, then complete a controlled conversion. The latest records will appear here.</p></section>;
   }
 
-  return <div className="mt-10 grid gap-10"><ActivityTable title="Recent visits" description="The tracker records these before redirecting the visitor." headers={["Campaign", "Visit ID", "Captured", "Tokens"]}>{snapshot.recentClicks.map((click) => <tr key={click.clickId} className="border-t-2 border-[#121212] align-top"><td className="px-3 py-4 font-medium">{click.campaign.name}</td><td className="px-3 py-4 font-mono text-xs">{shortId(click.clickId)}</td><td className="whitespace-nowrap px-3 py-4 text-xs">{formatDate(click.clickedAt)}</td><td className="px-3 py-4 text-xs leading-5"><TokenList value={click.trackingTokens} /></td></tr>)}</ActivityTable><ActivityTable title="Recent conversions" description="Each row ties a conversion event back to the campaign that received it." headers={["Event", "Campaign", "Received"]}>{snapshot.recentConversions.map((conversion) => <tr key={conversion.id} className="border-t-2 border-[#121212] align-top"><td className="px-3 py-4"><p className="font-medium">{conversion.eventType}</p><p className="mt-1 font-mono text-[11px]">{shortId(conversion.eventId)}</p></td><td className="px-3 py-4 text-sm">{conversion.click.campaign.name}</td><td className="whitespace-nowrap px-3 py-4 text-xs">{formatDate(conversion.receivedAt)}</td></tr>)}</ActivityTable></div>;
+  return <div className="mt-10 grid gap-10"><ActivityTable title="Recent visits" description="The tracker records these before redirecting the visitor." headers={["Campaign", "Visit ID", "Captured", "Tokens"]}>{snapshot.recentClicks.map((click) => <tr key={click.clickId} className="border-t-2 border-[#121212] align-top"><td className="px-3 py-4 font-medium">{click.campaign.name}</td><td className="px-3 py-4 font-mono text-xs">{shortId(click.clickId)}</td><td className="whitespace-nowrap px-3 py-4 text-xs">{formatDate(click.clickedAt, timezone)}</td><td className="px-3 py-4 text-xs leading-5"><TokenList value={click.trackingTokens} /></td></tr>)}</ActivityTable><ActivityTable title="Recent conversions" description="Each row ties a conversion event back to the campaign that received it." headers={["Event", "Campaign", "Received"]}>{snapshot.recentConversions.map((conversion) => <tr key={conversion.id} className="border-t-2 border-[#121212] align-top"><td className="px-3 py-4"><p className="font-medium">{conversion.eventType}</p><p className="mt-1 font-mono text-[11px]">{shortId(conversion.eventId)}</p></td><td className="px-3 py-4 text-sm">{conversion.click.campaign.name}</td><td className="whitespace-nowrap px-3 py-4 text-xs">{formatDate(conversion.receivedAt, timezone)}</td></tr>)}</ActivityTable></div>;
 }
 
 function ActivityTable({ title, description, headers, children }: { title: string; description: string; headers: string[]; children: React.ReactNode }) {

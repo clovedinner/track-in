@@ -4,6 +4,7 @@ import Link from "next/link";
 import AdminNavigation from "@/app/admin/admin-navigation";
 import { requireCurrentUser } from "@/lib/auth/current-user";
 import { prisma } from "@/lib/database/prisma";
+import { formatDateInTimezone } from "@/lib/timezone";
 
 export const metadata: Metadata = {
   title: "Profile | Trakio",
@@ -14,8 +15,8 @@ export default async function ProfilePage() {
   const user = await requireCurrentUser({ allowInactive: true });
   const subscription = await prisma.subscription.findFirst({ where: { userId: user.id }, orderBy: { createdAt: "desc" } });
   const statusLabel = user.accountStatus === "active" ? "Active" : user.accountStatus.replaceAll("_", " ");
-  const periodEnd = subscription?.currentPeriodEnd ? subscription.currentPeriodEnd.toISOString().slice(0, 10) : "Never";
-  const nextInvoice = subscription?.nextInvoiceAt ? subscription.nextInvoiceAt.toISOString().slice(0, 10) : "-";
+  const periodEnd = subscription?.currentPeriodEnd ? formatDateInTimezone(subscription.currentPeriodEnd, user.timezone, false) : "Never";
+  const nextInvoice = subscription?.nextInvoiceAt ? formatDateInTimezone(subscription.nextInvoiceAt, user.timezone, false) : "-";
   return (
     <main className="min-h-screen bg-[#F0F0F0] text-[#121212]">
       <AdminNavigation pathname="/admin/profile" />
@@ -45,6 +46,10 @@ export default async function ProfilePage() {
               <div>
                 <dt className="text-xs font-bold uppercase tracking-[0.14em] text-[#121212]">Workspace</dt>
                 <dd className="mt-1 font-semibold">Personal workspace · account-owned data</dd>
+              </div>
+              <div>
+                <dt className="text-xs font-bold uppercase tracking-[0.14em] text-[#121212]">Timezone</dt>
+                <dd className="mt-1 font-semibold">{user.timezone}</dd>
               </div>
             </dl>
           </section>

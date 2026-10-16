@@ -7,7 +7,7 @@ export async function getCurrentUser() {
   const cookieStore = await cookies();
   const session = await verifySessionToken(cookieStore.get(sessionCookieName())?.value);
   if (!session) return null;
-  return prisma.user.findUnique({ where: { id: session.userId }, select: { id: true, email: true, createdAt: true, accountStatus: true } });
+  return prisma.user.findUnique({ where: { id: session.userId }, select: { id: true, email: true, createdAt: true, accountStatus: true, timezone: true } });
 }
 
 export async function requireCurrentUser(options: { allowInactive?: boolean } = {}) {

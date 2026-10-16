@@ -4,14 +4,13 @@ import { useMemo, useState } from "react";
 
 type Conversion = Awaited<ReturnType<typeof import("@/lib/admin/conversions").getConversionWorkspace>>[number];
 type Option = { id: string; name: string };
-type Props = { initialConversions: Conversion[]; campaigns: Option[]; trafficSources: Option[]; eventTypes: string[]; initialFilters: Record<string, string | string[] | undefined> };
-const dateFormatter = new Intl.DateTimeFormat("en", { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" });
-function formatDate(value: Date | string) { return `${dateFormatter.format(new Date(value))} UTC`; }
+type Props = { initialConversions: Conversion[]; campaigns: Option[]; trafficSources: Option[]; eventTypes: string[]; initialFilters: Record<string, string | string[] | undefined>; timezone: string };
 function shortId(value: string) { return value.length > 18 ? `${value.slice(0, 9)}…${value.slice(-7)}` : value; }
 function statusClass(status: string) { if (status === "delivered") return "bg-[#F0C020]"; if (status.includes("failed")) return "bg-[#F0F0F0] text-[#8b3d23]"; return "bg-white"; }
 function tokenRows(tokens: Record<string, unknown>) { return Object.entries(tokens); }
 
-export default function ConversionsClient({ initialConversions, campaigns, trafficSources, eventTypes, initialFilters }: Props) {
+export default function ConversionsClient({ initialConversions, campaigns, trafficSources, eventTypes, initialFilters, timezone }: Props) {
+  const formatDate = (value: Date | string) => `${new Intl.DateTimeFormat("en", { dateStyle: "medium", timeStyle: "short", timeZone: timezone }).format(new Date(value))} ${timezone}`;
   const [selectedId, setSelectedId] = useState<string | null>(initialConversions[0]?.id ?? null);
   const selected = useMemo(() => initialConversions.find((row) => row.id === selectedId) ?? null, [initialConversions, selectedId]);
   const value = (key: string) => { const raw = initialFilters[key]; return Array.isArray(raw) ? raw[0] ?? "" : raw ?? ""; };

@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-import AdminNavigation from "@/app/admin/admin-navigation";
 
 type Status = "pending" | "processing" | "retryable_failed" | "delivered" | "permanently_failed";
 type Filter = Status | "all";
@@ -45,11 +44,6 @@ const filters: Array<{ value: Filter; label: string }> = [
   { value: "delivered", label: "Delivered" },
 ];
 
-const dateFormatter = new Intl.DateTimeFormat("en", { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" });
-
-function formatDate(value: string | null) {
-  return value ? `${dateFormatter.format(new Date(value))} UTC` : "—";
-}
 
 function statusLabel(status: Status) {
   return status.replaceAll("_", " ");
@@ -66,7 +60,8 @@ function statusClass(status: Status) {
   return "border-[#121212] bg-[#F0F0F0] text-[#121212]";
 }
 
-export default function DeliveryHealthClient() {
+export default function DeliveryHealthClient({ timezone }: { timezone: string }) {
+  const formatDate = (value: string | null) => value ? `${new Intl.DateTimeFormat("en", { dateStyle: "medium", timeStyle: "short", timeZone: timezone }).format(new Date(value))} ${timezone}` : "—";
   const [filter, setFilter] = useState<Filter>("all");
   const [data, setData] = useState<HealthResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -121,7 +116,6 @@ export default function DeliveryHealthClient() {
 
   return (
     <main className="min-h-screen bg-[#F0F0F0] text-[#121212]">
-      <AdminNavigation pathname="/admin/delivery-health" />
       <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:px-12 lg:py-12">
         <header className="flex flex-col gap-5 border-b-2 border-[#121212] pb-8 sm:flex-row sm:items-end sm:justify-between">
           <div>

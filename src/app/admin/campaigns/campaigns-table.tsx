@@ -6,7 +6,6 @@ import { useState } from "react";
 
 import type { CampaignListRow } from "@/lib/admin/campaign-views";
 
-const dateFormatter = new Intl.DateTimeFormat("en", { dateStyle: "medium", timeZone: "UTC" });
 
 function statusClass(status: string) {
   return status === "active" ? "bg-[#F0C020] text-[#121212]" : "bg-[#E0E0E0] text-[#121212]";
@@ -16,7 +15,7 @@ function slugify(value: string) {
   return value.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "-").slice(0, 90) || `campaign-copy-${Date.now()}`;
 }
 
-export default function CampaignsTable({ rows }: { rows: CampaignListRow[] }) {
+export default function CampaignsTable({ rows, timezone }: { rows: CampaignListRow[]; timezone: string }) {
   const router = useRouter();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [drawer, setDrawer] = useState(false);
@@ -86,7 +85,7 @@ export default function CampaignsTable({ rows }: { rows: CampaignListRow[] }) {
           <td className="px-3 py-3 font-mono">{row.clicks.toLocaleString()}</td>
           <td className="px-3 py-3 font-mono">{row.conversions.toLocaleString()}</td>
           <td className="px-3 py-3 font-mono">{row.registrations.toLocaleString()} / {row.ftds.toLocaleString()}</td>
-          <td className="whitespace-nowrap px-3 py-3 text-xs text-[#3e4855]">{dateFormatter.format(row.createdAt)} UTC</td>
+          <td className="whitespace-nowrap px-3 py-3 text-xs text-[#3e4855]">{new Intl.DateTimeFormat("en", { dateStyle: "medium", timeZone: timezone }).format(row.createdAt)} {timezone}</td>
         </tr>)}</tbody>
       </table>
       {rows.length === 0 ? <div className="border-t-2 border-[#121212] px-6 py-10"><h2 className="text-lg font-semibold">No campaigns match these filters.</h2><p className="mt-2 text-sm text-[#121212]">Create a campaign or clear the search and status filters.</p></div> : null}
@@ -98,7 +97,7 @@ export default function CampaignsTable({ rows }: { rows: CampaignListRow[] }) {
         <div className="space-y-6 px-6 py-7">
           <div className="grid grid-cols-2 gap-px border-2 border-[#121212] bg-[#121212]"><div className="bg-[#F0F0F0] p-3"><p className="text-[10px] font-bold uppercase tracking-[0.12em]">Status</p><p className="mt-1 font-semibold capitalize">{selected.status}</p></div><div className="bg-[#F0F0F0] p-3"><p className="text-[10px] font-bold uppercase tracking-[0.12em]">Routing</p><p className="mt-1 font-semibold capitalize">{selected.trackingMode}</p></div><div className="bg-[#F0F0F0] p-3"><p className="text-[10px] font-bold uppercase tracking-[0.12em]">Visits</p><p className="mt-1 font-mono font-semibold">{selected.clicks.toLocaleString()}</p></div><div className="bg-[#F0F0F0] p-3"><p className="text-[10px] font-bold uppercase tracking-[0.12em]">Conversions</p><p className="mt-1 font-mono font-semibold">{selected.conversions.toLocaleString()}</p></div></div>
           <div><p className="text-xs font-bold uppercase tracking-[0.12em]">Destination</p><p className="mt-2 break-all border-2 border-[#121212] bg-[#F0F0F0] p-3 font-mono text-xs leading-5">{selected.destinationUrl}</p></div>
-          <div><p className="text-xs font-bold uppercase tracking-[0.12em]">Configuration</p><dl className="mt-2 divide-y-2 divide-[#121212] border-2 border-[#121212] text-sm"><div className="flex justify-between gap-4 p-3"><dt>Traffic source</dt><dd className="font-semibold">{selected.trafficSourceName ?? "Not connected"}</dd></div><div className="flex justify-between gap-4 p-3"><dt>Currency</dt><dd className="font-mono font-semibold">{selected.defaultCurrency}</dd></div><div className="flex justify-between gap-4 p-3"><dt>Created</dt><dd>{dateFormatter.format(selected.createdAt)} UTC</dd></div></dl></div>
+          <div><p className="text-xs font-bold uppercase tracking-[0.12em]">Configuration</p><dl className="mt-2 divide-y-2 divide-[#121212] border-2 border-[#121212] text-sm"><div className="flex justify-between gap-4 p-3"><dt>Traffic source</dt><dd className="font-semibold">{selected.trafficSourceName ?? "Not connected"}</dd></div><div className="flex justify-between gap-4 p-3"><dt>Currency</dt><dd className="font-mono font-semibold">{selected.defaultCurrency}</dd></div><div className="flex justify-between gap-4 p-3"><dt>Created</dt><dd>{new Intl.DateTimeFormat("en", { dateStyle: "medium", timeZone: timezone }).format(selected.createdAt)} {timezone}</dd></div></dl></div>
           <p className="border-2 border-[#121212] bg-[#F0C020] px-4 py-3 text-sm leading-6">Use campaign setup to update tracking instructions, test the click handoff, and finish the destination configuration.</p>
         </div>
         <footer className="sticky bottom-0 flex flex-wrap justify-end gap-3 border-t-2 border-[#121212] bg-white px-6 py-4"><Link href={`/admin/campaigns/${selected.id}/setup`} className="border-2 border-[#121212] px-4 py-2.5 text-sm font-semibold hover:bg-[#F0C020]">Open setup</Link><Link href={`/admin/campaigns/${selected.id}`} className="bg-[#1040C0] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#D02020]">View details</Link></footer>
