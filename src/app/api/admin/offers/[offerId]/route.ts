@@ -21,9 +21,23 @@ export async function PATCH(request: Request, context: Context) {
   }
   try {
     const input = parseOfferInput(body);
-    const existing = await prisma.offer.findUnique({ where: { id: offerId }, select: { id: true, ownerId: true } });
-    if (!existing || existing.ownerId !== user.id) return apiErrorResponse(new ApiError("not_found", 404, "Offer not found."), correlationId);
-    const offer = await prisma.offer.update({ where: { id: offerId }, data: input, select: { id: true, name: true, offerUrl: true, createdAt: true } });
+    const offer = await prisma.$transaction(async (transaction) => {
+      const existing = await transaction.offer.findFirst({ where: { id: offerId, ownerId: user.id }, select: { id: true } });
+      if (!existing) return null;
+      const updated = await transaction.offer.update({
+        where: { id: offerId },
+        data: { ...input, updatedAt: new Date() },
+        select: { id: true, name: true, offerUrl: true, createdAt: true },
+      });
+      if (input.offerUrl) {
+        await transaction.campaign.updateMany({
+          where: { offerId, ownerId: user.id },
+          data: { destinationUrl: input.offerUrl, updatedAt: new Date() },
+        });
+      }
+      return updated;
+    });
+    if (!offer) return apiErrorResponse(new ApiError("not_found", 404, "Offer not found."), correlationId);
     return NextResponse.json({ offer }, { headers: { "x-request-id": correlationId } });
   } catch (error) {
     if (error instanceof OfferInputError) return apiErrorResponse(new ApiError("invalid_request", 400, `${error.field}: ${error.message}`), correlationId);
