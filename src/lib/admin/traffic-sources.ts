@@ -63,7 +63,7 @@ export function parseTrafficSourceInput(body: unknown): TrafficSourceInput {
   const name = requiredString(input.name, "name", 200);
   let type: ProviderId;
   try {
-    type = parseProviderId(input.type);
+    type = parseProviderId(input.type ?? "generic");
   } catch (error) {
     throw new TrafficSourceInputError("type", error instanceof Error ? error.message : "Unsupported provider type.");
   }
@@ -138,4 +138,31 @@ export function safeTrafficSourceConfiguration(value: unknown): Record<string, u
 export function parseTrafficSourceId(value: string): string {
   if (!uuidPattern.test(value)) throw new TrafficSourceInputError("id", "id must be a valid UUID.");
   return value;
+}
+
+/** Keep masked URL credentials on the server when an existing source is edited. */
+export function preserveMaskedPostbackValues(next: ProviderConfiguration, previous: unknown): ProviderConfiguration {
+  const saved = previous && typeof previous === "object" && !Array.isArray(previous) ? previous as ProviderConfiguration : {};
+  const restore = (candidate: string | undefined, original: string | undefined): string | undefined => {
+    if (!candidate) return candidate;
+    const url = new URL(candidate);
+    const hasMask = [...url.searchParams.values()].includes("[redacted]");
+    if (!hasMask) return candidate;
+    const old = original ? new URL(original) : undefined;
+    if (!old || old.origin !== url.origin || old.pathname !== url.pathname) throw new TrafficSourceInputError("configuration", "Enter real credentials when changing a masked postback endpoint.");
+    const restored = new URLSearchParams();
+    for (const [key, value] of url.searchParams) {
+      const originalValue = old.searchParams.get(key);
+      if (value === "[redacted]" && (!originalValue || originalValue === "[redacted]")) throw new TrafficSourceInputError("configuration", "Replace masked credentials with a valid value.");
+      restored.append(key, value === "[redacted]" ? originalValue! : value);
+    }
+    url.search = restored.toString();
+    return url.toString().replace(/%7b/gi, "{").replace(/%7d/gi, "}");
+  };
+  return {
+    ...next,
+    postbackUrl: restore(next.postbackUrl, saved.postbackUrl),
+    eventPostbacks: next.eventPostbacks?.map((entry) => ({ ...entry, url: restore(entry.url, saved.eventPostbacks?.find((old) => old.customConversionId === entry.customConversionId)?.url)! })),
+    postbackByEventType: next.postbackByEventType && Object.fromEntries(Object.entries(next.postbackByEventType).map(([event, url]) => [event, restore(url, saved.postbackByEventType?.[event])!])),
+  };
 }

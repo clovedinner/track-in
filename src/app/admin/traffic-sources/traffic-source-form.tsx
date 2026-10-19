@@ -1,20 +1,22 @@
 "use client";
 
 import { FormEvent, useEffect, useRef, useState } from "react";
-import { inferProviderIdFromTokenMacro } from "@/lib/providers/identity";
+import { GENERIC_POSTBACK_TOKENS } from "@/lib/providers/generic";
 
 type ParameterRow = { name: string; parameter: string; token: string; enabled: boolean };
 type EventPostback = { customConversionId: string; url: string };
 type CustomConversion = { id: string; name: string; eventValues: string[]; includeInConversions: boolean; includeInRevenue: boolean; sendPostbackToTrafficSource: boolean };
 const fieldClass = "block w-full border-2 border-[#121212] bg-white px-3 py-2 text-sm text-[#121212] outline-none transition focus:border-[#1040C0] focus:ring-2 focus:ring-[#1040C0]/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1040C0]";
 const labelClass = "text-xs font-semibold text-[#3e4855]";
-const tokenTemplates = ["{externalid}", "{clickid}", "{payout}", "{payout.currency}", "{transaction.id}", "{useragent}", "{var1}", "{country}", "{city}", "{region}", "{offer.id}", "{campaign.id}", "{campaign.name}", "{traffic.source.id}", "{traffic.source.name}", "{event.type}", "{conversion.cost}", "{workspace.id}", "{postbacktime}"];
+const legacyTokenTemplates = ["{externalid}", "{clickid}", "{payout}", "{payout.currency}", "{transaction.id}", "{useragent}", "{var1}", "{country}", "{city}", "{region}", "{offer.id}", "{campaign.id}", "{campaign.name}", "{traffic.source.id}", "{traffic.source.name}", "{event.type}", "{conversion.cost}", "{workspace.id}", "{postbacktime}"];
 
 export type TrafficSourceFormSource = { id: string; name: string; type: string; enabled: boolean; configuration?: Record<string, unknown> };
 type TrafficSourceFormProps = { onCreated?: () => void; source?: TrafficSourceFormSource; duplicate?: boolean };
 
 export default function TrafficSourceForm({ onCreated, source, duplicate = false }: TrafficSourceFormProps) {
   const sourceConfiguration = source?.configuration ?? {};
+  const genericPostback = !source || duplicate || source.type === "generic";
+  const tokenTemplates = genericPostback ? GENERIC_POSTBACK_TOKENS : legacyTokenTemplates;
   const sourceParameters = Array.isArray(sourceConfiguration.parameters) ? sourceConfiguration.parameters as Array<Record<string, unknown>> : [];
   const savedRows = sourceParameters.map((parameter) => ({ name: typeof parameter.name === "string" ? parameter.name : "", parameter: typeof parameter.parameter === "string" ? parameter.parameter : "", token: typeof parameter.token === "string" ? parameter.token : "", enabled: parameter.enabled !== false })).slice(0, 10);
   const savedPostbacks = Array.isArray(sourceConfiguration.eventPostbacks) ? sourceConfiguration.eventPostbacks.filter((entry): entry is Record<string, unknown> => typeof entry === "object" && entry !== null && !Array.isArray(entry)).map((entry) => ({ customConversionId: typeof entry.customConversionId === "string" ? entry.customConversionId : "", url: typeof entry.url === "string" ? entry.url : "" })).slice(0, 10) : [];
@@ -94,13 +96,7 @@ export default function TrafficSourceForm({ onCreated, source, duplicate = false
     }));
     const postbackUrl = String(form.get("postbackUrl") ?? "").trim();
     const externalIdToken = String(form.get("externalIdToken") ?? "").trim();
-    const inferredProvider = inferProviderIdFromTokenMacro(externalIdToken);
-    const providerType = inferredProvider ?? source?.type;
-    if (!providerType) {
-      setError("Use a supported external ID token: {click_id}, ${SUBID}, or {ACLID}.");
-      setSubmitting(false);
-      return;
-    }
+    const providerType = source && !duplicate ? source.type : "generic";
     if (postbackMode === "single" && !isHttpUrl(postbackUrl)) {
       setError("Enter a valid HTTP or HTTPS postback URL.");
       setSubmitting(false);
@@ -122,10 +118,8 @@ export default function TrafficSourceForm({ onCreated, source, duplicate = false
     }
     const body = {
       name: String(form.get("name") ?? "").trim(),
-      // Provider identity is internal routing metadata, inferred from the
-      // platform macro rather than exposed as a separate name or selector.
       type: providerType,
-      enabled: true,
+      enabled: source?.enabled ?? true,
       configuration: {
         postbackMode,
         ...(postbackMode === "single" ? { postbackUrl } : { eventPostbacks: selectedEventPostbacks }),
@@ -175,7 +169,7 @@ export default function TrafficSourceForm({ onCreated, source, duplicate = false
       <div className="mt-4 overflow-x-auto border-2 border-[#121212]">
         <div className="min-w-[720px]">
           <div className="grid grid-cols-[1.1fr_1.1fr_1.1fr_0.7fr_72px] gap-2 bg-[#E0E0E0] px-3 py-2 text-xs font-semibold text-[#121212]">
-            <span>Variable name</span><span>TS parameter</span><span>TS token</span><span>VLM token</span><span>State</span>
+            <span>Variable name</span><span>TS parameter</span><span>TS token</span><span>Trakio token</span><span>State</span>
           </div>
           <div className="grid grid-cols-[1.1fr_1.1fr_1.1fr_0.7fr_72px] items-center gap-2 border-t-2 border-[#121212] px-3 py-3">
             <span className="text-sm font-medium text-[#121212]">External ID</span>
@@ -210,13 +204,14 @@ export default function TrafficSourceForm({ onCreated, source, duplicate = false
     <section>
       <h2 className="text-lg font-semibold text-[#121212]">Passing conversion info to traffic source</h2>
       <p className="mt-1 text-sm leading-5 text-[#121212]">Choose one postback URL for every conversion, or map custom conversion events to separate URLs.</p>
+      {genericPostback ? <p className="mt-2 text-sm leading-5 text-[#3e4855]">Use {"{externalid}"} for the captured External ID, not Trakio’s visit ID. Use {"{var1}"}–{"{var10}"} for custom parameters. Trakio replaces these placeholders and sends your URL without adding platform-specific fields.</p> : null}
       <fieldset className="mt-4 flex flex-wrap gap-x-6 gap-y-3 border-2 border-[#121212] bg-[#F0F0F0] p-4">
         <legend className="px-1 text-xs font-semibold text-[#3e4855]">Postback delivery</legend>
         <label className="flex cursor-pointer items-center gap-2 text-sm text-[#121212]"><input type="radio" name="postbackMode" value="single" checked={postbackMode === "single"} onChange={() => setPostbackMode("single")} className="accent-[#1040C0]" />One postback URL</label>
         <label className="flex cursor-pointer items-center gap-2 text-sm text-[#121212]"><input type="radio" name="postbackMode" value="per_event" checked={postbackMode === "per_event"} onChange={() => setPostbackMode("per_event")} className="accent-[#1040C0]" />Postback URL per event</label>
       </fieldset>
       {postbackMode === "single" ? <div className="mt-4">
-        <label className={`${labelClass} block`}>Traffic source postback URL<input ref={postbackRef} name="postbackUrl" type="url" className={`${fieldClass} mt-2`} placeholder="https://example.com/postback?clickid={clickid}" /></label>
+        <label className={`${labelClass} block`}>Traffic source postback URL<input ref={postbackRef} name="postbackUrl" type="url" className={`${fieldClass} mt-2`} placeholder="https://example.com/postback?clickid={externalid}" /></label>
         <div className="mt-3 flex flex-wrap gap-2" aria-label="Postback token templates">{tokenTemplates.map((token) => <button key={token} type="button" onClick={() => insertToken(token)} className="border-2 border-[#121212] bg-[#E0E0E0] px-2 py-1 text-xs text-[#1040C0] hover:border-[#1040C0] hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1040C0]">{token}</button>)}</div>
       </div> : <div className="mt-4 space-y-4">
         {conversionLoadError ? <div role="alert" className="border-2 border-[#D02020] bg-[#F0F0F0] px-3 py-2 text-sm text-[#D02020]">{conversionLoadError}</div> : null}
@@ -224,7 +219,7 @@ export default function TrafficSourceForm({ onCreated, source, duplicate = false
         {eventPostbacks.map((row, index) => <div key={`${index}-${row.customConversionId}`} className="border-2 border-[#121212] bg-white p-3 sm:p-4">
           <div className="grid gap-3 sm:grid-cols-[minmax(180px,0.8fr)_minmax(260px,1.5fr)_auto] sm:items-end">
             <label className={`${labelClass} block`}>Conversion event<select value={row.customConversionId} onChange={(event) => setEventPostbacks((current) => current.map((item, rowIndex) => rowIndex === index ? { ...item, customConversionId: event.target.value } : item))} className={`${fieldClass} mt-2`}><option value="">Select an event</option>{customConversions.filter((conversion) => conversion.sendPostbackToTrafficSource).map((conversion) => <option key={conversion.id} value={conversion.id}>{conversion.name}</option>)}</select></label>
-            <label className={`${labelClass} block`}>Custom postback URL<input ref={(element) => { eventUrlRefs.current[index] = element; }} value={row.url} onChange={(event) => setEventPostbacks((current) => current.map((item, rowIndex) => rowIndex === index ? { ...item, url: event.target.value } : item))} type="url" className={`${fieldClass} mt-2`} placeholder="https://example.com/postback?clickid={clickid}" aria-label={`Postback URL for event ${index + 1}`} /></label>
+            <label className={`${labelClass} block`}>Custom postback URL<input ref={(element) => { eventUrlRefs.current[index] = element; }} value={row.url} onChange={(event) => setEventPostbacks((current) => current.map((item, rowIndex) => rowIndex === index ? { ...item, url: event.target.value } : item))} type="url" className={`${fieldClass} mt-2`} placeholder="https://example.com/postback?clickid={externalid}" aria-label={`Postback URL for event ${index + 1}`} /></label>
             <button type="button" disabled={eventPostbacks.length <= 1} onClick={() => setEventPostbacks((current) => current.filter((_, rowIndex) => rowIndex !== index))} aria-label={`Remove event postback ${index + 1}`} className="h-10 border-2 border-[#121212] px-3 text-lg font-semibold text-[#D02020] hover:bg-[#F0F0F0] disabled:cursor-not-allowed disabled:opacity-40">×</button>
           </div>
           <div className="mt-3 flex flex-wrap gap-2" aria-label={`Postback token templates for event ${index + 1}`}>{tokenTemplates.map((token) => <button key={token} type="button" onClick={() => insertToken(token, index)} className="border-2 border-[#121212] bg-[#E0E0E0] px-2 py-1 text-xs text-[#1040C0] hover:border-[#1040C0] hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1040C0]">{token}</button>)}</div>

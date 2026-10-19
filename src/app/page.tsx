@@ -98,10 +98,10 @@ export default function Home() {
             Sign in
           </Link>
           <Link
-            href="/auth/sign-up"
+            href="#pricing"
             className="border-2 border-[#121212] bg-[#1040C0] px-4 py-2 text-white shadow-[3px_3px_0_#121212] hover:bg-[#D02020] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D02020]"
           >
-            Start free
+            View plans
           </Link>
         </div>
       </nav>
@@ -121,10 +121,10 @@ export default function Home() {
           </p>
           <div className="mt-9 flex flex-wrap items-center gap-4">
             <Link
-              href="/auth/sign-up"
+              href="#pricing"
               className="bg-[#1040C0] px-5 py-3 text-sm font-semibold text-white shadow-[4px_4px_0_#121212] hover:bg-[#D02020] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1040C0]"
             >
-              Start free
+              View plans
             </Link>
             {/* <Link href="/auth/sign-in" className="border-b-2 border-[#D02020] pb-1 text-sm font-semibold text-[#121212] hover:text-[#D02020]">Sign in</Link> */}
             <a

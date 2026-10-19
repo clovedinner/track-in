@@ -31,6 +31,7 @@ type TemplateDefinition = {
 };
 
 const DEFINITIONS: Record<ProviderId, TemplateDefinition> = {
+  generic: { placeholders: {}, dynamicParameters: {} },
   trafficstars: {
     placeholders: {
       clickid: "{click_id}",
@@ -163,6 +164,7 @@ export function generateProviderPostbackTemplates(
   configurations: Partial<Record<ProviderId, unknown>>,
 ): Record<ProviderId, ProviderPostbackTemplate | undefined> {
   return {
+    generic: configurations.generic === undefined ? undefined : generateProviderPostbackTemplate("generic", configurations.generic),
     trafficstars: configurations.trafficstars === undefined
       ? undefined
       : generateProviderPostbackTemplate("trafficstars", configurations.trafficstars),

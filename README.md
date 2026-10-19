@@ -84,6 +84,16 @@ Never commit `.env.local` or credentials. Do not route tracking traffic to this 
 Operational recovery procedures, including a disposable Neon restore rehearsal,
 are documented in [OPERATIONS_RUNBOOK.md](OPERATIONS_RUNBOOK.md).
 
+### Configurable traffic-source postbacks
+
+New traffic sources use the saved URL template rather than guessing a platform from the incoming macro. For example, External ID parameter `visitor_id` with TS token `${SUBID}` captures the incoming `visitor_id` value. An outgoing URL such as `https://provider.example/postback?clickid={externalid}&goal=8` substitutes that captured value without adding or renaming provider query fields.
+
+Supported placeholders are `{externalid}` (the configured source token), `{clickid}` (the Trakio visit ID), `{event.id}`, `{event.type}`, `{transaction.id}` (transaction reference, falling back to event ID), `{payout}`, `{payout.minor}`, `{payout.currency}`, `{cost}`, and `{var1}` through `{var10}`. Payout uses the conversion currency's minor-unit precision. `{param.parameter_name}` and saved brace-style TS macros also resolve enabled mappings. Missing, disabled, unexpanded, or unknown referenced values fail delivery instead of guessing another token. Use `{externalid}`, not `{clickid}`, when the ad platform requires its original click token.
+
+Single-URL and per-event delivery both use the durable outbox. Generic delivery accepts HTTP 2xx; timeouts, network errors, HTTP 408/425/429 and 5xx use the existing bounded retries. Other responses require operator attention. Redirects are not followed. Destinations must resolve only to public internet addresses; DNS results are pinned for the request, with a 10-second deadline. A successful HTTP response is not a guarantee that the platform has credited a conversion: verify each provider's test flow before paid traffic.
+
+Existing sources keep their built-in adapters, including the corrected saved external-ID mapping for Propeller. No automatic production-data migration is performed. Deploy both the application and outbox worker to activate these changes; the JSON configuration needs no schema migration.
+
 Before routing paid traffic to a production deployment, complete
 [DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md). `/api/health` is a liveness
 check; `/api/readiness` validates required production configuration and returns

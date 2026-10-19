@@ -10,6 +10,7 @@ type FakeState = {
   click: {
     id: string;
     clickId: string;
+    campaign: { ownerId: string };
     trafficSourceId: string | null;
     trafficSource: { id: string; enabled: boolean; configuration: Record<string, unknown> } | null;
   } | null;
@@ -30,6 +31,7 @@ const state: FakeState = {
 };
 
 const fakePrisma = {
+  customConversion: { findMany: vi.fn(async () => []) },
   campaign: {
     findFirst: vi.fn(async () => state.campaign),
   },
@@ -38,6 +40,7 @@ const fakePrisma = {
       state.click = {
         id: "click-row-1",
         clickId: data.clickId,
+        campaign: { ownerId: "owner-1" },
         trafficSourceId: "source-1",
         trafficSource: {
           id: "source-1",

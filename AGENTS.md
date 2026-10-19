@@ -193,6 +193,8 @@ Protect dashboard and configuration routes with strong operator authentication. 
 
 ## Outbound postback delivery
 
+- New traffic sources use a generic GET postback template and their saved external-ID, cost, and custom-parameter mappings. Do not infer an adapter from an incoming macro. Existing built-in adapters remain for backward compatibility; do not automatically migrate their configurations.
+- Generic templates substitute documented placeholders only, preserving the client's endpoint and fixed query fields. Resolve and pin public destination addresses, refuse private networks, do not follow redirects, and apply a request deadline. Never substitute the tracker visit ID for the external source token.
 - Build provider adapters behind a small interface. Each adapter owns request formatting, authentication, response classification, and token mapping for one platform.
 - Include the platform's original click token when required. The tracker click ID is not automatically usable as an ad-platform click ID.
 - Make delivery idempotent where the target supports an event ID or transaction ID.

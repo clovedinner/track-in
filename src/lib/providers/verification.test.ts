@@ -2,6 +2,17 @@ import { describe, expect, it } from "vitest";
 import { buildProviderVerificationPlan, verifyProvidersDryRun } from "@/lib/providers/verification";
 
 describe("provider verification", () => {
+  it("verifies generic saved mappings and redacts path tokens without a network call", () => {
+    const plan = buildProviderVerificationPlan({ providerId: "generic", configuration: {
+      postbackUrl: "https://example.com/{externalid}?event={event.type}&key=secret",
+      externalId: { parameter: "custom_key", token: "${NEW_TOKEN}" },
+    }, sampleTokens: { custom_key: "original-sensitive-token" } });
+    expect(plan.externalCall).toBe(false);
+    expect(plan.requiredTokenFound).toBe(true);
+    expect(plan.redactedUrl).not.toContain("original-sensitive-token");
+    expect(plan.redactedUrl).not.toContain("secret");
+  });
+
   it("builds a fully redacted dry-run plan without network access", () => {
     const plan = buildProviderVerificationPlan({
       providerId: "trafficstars",

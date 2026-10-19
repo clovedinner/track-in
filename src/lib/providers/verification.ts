@@ -1,4 +1,5 @@
-import { buildPropellerAdsRequest, type PropellerAdsConfig } from "@/lib/providers/propeller-ads";
+import { buildPropellerAdsRequest, resolvePropellerSubId, type PropellerAdsConfig } from "@/lib/providers/propeller-ads";
+import { buildGenericPostbackRequest } from "@/lib/providers/generic";
 import { buildTrafficJunkyRequest, type TrafficJunkyConfig } from "@/lib/providers/trafficjunky";
 import { buildTrafficStarsRequest } from "@/lib/providers/trafficstars";
 import {
@@ -38,6 +39,7 @@ function firstToken(tokens: Record<string, unknown>, keys: readonly string[]): s
 
 function redactUrl(rawUrl: string): { redactedUrl: string; queryKeys: string[] } {
   const url = new URL(rawUrl);
+  url.pathname = "/[redacted]";
   const queryKeys = [...new Set([...url.searchParams.keys()])].sort();
   for (const key of url.searchParams.keys()) url.searchParams.set(key, "[redacted]");
   return { redactedUrl: url.toString(), queryKeys };
@@ -46,6 +48,10 @@ function redactUrl(rawUrl: string): { redactedUrl: string; queryKeys: string[] }
 function buildRequest(input: ProviderVerificationInput, provider: ProviderId, config: ProviderConfiguration): { url: string; token: string | undefined } {
   const eventId = input.eventId ?? "verification-event";
   const eventType = input.eventType ?? "purchase";
+  if (provider === "generic") {
+    const url = buildGenericPostbackRequest({ ...config, postbackUrl: config.postbackUrl ?? config.eventPostbacks?.[0]?.url }, input.sampleTokens, { eventId, eventType, valueMinor: input.valueMinor ?? BigInt(0), currency: input.currency ?? "USD", clickId: "verification-visit" }).url;
+    return { url, token: "configured-template" };
+  }
   if (provider === "trafficstars") {
     const token = firstToken(input.sampleTokens, ["clickid", "click_id", "CLICKID"]);
     if (token === undefined) throw new Error("TrafficStars verification requires a sample clickid token.");
@@ -55,8 +61,7 @@ function buildRequest(input: ProviderVerificationInput, provider: ProviderId, co
     };
   }
   if (provider === "propeller") {
-    const token = firstToken(input.sampleTokens, ["subid", "SUBID", "clickid", "CLICKID", "click_id", "CLICK_ID"]);
-    if (token === undefined) throw new Error("PropellerAds verification requires a sample SUBID/clickid token.");
+    const token = resolvePropellerSubId(input.sampleTokens, config.externalId);
     return {
       url: buildPropellerAdsRequest({ ...config, postbackUrl: config.postbackUrl ?? config.eventPostbacks?.[0]?.url ?? "" } as PropellerAdsConfig, input.sampleTokens, { eventType, valueMinor: input.valueMinor, currency: input.currency }).url,
       token,

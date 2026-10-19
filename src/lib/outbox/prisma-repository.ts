@@ -33,7 +33,8 @@ export function createPrismaOutboxRepository(client: PrismaClient): OutboxReposi
                 eventType: true,
                 valueMinor: true,
                 currency: true,
-                click: { select: { trackingTokens: true } },
+                transactionReference: true,
+                click: { select: { clickId: true, trackingTokens: true } },
               },
             },
             trafficSource: { select: { type: true, configuration: true, enabled: true } },
@@ -71,6 +72,8 @@ export function createPrismaOutboxRepository(client: PrismaClient): OutboxReposi
               eventType: candidate.conversion.eventType,
               valueMinor: candidate.conversion.valueMinor,
               currency: candidate.conversion.currency,
+              clickId: candidate.conversion.click.clickId,
+              transactionReference: candidate.conversion.transactionReference,
             },
           });
         }

@@ -7,9 +7,12 @@
  * to logs.
  */
 
-export const SUPPORTED_PROVIDER_IDS = ["trafficstars", "propeller", "trafficjunky"] as const;
+import { validateGenericPostbackTemplate } from "@/lib/providers/generic";
+
+export const SUPPORTED_PROVIDER_IDS = ["trafficstars", "propeller", "trafficjunky", "generic"] as const;
 
 export type ProviderId = (typeof SUPPORTED_PROVIDER_IDS)[number];
+export type BuiltinProviderId = Exclude<ProviderId, "generic">;
 
 export type TrafficStarsProviderConfiguration = {
   postbackUrl?: string;
@@ -53,10 +56,15 @@ export type TrafficJunkyProviderConfiguration = {
   externalId?: { parameter: string; token: string; enabled?: boolean };
 };
 
+export type GenericProviderConfiguration = Pick<PropellerProviderConfiguration,
+  "postbackUrl" | "postbackMode" | "eventPostbacks" | "externalId" | "cost" | "parameters" | "costCurrency" | "postbackByEventType"
+>;
+
 export type ProviderConfiguration =
   | TrafficStarsProviderConfiguration
   | PropellerProviderConfiguration
-  | TrafficJunkyProviderConfiguration;
+  | TrafficJunkyProviderConfiguration
+  | GenericProviderConfiguration;
 
 export type ProviderDefinition = {
   id: ProviderId;
@@ -65,6 +73,7 @@ export type ProviderDefinition = {
 };
 
 const PROVIDER_DEFINITIONS: Record<ProviderId, ProviderDefinition> = {
+  generic: { id: "generic", label: "Custom postback", requiredOriginalTokenKeys: [] },
   trafficstars: {
     id: "trafficstars",
     label: "TrafficStars",
@@ -298,6 +307,27 @@ export function getProviderDefinition(providerId: unknown): ProviderDefinition {
 
 export function validateProviderConfiguration(providerId: unknown, value: unknown): ProviderConfiguration {
   switch (parseProviderId(providerId)) {
+    case "generic": {
+      if (!isRecord(value)) throw new Error("Postback configuration must be an object.");
+      const postbackUrl = optionalString(value, "postbackUrl");
+      const common = optionalCommonConfiguration(value);
+      validatePostbackMode(common.postbackMode, common.eventPostbacks, postbackUrl);
+      if (!common.externalId || common.externalId.enabled === false) throw new Error("Configure an enabled external-ID parameter and its traffic-source token.");
+      const names = new Set<string>();
+      for (const mapping of [common.externalId, common.cost, ...(common.parameters ?? [])]) {
+        if (!mapping || mapping.enabled === false) continue;
+        const name = mapping.parameter?.toLowerCase();
+        if (!name || !/^[a-z][a-z0-9_-]{0,49}$/.test(name) || ["cid", "cpid", "oid"].includes(name)) throw new Error("Enabled tracking mappings require valid, non-reserved parameter names.");
+        if (names.has(name)) throw new Error("Enabled tracking parameters must have distinct names.");
+        names.add(name);
+        if (mapping.token.length > 512) throw new Error("Traffic-source tokens must not exceed 512 characters.");
+      }
+      const configuration = { postbackUrl, ...common };
+      for (const url of [postbackUrl, ...(common.eventPostbacks ?? []).map((entry) => entry.url), ...Object.values(common.postbackByEventType ?? {})]) {
+        if (url !== undefined) validateGenericPostbackTemplate(url, configuration);
+      }
+      return configuration;
+    }
     case "trafficstars":
       return validateTrafficStarsConfiguration(value);
     case "propeller":

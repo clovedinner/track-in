@@ -21,6 +21,8 @@ export type OutboxJob = {
     eventType: string;
     valueMinor: bigint;
     currency: string;
+    clickId?: string;
+    transactionReference?: string | null;
   };
 };
 

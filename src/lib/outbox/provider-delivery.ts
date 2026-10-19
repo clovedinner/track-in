@@ -16,6 +16,8 @@ import {
 } from "@/lib/providers/trafficstars";
 import { parseProviderId, validateProviderConfiguration } from "@/lib/providers/config";
 import type { DeliveryResult, OutboxDelivery, OutboxJob } from "@/lib/outbox/worker";
+import { buildGenericPostbackRequest } from "@/lib/providers/generic";
+import { sendPublicPostback, UnsafePostbackDestinationError, type PostbackTransport } from "@/lib/providers/postback-transport";
 
 type FetchLike = typeof fetch;
 
@@ -58,7 +60,7 @@ function originalTrafficStarsToken(job: OutboxJob, config: TrafficStarsConfig): 
  * Configuration and original click tokens come from the persisted records; the
  * internal Trakio cid is never substituted for a provider token.
  */
-export function createProviderOutboxDelivery(fetchImpl: FetchLike = fetch): OutboxDelivery {
+export function createProviderOutboxDelivery(fetchImpl: FetchLike = fetch, genericTransport: PostbackTransport = sendPublicPostback): OutboxDelivery {
   return async (job) => {
     try {
       const providerId = parseProviderId(job.providerId);
@@ -72,6 +74,17 @@ export function createProviderOutboxDelivery(fetchImpl: FetchLike = fetch): Outb
         postbackUrl: job.destination,
       });
       const conversion = conversionFor(job);
+
+      if (providerId === "generic") {
+        const request = buildGenericPostbackRequest(config, tokensFor(job), conversion);
+        try {
+          const { status } = await genericTransport(request);
+          if (status >= 200 && status < 300) return { outcome: "delivered", responseStatus: status, responseSummary: "Postback endpoint returned a successful HTTP response." };
+          return { outcome: "failed", kind: [408, 425, 429].includes(status) || status >= 500 ? "transient" : "permanent", responseStatus: status, error: `Postback endpoint returned HTTP ${status}.` };
+        } catch (error) {
+          return { outcome: "failed", kind: error instanceof UnsafePostbackDestinationError ? "permanent" : "transient", error: error instanceof UnsafePostbackDestinationError ? error.message : "Postback network request failed or timed out." };
+        }
+      }
 
       if (providerId === "trafficstars") {
         const request = buildTrafficStarsRequest(config as TrafficStarsConfig, {

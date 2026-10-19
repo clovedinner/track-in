@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { Prisma } from "@/generated/prisma/client";
 
-import { parseTrafficSourceId, parseTrafficSourceInput, postbackEventConversionIds, safeTrafficSourceConfiguration, TrafficSourceInputError } from "@/lib/admin/traffic-sources";
+import { parseTrafficSourceId, parseTrafficSourceInput, postbackEventConversionIds, preserveMaskedPostbackValues, safeTrafficSourceConfiguration, TrafficSourceInputError } from "@/lib/admin/traffic-sources";
 import { prisma } from "@/lib/database/prisma";
 import { ApiError, apiErrorResponse } from "@/lib/http/api-error";
 import { getCorrelationId } from "@/lib/observability/correlation-id";
@@ -29,6 +29,9 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
     if (available.length !== eventConversionIds.length) return inputError(new TrafficSourceInputError("configuration", "Every event postback must reference an enabled custom conversion in this account."), correlationId);
   }
   try {
+    const previous = await prisma.trafficSource.findFirst({ where: { id, ownerId: user.id }, select: { configuration: true } });
+    if (!previous) return apiErrorResponse(new ApiError("not_found", 404, "Traffic source not found."), correlationId);
+    input.configuration = preserveMaskedPostbackValues(input.configuration, previous.configuration);
     const source = await prisma.trafficSource.update({
       where: { id, ownerId: user.id },
       data: {
@@ -42,6 +45,7 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
     logger.info("admin.traffic_source_updated", { trafficSourceId: id, provider: source.type, requestId: correlationId });
     return NextResponse.json({ trafficSource: safe(source) }, { headers: { "x-request-id": correlationId } });
   } catch (error) {
+    if (error instanceof TrafficSourceInputError) return inputError(error, correlationId);
     if ((error as { code?: string }).code === "P2025") return apiErrorResponse(new ApiError("not_found", 404, "Traffic source not found."), correlationId);
     logger.error("admin.traffic_source_update_failed", { errorName: error instanceof Error ? error.name : "UnknownError", requestId: correlationId });
     return apiErrorResponse(new ApiError("internal_error", 500, "Unable to update traffic source."), correlationId);

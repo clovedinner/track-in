@@ -1,4 +1,4 @@
-import { buildCampaignTrackingUrl, buildDirectCampaignUrl, getTrackingUrlDefinition } from "@/lib/tracking/campaign-url";
+import { buildCampaignTrackingUrl, buildDirectCampaignUrl, buildMappedCampaignTrackingUrl, getTrackingUrlDefinition } from "@/lib/tracking/campaign-url";
 import { generateDefaultGtmSnippets } from "@/lib/setup/gtm-snippets";
 import { parseProviderId, validateProviderConfiguration, type ProviderId } from "@/lib/providers/config";
 
@@ -46,9 +46,13 @@ function safeProvider(value: string | undefined): ProviderId | null {
   try { return parseProviderId(value); } catch { return null; }
 }
 
-function hasProviderToken(provider: ProviderId | null, allowed: string[]): boolean {
+function hasProviderToken(provider: ProviderId | null, allowed: string[], configuration: unknown): boolean {
   if (!provider) return false;
-  const tokenParameter = provider === "trafficstars" ? "clickid" : provider === "propeller" ? "subid" : "ACLID";
+  const record = configuration && typeof configuration === "object" ? configuration as Record<string, unknown> : {};
+  const externalId = record.externalId as { parameter?: string; enabled?: boolean } | undefined;
+  const tokenParameter = externalId?.enabled !== false && externalId?.parameter
+    ? externalId.parameter : provider === "generic" ? undefined : getTrackingUrlDefinition(provider).tokenParameter;
+  if (!tokenParameter) return false;
   return allowed.some((name) => name.toLowerCase() === tokenParameter.toLowerCase());
 }
 
@@ -81,12 +85,18 @@ export function buildCampaignSetupReport(input: CampaignSetupInput, trackerBaseU
         const configuration = input.trafficSource?.configuration;
         const record = configuration && typeof configuration === "object" && !Array.isArray(configuration) ? configuration as Record<string, unknown> : {};
         const cost = record.cost && typeof record.cost === "object" && !Array.isArray(record.cost) ? record.cost as { parameter?: string; token?: string; enabled?: boolean } : undefined;
-        const additionalParameters = cost?.enabled !== false && cost?.parameter && cost?.token ? { [cost.parameter]: cost.token } : {};
-        const trackingParameters = [...allowedTrackingParameters];
-        const providerTokenParameter = getTrackingUrlDefinition(provider).tokenParameter;
-        if (!trackingParameters.some((name) => name.toLowerCase() === providerTokenParameter.toLowerCase())) trackingParameters.push(providerTokenParameter);
-        if (Object.keys(additionalParameters).length > 0) trackingParameters.push(...Object.keys(additionalParameters).filter((name) => !trackingParameters.includes(name)));
-        trackingUrls = { [provider]: buildCampaignTrackingUrl({ trackerBaseUrl: baseUrl, campaignSlug: input.slug, provider, allowedTrackingParameters: trackingParameters, additionalParameters }) };
+        const externalId = record.externalId as { parameter?: string; token?: string; enabled?: boolean } | undefined;
+        const parameters = Array.isArray(record.parameters) ? record.parameters as Array<{ parameter?: string; token?: string; enabled?: boolean }> : [];
+        if (externalId || provider === "generic") {
+          trackingUrls = { [provider]: buildMappedCampaignTrackingUrl({ trackerBaseUrl: baseUrl, campaignSlug: input.slug, externalId, cost, parameters }) };
+        } else {
+          const additionalParameters = cost?.enabled !== false && cost?.parameter && cost?.token ? { [cost.parameter]: cost.token } : {};
+          const trackingParameters = [...allowedTrackingParameters];
+          const providerTokenParameter = getTrackingUrlDefinition(provider).tokenParameter;
+          if (!trackingParameters.some((name) => name.toLowerCase() === providerTokenParameter.toLowerCase())) trackingParameters.push(providerTokenParameter);
+          if (Object.keys(additionalParameters).length > 0) trackingParameters.push(...Object.keys(additionalParameters).filter((name) => !trackingParameters.includes(name)));
+          trackingUrls = { [provider]: buildCampaignTrackingUrl({ trackerBaseUrl: baseUrl, campaignSlug: input.slug, provider, allowedTrackingParameters: trackingParameters, additionalParameters }) };
+        }
       }
     } catch (error) {
       trackingError = error instanceof Error ? error.message : "Tracking URL configuration is invalid.";
@@ -113,7 +123,7 @@ export function buildCampaignSetupReport(input: CampaignSetupInput, trackerBaseU
       destinationHttps: input.destinationUrl.startsWith("https://"),
       providerConfigured,
       providerEnabled: input.trafficSource?.enabled === true,
-      providerTokenAllowlisted: hasProviderToken(provider, allowedTrackingParameters),
+      providerTokenAllowlisted: hasProviderToken(provider, allowedTrackingParameters, input.trafficSource?.configuration),
       externalCalls: false,
     },
     provider,

@@ -19,6 +19,7 @@ export type PropellerAdsConfig = {
   aid?: string;
   pid?: string;
   tid?: string;
+  externalId?: { parameter: string; enabled?: boolean };
   /** Optional explicit event-to-goal mapping. `undefined` means main conversion. */
   goalByEventType?: Record<string, number | undefined>;
 };
@@ -48,22 +49,38 @@ const DEFAULT_EVENT_GOALS: Record<string, number | undefined> = {
   redeposit: 3,
 };
 
-const PROPeller_TOKEN_KEYS = ["subid", "SUBID", "clickid", "CLICKID", "click_id", "CLICK_ID"] as const;
+const PROPELLER_TOKEN_KEYS = ["subid", "SUBID", "clickid", "CLICKID", "click_id", "CLICK_ID", "visitor_id"] as const;
+
+function capturedToken(tokens: Record<string, unknown>, parameter: string): string | undefined {
+  const value = tokens[parameter] ?? Object.entries(tokens).find(([key]) => key.toLowerCase() === parameter.toLowerCase())?.[1];
+  if (typeof value !== "string") return undefined;
+  const normalized = value.trim();
+  return normalized.length > 0 && normalized.length <= 256 ? normalized : undefined;
+}
 
 function firstNonEmptyToken(tokens: Record<string, unknown>): string | undefined {
-  for (const key of PROPeller_TOKEN_KEYS) {
-    const value = tokens[key];
-    if (typeof value === "string" && value.length > 0 && value.length <= 256) {
-      return value;
-    }
+  for (const key of PROPELLER_TOKEN_KEYS) {
+    const value = capturedToken(tokens, key);
+    if (value !== undefined) return value;
   }
   return undefined;
 }
 
-export function resolvePropellerSubId(tokens: Record<string, unknown>): string {
+export function resolvePropellerSubId(
+  tokens: Record<string, unknown>,
+  externalId?: PropellerAdsConfig["externalId"],
+): string {
+  const parameter = externalId?.enabled !== false ? externalId?.parameter.trim() : undefined;
+  if (parameter) {
+    const configuredToken = capturedToken(tokens, parameter);
+    if (configuredToken === undefined) {
+      throw new Error(`PropellerAds requires the original click token in configured parameter "${parameter}".`);
+    }
+    return configuredToken;
+  }
   const subId = firstNonEmptyToken(tokens);
   if (subId === undefined) {
-    throw new Error("PropellerAds requires the original click token (SUBID/clickid).");
+    throw new Error("PropellerAds requires the original click token (visitor_id/SUBID/clickid).");
   }
   return subId;
 }
@@ -102,7 +119,7 @@ export function buildPropellerAdsRequest(
     throw new Error("PropellerAds postback URL must use HTTP or HTTPS.");
   }
 
-  destination.searchParams.set("visitor_id", resolvePropellerSubId(tokens));
+  destination.searchParams.set("visitor_id", resolvePropellerSubId(tokens, config.externalId));
   if (config.aid !== undefined) destination.searchParams.set("aid", config.aid);
   if (config.pid !== undefined) destination.searchParams.set("pid", config.pid);
   if (config.tid !== undefined) destination.searchParams.set("tid", config.tid);

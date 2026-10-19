@@ -1,4 +1,4 @@
-import type { ProviderId } from "@/lib/providers/config";
+import type { BuiltinProviderId } from "@/lib/providers/config";
 
 /**
  * The macros are the values the traffic source expands before the click
@@ -6,7 +6,7 @@ import type { ProviderId } from "@/lib/providers/config";
  * internal `cid`, which is created by the redirect endpoint.
  */
 export type TrackingUrlDefinition = {
-  provider: ProviderId;
+  provider: BuiltinProviderId;
   tokenParameter: string;
   tokenMacro: string;
   label: string;
@@ -15,14 +15,14 @@ export type TrackingUrlDefinition = {
 export type BuildCampaignTrackingUrlInput = {
   trackerBaseUrl: string;
   campaignSlug: string;
-  provider: ProviderId;
+  provider: BuiltinProviderId;
   /** Names configured on the campaign and permitted to receive source macros. */
   allowedTrackingParameters?: readonly string[];
   /** Optional source macros for configured, allowlisted parameters. */
   additionalParameters?: Readonly<Record<string, string>>;
 };
 
-const definitions: Record<ProviderId, TrackingUrlDefinition> = {
+const definitions: Record<BuiltinProviderId, TrackingUrlDefinition> = {
   trafficstars: {
     provider: "trafficstars",
     label: "TrafficStars",
@@ -46,7 +46,7 @@ const definitions: Record<ProviderId, TrackingUrlDefinition> = {
 const parameterNamePattern = /^[A-Za-z][A-Za-z0-9_-]{0,63}$/;
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
-export function getTrackingUrlDefinition(provider: ProviderId): TrackingUrlDefinition {
+export function getTrackingUrlDefinition(provider: BuiltinProviderId): TrackingUrlDefinition {
   return definitions[provider];
 }
 
@@ -142,7 +142,7 @@ export function buildCampaignTrackingUrl(input: BuildCampaignTrackingUrlInput): 
 
 export function buildAllCampaignTrackingUrls(
   input: Omit<BuildCampaignTrackingUrlInput, "provider">,
-): Record<ProviderId, string> {
+): Record<BuiltinProviderId, string> {
   return {
     trafficstars: buildCampaignTrackingUrl({ ...input, provider: "trafficstars" }),
     propeller: buildCampaignTrackingUrl({ ...input, provider: "propeller" }),
@@ -164,10 +164,16 @@ export function buildDirectCampaignUrl(input: {
   if (input.offerId) parameterMap.set("oid", input.offerId);
   const entries = [input.externalId, input.cost, ...(input.parameters ?? [])];
   for (const entry of entries) {
-    if (!entry?.enabled || !entry.parameter || !entry.token) continue;
+    if (!entry || entry.enabled === false || !entry.parameter || !entry.token) continue;
     validateParameterName(entry.parameter);
     validateMacro(entry.token, entry.parameter);
     parameterMap.set(entry.parameter, entry.token);
   }
   return buildUrlWithQuery(destination, [...parameterMap.entries()]);
+}
+
+export function buildMappedCampaignTrackingUrl(input: Omit<Parameters<typeof buildDirectCampaignUrl>[0], "offerUrl" | "campaignId" | "offerId"> & { trackerBaseUrl: string; campaignSlug: string }): string {
+  if (!slugPattern.test(input.campaignSlug)) throw new Error("Invalid campaign slug.");
+  const endpoint = new URL(`/t/${encodeURIComponent(input.campaignSlug)}`, parseBaseUrl(input.trackerBaseUrl));
+  return buildDirectCampaignUrl({ ...input, offerUrl: endpoint.toString() });
 }

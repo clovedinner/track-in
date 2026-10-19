@@ -1,7 +1,27 @@
 import { describe, expect, it } from "vitest";
-import { parseTrafficSourceInput, safeTrafficSourceConfiguration } from "./traffic-sources";
+import { parseTrafficSourceInput, preserveMaskedPostbackValues, safeTrafficSourceConfiguration } from "./traffic-sources";
 
 describe("traffic source administration", () => {
+  it("preserves masked postback credentials when editing without exposing them to the browser", () => {
+    const previous = { postbackUrl: "https://example.com/p?key=secret&id={externalid}", externalId: { parameter: "custom_key", token: "${NEW_MACRO}" } };
+    const next = { ...previous, postbackUrl: "https://example.com/p?key=%5Bredacted%5D&id={externalid}&goal=8" };
+    const restored = preserveMaskedPostbackValues(next, previous);
+    const url = new URL(restored.postbackUrl!);
+    expect(url.searchParams.get("key")).toBe("secret");
+    expect(url.searchParams.get("goal")).toBe("8");
+    expect(safeTrafficSourceConfiguration(restored).postbackUrl).not.toContain("secret");
+  });
+
+  it("matches masked credentials by event identity rather than event order", () => {
+    const previous = { eventPostbacks: [{ customConversionId: "reg", url: "https://example.com/p?key=reg-secret" }, { customConversionId: "ftd", url: "https://example.com/p?key=ftd-secret" }] };
+    const next = { eventPostbacks: [{ customConversionId: "ftd", url: "https://example.com/p?key=[redacted]" }] };
+    expect(preserveMaskedPostbackValues(next, previous).eventPostbacks?.[0].url).toContain("ftd-secret");
+  });
+
+  it("does not copy a masked credential to a different host or endpoint", () => {
+    expect(() => preserveMaskedPostbackValues({ postbackUrl: "https://other.example/p?key=[redacted]" }, { postbackUrl: "https://example.com/p?key=secret" })).toThrow(/real credentials/);
+  });
+
   it("validates provider-specific configuration", () => {
     expect(parseTrafficSourceInput({ name: "Propeller", type: "propeller", configuration: { postbackUrl: "https://example.test/conversion.php" } }).type).toBe("propeller");
     expect(() => parseTrafficSourceInput({ name: "Bad", type: "propeller", configuration: { postbackUrl: "javascript:alert(1)" } })).toThrow();

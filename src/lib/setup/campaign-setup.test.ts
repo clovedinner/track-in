@@ -17,6 +17,21 @@ const campaign = {
 };
 
 describe("campaign setup report", () => {
+  it.each(["direct", "redirect"])("uses saved generic mappings in %s tracking URLs", (trackingMode) => {
+    const report = buildCampaignSetupReport({ ...campaign, trackingMode, allowedTrackingParameters: ["custom_source_id"], trafficSource: { type: "generic", enabled: true, configuration: {
+      postbackUrl: "https://unknown.example/postback?token={externalid}",
+      externalId: { parameter: "custom_source_id", token: "${NEW_MACRO}" },
+      cost: { parameter: "price", token: "{PRICE}" },
+      parameters: [{ name: "zone", parameter: "zone", token: "{ZONE}" }],
+    } } }, "https://tracker.example.test");
+    expect(report.trackingUrls.generic).toContain("custom_source_id=${NEW_MACRO}");
+    expect(report.trackingUrls.generic).toContain("price={PRICE}");
+    expect(report.trackingUrls.generic).toContain("zone={ZONE}");
+    expect(report.checks.providerTokenAllowlisted).toBe(true);
+    expect(report.checks.providerConfigured).toBe(true);
+    expect(report.providerError).toBeNull();
+  });
+
   it("generates the provider URL and GTM snippets without network work", () => {
     const report = buildCampaignSetupReport(campaign, "https://tracker.example.test");
     expect(report.trackingUrls.propeller).toContain("/t/client-offer");
