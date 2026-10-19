@@ -39,13 +39,14 @@ export function collectTrackingTokens(
   const tokens: Record<string, string> = {};
 
   for (const candidate of allowedParameters) {
-    if (typeof candidate !== "string" || candidate === reservedParameter) {
+    if (typeof candidate !== "string" || candidate.trim().toLowerCase() === reservedParameter) {
       continue;
     }
 
-    const value = searchParams.get(candidate);
+    const exactValue = searchParams.get(candidate);
+    const value = exactValue ?? [...searchParams.entries()].find(([name]) => name.toLowerCase() === candidate.toLowerCase())?.[1] ?? null;
     if (value !== null && value.length > 0 && value.length <= 512) {
-      tokens[candidate] = value;
+      tokens[candidate.trim()] = value;
     }
   }
 

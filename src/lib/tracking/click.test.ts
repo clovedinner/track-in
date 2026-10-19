@@ -36,6 +36,20 @@ describe("click tracking helpers", () => {
     });
   });
 
+  it("matches configured tracking parameter names without case sensitivity", () => {
+    const query = new URLSearchParams("subid=propeller-click-123");
+
+    expect(collectTrackingTokens(query, ["SUBID"])).toEqual({
+      SUBID: "propeller-click-123",
+    });
+  });
+
+  it("does not allow case variants of the internal click ID parameter", () => {
+    const query = new URLSearchParams("CID=spoofed&cid=also-spoofed");
+
+    expect(collectTrackingTokens(query, ["CID"])).toEqual({});
+  });
+
   it("sets cid and approved tokens without accepting a request destination", () => {
     const destination = buildTrackingDestination(
       "https://money-site.test/offer?existing=kept&cid=old",

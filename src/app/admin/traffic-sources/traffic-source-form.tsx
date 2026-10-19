@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useRef, useState } from "react";
+import { inferProviderIdFromTokenMacro } from "@/lib/providers/identity";
 
 type ParameterRow = { name: string; parameter: string; token: string; enabled: boolean };
 type EventPostback = { customConversionId: string; url: string };
@@ -87,6 +88,14 @@ export default function TrafficSourceForm({ onCreated, source, duplicate = false
       enabled: row.enabled,
     }));
     const postbackUrl = String(form.get("postbackUrl") ?? "").trim();
+    const externalIdToken = String(form.get("externalIdToken") ?? "").trim();
+    const inferredProvider = inferProviderIdFromTokenMacro(externalIdToken);
+    const providerType = inferredProvider ?? source?.type;
+    if (!providerType) {
+      setError("Use a supported external ID token: {click_id}, ${SUBID}, or {ACLID}.");
+      setSubmitting(false);
+      return;
+    }
     if (postbackMode === "single" && !isHttpUrl(postbackUrl)) {
       setError("Enter a valid HTTP or HTTPS postback URL.");
       setSubmitting(false);
@@ -108,12 +117,14 @@ export default function TrafficSourceForm({ onCreated, source, duplicate = false
     }
     const body = {
       name: String(form.get("name") ?? "").trim(),
-      type: "trafficstars",
+      // Provider identity is internal routing metadata, inferred from the
+      // platform macro rather than exposed as a separate name or selector.
+      type: providerType,
       enabled: true,
       configuration: {
         postbackMode,
         ...(postbackMode === "single" ? { postbackUrl } : { eventPostbacks: selectedEventPostbacks }),
-        externalId: { parameter: String(form.get("externalIdParameter") ?? "").trim(), token: String(form.get("externalIdToken") ?? "").trim(), enabled: true },
+        externalId: { parameter: String(form.get("externalIdParameter") ?? "").trim(), token: externalIdToken, enabled: true },
         parameters,
         costCurrency: "USD",
       },
