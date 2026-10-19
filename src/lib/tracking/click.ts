@@ -4,6 +4,7 @@ const reservedParameter = "cid";
 
 type TrafficSourceConfiguration = {
   externalId?: { parameter?: unknown; enabled?: unknown };
+  cost?: { parameter?: unknown; enabled?: unknown };
   parameters?: Array<{ parameter?: unknown; enabled?: unknown }>;
 };
 
@@ -14,6 +15,9 @@ export function enabledTrafficSourceParameters(configuration: unknown): string[]
   const parameters: string[] = [];
   if (record.externalId?.enabled !== false && typeof record.externalId?.parameter === "string" && record.externalId.parameter.trim()) {
     parameters.push(record.externalId.parameter.trim());
+  }
+  if (record.cost?.enabled !== false && typeof record.cost?.parameter === "string" && record.cost.parameter.trim()) {
+    parameters.push(record.cost.parameter.trim());
   }
   if (Array.isArray(record.parameters)) {
     for (const entry of record.parameters) {

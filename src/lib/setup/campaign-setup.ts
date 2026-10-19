@@ -1,4 +1,4 @@
-import { buildCampaignTrackingUrl, buildDirectCampaignUrl } from "@/lib/tracking/campaign-url";
+import { buildCampaignTrackingUrl, buildDirectCampaignUrl, getTrackingUrlDefinition } from "@/lib/tracking/campaign-url";
 import { generateDefaultGtmSnippets } from "@/lib/setup/gtm-snippets";
 import { parseProviderId, validateProviderConfiguration, type ProviderId } from "@/lib/providers/config";
 
@@ -74,10 +74,19 @@ export function buildCampaignSetupReport(input: CampaignSetupInput, trackerBaseU
         const offerUrl = input.destinationUrl;
         const record = configuration && typeof configuration === "object" && !Array.isArray(configuration) ? configuration as Record<string, unknown> : {};
         const externalId = record.externalId && typeof record.externalId === "object" && !Array.isArray(record.externalId) ? record.externalId as { parameter?: string; token?: string; enabled?: boolean } : undefined;
+        const cost = record.cost && typeof record.cost === "object" && !Array.isArray(record.cost) ? record.cost as { parameter?: string; token?: string; enabled?: boolean } : undefined;
         const parameters = Array.isArray(record.parameters) ? record.parameters as Array<{ parameter?: string; token?: string; enabled?: boolean }> : [];
-        trackingUrls = { [provider]: buildDirectCampaignUrl({ offerUrl, campaignId: input.id, offerId: input.offerId ?? undefined, externalId, parameters }) };
+        trackingUrls = { [provider]: buildDirectCampaignUrl({ offerUrl, campaignId: input.id, offerId: input.offerId ?? undefined, externalId, cost, parameters }) };
       } else {
-        trackingUrls = { [provider]: buildCampaignTrackingUrl({ trackerBaseUrl: baseUrl, campaignSlug: input.slug, provider, allowedTrackingParameters }) };
+        const configuration = input.trafficSource?.configuration;
+        const record = configuration && typeof configuration === "object" && !Array.isArray(configuration) ? configuration as Record<string, unknown> : {};
+        const cost = record.cost && typeof record.cost === "object" && !Array.isArray(record.cost) ? record.cost as { parameter?: string; token?: string; enabled?: boolean } : undefined;
+        const additionalParameters = cost?.enabled !== false && cost?.parameter && cost?.token ? { [cost.parameter]: cost.token } : {};
+        const trackingParameters = [...allowedTrackingParameters];
+        const providerTokenParameter = getTrackingUrlDefinition(provider).tokenParameter;
+        if (!trackingParameters.some((name) => name.toLowerCase() === providerTokenParameter.toLowerCase())) trackingParameters.push(providerTokenParameter);
+        if (Object.keys(additionalParameters).length > 0) trackingParameters.push(...Object.keys(additionalParameters).filter((name) => !trackingParameters.includes(name)));
+        trackingUrls = { [provider]: buildCampaignTrackingUrl({ trackerBaseUrl: baseUrl, campaignSlug: input.slug, provider, allowedTrackingParameters: trackingParameters, additionalParameters }) };
       }
     } catch (error) {
       trackingError = error instanceof Error ? error.message : "Tracking URL configuration is invalid.";

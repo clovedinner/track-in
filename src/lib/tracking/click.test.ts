@@ -11,12 +11,13 @@ describe("click tracking helpers", () => {
   it("uses enabled traffic-source parameter mappings as the click allowlist", () => {
     expect(enabledTrafficSourceParameters({
       externalId: { parameter: "ACLID", enabled: true },
+      cost: { parameter: "cost", enabled: true },
       parameters: [
         { parameter: "CampaignID", enabled: true },
         { parameter: "Disabled", enabled: false },
         { parameter: "ACLID", enabled: true },
       ],
-    })).toEqual(["ACLID", "CampaignID"]);
+    })).toEqual(["ACLID", "cost", "CampaignID"]);
   });
 
   it("creates URL-safe opaque click IDs", () => {

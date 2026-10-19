@@ -6,6 +6,7 @@ import TrafficSourceCreateModal from "./traffic-source-create-modal";
 import TrafficSourcesTable, { type TrafficSourceRow } from "./traffic-sources-table";
 import { requireCurrentUser } from "@/lib/auth/current-user";
 import { getCustomConversionCounts, includedCustomConversionColumns, type CustomConversionColumn } from "@/lib/admin/custom-conversion-metrics";
+import { safeTrafficSourceConfiguration } from "@/lib/admin/traffic-sources";
 
 export const metadata: Metadata = { title: "Traffic sources | Trakio", description: "Configure ad-platform traffic sources." };
 export const dynamic = "force-dynamic";
@@ -13,14 +14,20 @@ export const dynamic = "force-dynamic";
 export default async function TrafficSourcesPage() {
   const user = await requireCurrentUser();
   const customConversions: CustomConversionColumn[] = await prisma.customConversion.findMany({ where: { ownerId: user.id, includeInConversions: true }, select: { id: true, name: true, eventValues: true, includeInConversions: true } });
-  const sources = await prisma.trafficSource.findMany({ where: { ownerId: user.id }, orderBy: { name: "asc" }, select: { id: true, name: true, type: true, enabled: true } });
+  const sources = await prisma.trafficSource.findMany({ where: { ownerId: user.id }, orderBy: { name: "asc" }, select: { id: true, name: true, type: true, enabled: true, configuration: true } });
   const rows = await Promise.all(sources.map(async (source) => {
     const [visits, conversions, conversionEvents] = await Promise.all([
       prisma.click.count({ where: { trafficSourceId: source.id } }),
       prisma.conversion.count({ where: { click: { trafficSourceId: source.id } } }),
       prisma.conversion.findMany({ where: { click: { trafficSourceId: source.id } }, select: { eventType: true } }),
     ]);
-    return { ...source, visits, conversions, customConversionCounts: getCustomConversionCounts(conversionEvents, includedCustomConversionColumns(customConversions)) };
+    return {
+      ...source,
+      configuration: safeTrafficSourceConfiguration(source.configuration),
+      visits,
+      conversions,
+      customConversionCounts: getCustomConversionCounts(conversionEvents, includedCustomConversionColumns(customConversions)),
+    };
   }));
   const tableRows: TrafficSourceRow[] = rows;
   return <main className="min-h-screen bg-[#F0F0F0] text-[#121212]"><AdminNavigation pathname="/admin/traffic-sources" /><div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:px-12 lg:py-12">

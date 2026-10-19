@@ -19,6 +19,7 @@ export type TrafficStarsProviderConfiguration = {
   key?: string;
   allowDuplicates?: boolean;
   goalId?: string;
+  cost?: { parameter: string; token: string; enabled?: boolean };
   parameters?: Array<{ name: string; parameter?: string; token: string; enabled?: boolean }>;
   costCurrency?: "USD";
   postbackByEventType?: Record<string, string>;
@@ -33,6 +34,7 @@ export type PropellerProviderConfiguration = {
   pid?: string;
   tid?: string;
   goalByEventType?: Record<string, number | undefined>;
+  cost?: { parameter: string; token: string; enabled?: boolean };
   parameters?: Array<{ name: string; parameter?: string; token: string; enabled?: boolean }>;
   costCurrency?: "USD";
   postbackByEventType?: Record<string, string>;
@@ -44,6 +46,7 @@ export type TrafficJunkyProviderConfiguration = {
   postbackMode?: "single" | "per_event";
   eventPostbacks?: Array<{ customConversionId: string; url: string }>;
   descriptionByEventType?: Record<string, string | undefined>;
+  cost?: { parameter: string; token: string; enabled?: boolean };
   parameters?: Array<{ name: string; parameter?: string; token: string; enabled?: boolean }>;
   costCurrency?: "USD";
   postbackByEventType?: Record<string, string>;
@@ -186,6 +189,7 @@ function optionalExternalId(record: Record<string, unknown>): { parameter: strin
   if (!isRecord(value)) throw new Error("externalId must be an object.");
   const parameter = requiredString(value, "parameter");
   const token = requiredString(value, "token");
+  if (!/^[A-Za-z][A-Za-z0-9_-]{0,49}$/.test(parameter)) throw new Error("externalId.parameter is invalid.");
   const enabled = value.enabled === undefined ? true : value.enabled;
   if (typeof enabled !== "boolean") throw new Error("externalId.enabled must be a boolean.");
   return { parameter, token, enabled };
@@ -207,10 +211,22 @@ function optionalParameters(record: Record<string, unknown>): Array<{ name: stri
   });
 }
 
+function optionalCost(record: Record<string, unknown>): { parameter: string; token: string; enabled?: boolean } | undefined {
+  const value = record.cost;
+  if (value === undefined) return undefined;
+  if (!isRecord(value)) throw new Error("cost must be an object.");
+  const parameter = requiredString(value, "parameter");
+  const token = requiredString(value, "token");
+  if (!/^[A-Za-z][A-Za-z0-9_-]{0,49}$/.test(parameter)) throw new Error("cost.parameter is invalid.");
+  const enabled = value.enabled === undefined ? true : value.enabled;
+  if (typeof enabled !== "boolean") throw new Error("cost.enabled must be a boolean.");
+  return { parameter, token, enabled };
+}
+
 function optionalCommonConfiguration(record: Record<string, unknown>) {
   const costCurrency = record.costCurrency === undefined ? undefined : record.costCurrency;
   if (costCurrency !== undefined && costCurrency !== "USD") throw new Error("costCurrency must be USD.");
-  return { parameters: optionalParameters(record), costCurrency: costCurrency as "USD" | undefined, postbackByEventType: optionalEventPostbacks(record), externalId: optionalExternalId(record), ...optionalPostbackConfiguration(record) };
+  return { cost: optionalCost(record), parameters: optionalParameters(record), costCurrency: costCurrency as "USD" | undefined, postbackByEventType: optionalEventPostbacks(record), externalId: optionalExternalId(record), ...optionalPostbackConfiguration(record) };
 }
 
 function validateTrafficStarsConfiguration(value: unknown): TrafficStarsProviderConfiguration {

@@ -51,6 +51,7 @@ describe("campaign setup report", () => {
         configuration: {
           postbackUrl: "https://provider.example.test/postback",
           externalId: { parameter: "ACLID", token: "{ACLID}", enabled: true },
+          cost: { parameter: "cost", token: "{cost}", enabled: true },
           parameters: [{ parameter: "CampaignID", token: "{CampaignID}", enabled: true }],
         },
       },
@@ -59,6 +60,40 @@ describe("campaign setup report", () => {
     expect(report.trackingUrls.propeller).toContain("cpid=35a1009f-15e3-40ff-a359-7ed6326d7e19");
     expect(report.trackingUrls.propeller).toContain("oid=f7fc0d84-3b1c-4568-a6a4-18d412309b68");
     expect(report.trackingUrls.propeller).toContain("ACLID={ACLID}");
+    expect(report.trackingUrls.propeller).toContain("cost={cost}");
     expect(report.trackingUrls.propeller).toContain("CampaignID={CampaignID}");
+  });
+
+  it("adds the built-in cost macro to redirect tracking URLs", () => {
+    const report = buildCampaignSetupReport({
+      ...campaign,
+      trafficSource: {
+        ...campaign.trafficSource,
+        configuration: {
+          postbackUrl: "https://provider.example.test/postback",
+          cost: { parameter: "cost", token: "{cost}", enabled: true },
+        },
+      },
+    }, "https://tracker.example.test");
+
+    expect(report.trackingUrls.propeller).toContain("subid=${SUBID}");
+    expect(report.trackingUrls.propeller).toContain("cost={cost}");
+  });
+
+  it("keeps the provider token when adding cost to a campaign without an explicit allowlist", () => {
+    const report = buildCampaignSetupReport({
+      ...campaign,
+      allowedTrackingParameters: [],
+      trafficSource: {
+        ...campaign.trafficSource,
+        configuration: {
+          postbackUrl: "https://provider.example.test/postback",
+          cost: { parameter: "cost", token: "{cost}", enabled: true },
+        },
+      },
+    }, "https://tracker.example.test");
+
+    expect(report.trackingUrls.propeller).toContain("subid=${SUBID}");
+    expect(report.trackingUrls.propeller).toContain("cost={cost}");
   });
 });

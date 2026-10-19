@@ -154,6 +154,7 @@ export function buildDirectCampaignUrl(input: {
   offerUrl: string;
   campaignId?: string;
   offerId?: string;
+  cost?: { parameter?: string; token?: string; enabled?: boolean };
   externalId?: { parameter?: string; token?: string; enabled?: boolean };
   parameters?: ReadonlyArray<{ parameter?: string; token?: string; enabled?: boolean }>;
 }): string {
@@ -161,7 +162,7 @@ export function buildDirectCampaignUrl(input: {
   const parameterMap = new Map<string, string>(destination.searchParams.entries());
   if (input.campaignId) parameterMap.set("cpid", input.campaignId);
   if (input.offerId) parameterMap.set("oid", input.offerId);
-  const entries = [input.externalId, ...(input.parameters ?? [])];
+  const entries = [input.externalId, input.cost, ...(input.parameters ?? [])];
   for (const entry of entries) {
     if (!entry?.enabled || !entry.parameter || !entry.token) continue;
     validateParameterName(entry.parameter);

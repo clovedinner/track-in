@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildAllCampaignTrackingUrls,
   buildCampaignTrackingUrl,
+  buildDirectCampaignUrl,
   getTrackingUrlDefinition,
 } from "@/lib/tracking/campaign-url";
 
@@ -34,6 +35,15 @@ describe("campaign tracking URL generation", () => {
     expect(url.searchParams.get("subid")).toBe("${SUBID}");
     expect(url.searchParams.get("zoneid")).toBe("{zoneid}");
     expect(url.searchParams.get("campaign_id")).toBe("{campaign_id}");
+  });
+
+  it("adds the configured built-in cost macro to a direct campaign URL", () => {
+    const url = buildDirectCampaignUrl({
+      offerUrl: "https://offer.example.test/register",
+      cost: { parameter: "cost", token: "{cost}", enabled: true },
+    });
+
+    expect(new URL(url).searchParams.get("cost")).toBe("{cost}");
   });
 
   it("rejects an additional parameter that is not allowlisted", () => {

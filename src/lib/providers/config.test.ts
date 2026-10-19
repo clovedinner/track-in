@@ -31,8 +31,30 @@ describe("provider configuration", () => {
     const propeller = validateProviderConfiguration("propeller", {
       postbackUrl: "https://ad.propellerads.com/conversion.php",
       goalByEventType: { ftd: 2 },
+      cost: { parameter: "cost", token: "{cost}" },
     });
-    expect(propeller).toMatchObject({ goalByEventType: { ftd: 2 } });
+    expect(propeller).toMatchObject({ goalByEventType: { ftd: 2 }, cost: { parameter: "cost", token: "{cost}", enabled: true } });
+  });
+
+  it("keeps the built-in cost mapping separate from the ten custom variables", () => {
+    const parameters = Array.from({ length: 10 }, (_, index) => ({
+      name: `variable${index + 1}`,
+      parameter: `source${index + 1}`,
+      token: `{source${index + 1}}`,
+      enabled: true,
+    }));
+    const valid = validateProviderConfiguration("propeller", {
+      postbackUrl: "https://ad.propellerads.com/conversion.php",
+      cost: { parameter: "cost", token: "{cost}" },
+      parameters,
+    });
+
+    expect(valid).toMatchObject({ cost: { parameter: "cost", token: "{cost}" }, parameters });
+    expect(() => validateProviderConfiguration("propeller", {
+      postbackUrl: "https://ad.propellerads.com/conversion.php",
+      cost: { parameter: "cost", token: "{cost}" },
+      parameters: [...parameters, { name: "variable11", parameter: "source11", token: "{source11}", enabled: true }],
+    })).toThrow(/at most 10/);
   });
 
   it("provides only a provider identifier for logs", () => {

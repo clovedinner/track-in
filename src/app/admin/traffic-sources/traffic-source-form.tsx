@@ -37,11 +37,16 @@ export default function TrafficSourceForm({ onCreated, source, duplicate = false
     if (!source || !formRef.current) return;
     const configuration = source.configuration ?? {};
     const externalId = configuration.externalId && typeof configuration.externalId === "object" && !Array.isArray(configuration.externalId) ? configuration.externalId as Record<string, unknown> : {};
+    const cost = configuration.cost && typeof configuration.cost === "object" && !Array.isArray(configuration.cost) ? configuration.cost as Record<string, unknown> : {};
     const parameter = formRef.current.elements.namedItem("externalIdParameter") as HTMLInputElement | null;
     const token = formRef.current.elements.namedItem("externalIdToken") as HTMLInputElement | null;
+    const costParameter = formRef.current.elements.namedItem("costParameter") as HTMLInputElement | null;
+    const costToken = formRef.current.elements.namedItem("costToken") as HTMLInputElement | null;
     const postback = formRef.current.elements.namedItem("postbackUrl") as HTMLInputElement | null;
     if (parameter) parameter.value = typeof externalId.parameter === "string" ? externalId.parameter : "";
     if (token) token.value = typeof externalId.token === "string" ? externalId.token : "";
+    if (costParameter) costParameter.value = typeof cost.parameter === "string" ? cost.parameter : "cost";
+    if (costToken) costToken.value = typeof cost.token === "string" ? cost.token : "{cost}";
     if (postback) postback.value = typeof configuration.postbackUrl === "string" ? configuration.postbackUrl : typeof configuration.endpoint === "string" ? configuration.endpoint : "";
   }, [source]);
 
@@ -125,6 +130,7 @@ export default function TrafficSourceForm({ onCreated, source, duplicate = false
         postbackMode,
         ...(postbackMode === "single" ? { postbackUrl } : { eventPostbacks: selectedEventPostbacks }),
         externalId: { parameter: String(form.get("externalIdParameter") ?? "").trim(), token: externalIdToken, enabled: true },
+        cost: { parameter: String(form.get("costParameter") ?? "cost").trim() || "cost", token: String(form.get("costToken") ?? "{cost}").trim() || "{cost}", enabled: true },
         parameters,
         costCurrency: "USD",
       },
@@ -158,7 +164,49 @@ export default function TrafficSourceForm({ onCreated, source, duplicate = false
     {error ? <div role="alert" className="border-2 border-[#D02020] bg-[#F0F0F0] px-4 py-3 text-sm text-[#D02020]">{error}</div> : null}
     {done ? <div role="status" className="border-2 border-[#121212] bg-[#F0C020] px-4 py-3 text-sm text-[#121212]">Traffic source created and ready to attach to a campaign.</div> : null}
     <section><h2 className="text-lg font-semibold text-[#121212]">General</h2><label className={`${labelClass} mt-5 block`}>Name<input required name="name" maxLength={200} defaultValue={source?.name ?? ""} className={`${fieldClass} mt-2`} placeholder="Traffic source name" /></label></section>
-    <section><div className="flex items-baseline justify-between gap-4"><div><h2 className="text-lg font-semibold text-[#121212]">Parameters</h2><p className="mt-1 max-w-2xl text-sm leading-5 text-[#121212]">Use one external ID and custom parameters to preserve values from the traffic source.</p></div><span className="text-xs text-[#121212]">{rows.length}/10 custom</span></div><div className="mt-4 overflow-x-auto border-2 border-[#121212]"><div className="min-w-[720px]"><div className="grid grid-cols-[1.1fr_1.1fr_1.1fr_0.7fr_72px] gap-2 bg-[#E0E0E0] px-3 py-2 text-xs font-semibold text-[#121212]"><span>Variable name</span><span>TS parameter</span><span>TS token</span><span>VLM token</span><span>State</span></div><div className="grid grid-cols-[1.1fr_1.1fr_1.1fr_0.7fr_72px] items-center gap-2 border-t-2 border-[#121212] px-3 py-3"><span className="text-sm font-medium text-[#121212]">External ID</span><input name="externalIdParameter" className={fieldClass} placeholder="Type parameter" /><input name="externalIdToken" className={fieldClass} placeholder="Type token" /><span className="font-mono text-xs text-[#1040C0]">{`{externalid}`}</span><span className="text-xs text-[#121212]">Enabled</span></div>{rows.map((row, index) => <div key={index} className="grid grid-cols-[1.1fr_1.1fr_1.1fr_0.7fr_72px] items-center gap-2 border-t-2 border-[#121212] px-3 py-3"><input value={row.name} onChange={(event) => updateRow(index, { name: event.target.value })} className={fieldClass} placeholder={`Variable ${index + 1}`} aria-label={`Variable name ${index + 1}`} /><input value={row.parameter} onChange={(event) => updateRow(index, { parameter: event.target.value })} className={fieldClass} placeholder="Type parameter" aria-label={`Traffic-source parameter ${index + 1}`} /><input value={row.token} onChange={(event) => updateRow(index, { token: event.target.value })} className={fieldClass} placeholder="Type token" aria-label={`Traffic-source token ${index + 1}`} /><span className="font-mono text-xs text-[#1040C0]">{`{var${index + 1}}`}</span><span className="flex items-center gap-2"><button type="button" role="switch" aria-checked={row.enabled} onClick={() => updateRow(index, { enabled: !row.enabled })} className={`relative h-5 w-9 rounded-full transition ${row.enabled ? "bg-[#1040C0]" : "bg-[#121212]"}`}><span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition ${row.enabled ? "left-[18px]" : "left-0.5"}`} /></button>{index === rows.length - 1 ? <button type="button" aria-label={`Delete variable ${index + 1}`} onClick={() => setRows((current) => current.length > 2 ? current.slice(0, -1) : current)} className="text-[#1040C0] hover:text-[#D02020] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1040C0]">×</button> : null}</span></div>)}</div></div><button type="button" disabled={rows.length >= 10} onClick={() => setRows((current) => [...current, { name: "", parameter: "", token: "", enabled: true }])} className="mt-3 text-sm font-semibold text-[#1040C0] hover:underline disabled:cursor-not-allowed disabled:opacity-50">+ Add parameter</button></section>
+    <section>
+      <div className="flex items-baseline justify-between gap-4">
+        <div>
+          <h2 className="text-lg font-semibold text-[#121212]">Parameters</h2>
+          <p className="mt-1 max-w-2xl text-sm leading-5 text-[#121212]">Use one external ID and custom parameters to preserve values from the traffic source.</p>
+        </div>
+        <span className="text-xs text-[#121212]">{rows.length}/10 custom</span>
+      </div>
+      <div className="mt-4 overflow-x-auto border-2 border-[#121212]">
+        <div className="min-w-[720px]">
+          <div className="grid grid-cols-[1.1fr_1.1fr_1.1fr_0.7fr_72px] gap-2 bg-[#E0E0E0] px-3 py-2 text-xs font-semibold text-[#121212]">
+            <span>Variable name</span><span>TS parameter</span><span>TS token</span><span>VLM token</span><span>State</span>
+          </div>
+          <div className="grid grid-cols-[1.1fr_1.1fr_1.1fr_0.7fr_72px] items-center gap-2 border-t-2 border-[#121212] px-3 py-3">
+            <span className="text-sm font-medium text-[#121212]">External ID</span>
+            <input name="externalIdParameter" className={fieldClass} placeholder="Type parameter" />
+            <input name="externalIdToken" className={fieldClass} placeholder="Type token" />
+            <span className="font-mono text-xs text-[#1040C0]">{`{externalid}`}</span>
+            <span className="text-xs text-[#121212]">Enabled</span>
+          </div>
+          <div className="grid grid-cols-[1.1fr_1.1fr_1.1fr_0.7fr_72px] items-center gap-2 border-t-2 border-[#121212] px-3 py-3">
+            <span className="text-sm font-medium text-[#121212]">Cost</span>
+            <input name="costParameter" defaultValue="cost" className={fieldClass} aria-label="Cost traffic-source parameter" />
+            <input name="costToken" defaultValue="{cost}" className={fieldClass} aria-label="Cost traffic-source token" />
+            <span className="font-mono text-xs text-[#1040C0]">{`{cost}`}</span>
+            <span className="text-xs text-[#121212]">Built-in</span>
+          </div>
+          {rows.map((row, index) => <div key={index} className="grid grid-cols-[1.1fr_1.1fr_1.1fr_0.7fr_72px] items-center gap-2 border-t-2 border-[#121212] px-3 py-3">
+            <input value={row.name} onChange={(event) => updateRow(index, { name: event.target.value })} className={fieldClass} placeholder={`Variable ${index + 1}`} aria-label={`Variable name ${index + 1}`} />
+            <input value={row.parameter} onChange={(event) => updateRow(index, { parameter: event.target.value })} className={fieldClass} placeholder="Type parameter" aria-label={`Traffic-source parameter ${index + 1}`} />
+            <input value={row.token} onChange={(event) => updateRow(index, { token: event.target.value })} className={fieldClass} placeholder="Type token" aria-label={`Traffic-source token ${index + 1}`} />
+            <span className="font-mono text-xs text-[#1040C0]">{`{var${index + 1}}`}</span>
+            <span className="flex items-center gap-2">
+              <button type="button" role="switch" aria-checked={row.enabled} onClick={() => updateRow(index, { enabled: !row.enabled })} className={`relative h-5 w-9 rounded-full transition ${row.enabled ? "bg-[#1040C0]" : "bg-[#121212]"}`}>
+                <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition ${row.enabled ? "left-[18px]" : "left-0.5"}`} />
+              </button>
+              {index === rows.length - 1 ? <button type="button" aria-label={`Delete variable ${index + 1}`} onClick={() => setRows((current) => current.length > 2 ? current.slice(0, -1) : current)} className="text-[#1040C0] hover:text-[#D02020] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1040C0]">×</button> : null}
+            </span>
+          </div>)}
+        </div>
+      </div>
+      <button type="button" disabled={rows.length >= 10} onClick={() => setRows((current) => [...current, { name: "", parameter: "", token: "", enabled: true }])} className="mt-3 text-sm font-semibold text-[#1040C0] hover:underline disabled:cursor-not-allowed disabled:opacity-50">+ Add parameter</button>
+    </section>
     <section>
       <h2 className="text-lg font-semibold text-[#121212]">Passing conversion info to traffic source</h2>
       <p className="mt-1 text-sm leading-5 text-[#121212]">Choose one postback URL for every conversion, or map custom conversion events to separate URLs.</p>

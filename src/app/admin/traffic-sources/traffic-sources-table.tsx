@@ -10,6 +10,7 @@ export type TrafficSourceRow = {
   name: string;
   type: string;
   enabled: boolean;
+  configuration: Record<string, unknown>;
   visits: number;
   conversions: number;
   customConversionCounts: Record<string, number>;
