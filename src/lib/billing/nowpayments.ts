@@ -3,6 +3,27 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 export const NOWPAYMENTS_PROVIDER = "nowpayments";
 export const NOWPAYMENTS_PAY_CURRENCY = "usdttrc20";
 
+export function buildNowPaymentsInvoiceRequest(input: {
+  amountMinor: number;
+  callbackUrl: string;
+  cancelUrl: string;
+  invoiceId: string;
+  plan: string;
+  successUrl: string;
+}) {
+  return {
+    price_amount: input.amountMinor / 100,
+    price_currency: "usd",
+    pay_currency: NOWPAYMENTS_PAY_CURRENCY,
+    ipn_callback_url: input.callbackUrl,
+    order_id: input.invoiceId,
+    order_description: `Trakio ${input.plan} subscription`,
+    success_url: input.successUrl,
+    cancel_url: input.cancelUrl,
+    is_fee_paid_by_user: true,
+  };
+}
+
 function sortJson(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(sortJson);
   if (!value || typeof value !== "object") return value;

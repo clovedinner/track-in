@@ -1,9 +1,30 @@
 import { createHmac } from "node:crypto";
 import { describe, expect, it } from "vitest";
 
-import { isNowPaymentsInvoiceUrl, parseUsdCents, stableNowPaymentsPayload, verifyNowPaymentsSignature } from "./nowpayments";
+import { buildNowPaymentsInvoiceRequest, isNowPaymentsInvoiceUrl, parseUsdCents, stableNowPaymentsPayload, verifyNowPaymentsSignature } from "./nowpayments";
 
 describe("NOWPayments helpers", () => {
+  it("passes the plan price in USD and asks the customer to cover provider fees", () => {
+    expect(buildNowPaymentsInvoiceRequest({
+      amountMinor: 50_000,
+      callbackUrl: "https://trakio.org/api/billing/nowpayments",
+      cancelUrl: "https://trakio.org/admin/subscribe?payment=cancelled",
+      invoiceId: "trk_inv_test",
+      plan: "Operator",
+      successUrl: "https://trakio.org/admin/profile",
+    })).toEqual({
+      price_amount: 500,
+      price_currency: "usd",
+      pay_currency: "usdttrc20",
+      ipn_callback_url: "https://trakio.org/api/billing/nowpayments",
+      order_id: "trk_inv_test",
+      order_description: "Trakio Operator subscription",
+      success_url: "https://trakio.org/admin/profile",
+      cancel_url: "https://trakio.org/admin/subscribe?payment=cancelled",
+      is_fee_paid_by_user: true,
+    });
+  });
+
   it("verifies signatures over recursively sorted JSON", () => {
     const secret = "ipn-secret-for-test";
     const payload = { z: 1, nested: { b: true, a: "value" }, a: [2, 1] };

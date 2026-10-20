@@ -134,6 +134,7 @@ model BillingPayment {
   provider              String
   providerInvoiceId     String?               @map("provider_invoice_id")
   checkoutUrl           String?               @map("checkout_url")
+  customerPaysFees      Boolean               @default(false) @map("customer_pays_fees")
   plan                  String
   isTest                Boolean               @default(false) @map("is_test")
   amountMinor           BigInt                @map("amount_minor")

@@ -1,0 +1,1 @@
+ALTER TABLE "billing_payments" ADD COLUMN "customer_pays_fees" BOOLEAN NOT NULL DEFAULT false;

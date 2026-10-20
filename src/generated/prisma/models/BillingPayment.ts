@@ -44,6 +44,7 @@ export type BillingPaymentMinAggregateOutputType = {
   provider: string | null
   providerInvoiceId: string | null
   checkoutUrl: string | null
+  customerPaysFees: boolean | null
   plan: string | null
   isTest: boolean | null
   amountMinor: bigint | null
@@ -68,6 +69,7 @@ export type BillingPaymentMaxAggregateOutputType = {
   provider: string | null
   providerInvoiceId: string | null
   checkoutUrl: string | null
+  customerPaysFees: boolean | null
   plan: string | null
   isTest: boolean | null
   amountMinor: bigint | null
@@ -92,6 +94,7 @@ export type BillingPaymentCountAggregateOutputType = {
   provider: number
   providerInvoiceId: number
   checkoutUrl: number
+  customerPaysFees: number
   plan: number
   isTest: number
   amountMinor: number
@@ -128,6 +131,7 @@ export type BillingPaymentMinAggregateInputType = {
   provider?: true
   providerInvoiceId?: true
   checkoutUrl?: true
+  customerPaysFees?: true
   plan?: true
   isTest?: true
   amountMinor?: true
@@ -152,6 +156,7 @@ export type BillingPaymentMaxAggregateInputType = {
   provider?: true
   providerInvoiceId?: true
   checkoutUrl?: true
+  customerPaysFees?: true
   plan?: true
   isTest?: true
   amountMinor?: true
@@ -176,6 +181,7 @@ export type BillingPaymentCountAggregateInputType = {
   provider?: true
   providerInvoiceId?: true
   checkoutUrl?: true
+  customerPaysFees?: true
   plan?: true
   isTest?: true
   amountMinor?: true
@@ -287,6 +293,7 @@ export type BillingPaymentGroupByOutputType = {
   provider: string
   providerInvoiceId: string | null
   checkoutUrl: string | null
+  customerPaysFees: boolean
   plan: string
   isTest: boolean
   amountMinor: bigint
@@ -334,6 +341,7 @@ export type BillingPaymentWhereInput = {
   provider?: Prisma.StringFilter<"BillingPayment"> | string
   providerInvoiceId?: Prisma.StringNullableFilter<"BillingPayment"> | string | null
   checkoutUrl?: Prisma.StringNullableFilter<"BillingPayment"> | string | null
+  customerPaysFees?: Prisma.BoolFilter<"BillingPayment"> | boolean
   plan?: Prisma.StringFilter<"BillingPayment"> | string
   isTest?: Prisma.BoolFilter<"BillingPayment"> | boolean
   amountMinor?: Prisma.BigIntFilter<"BillingPayment"> | bigint | number
@@ -361,6 +369,7 @@ export type BillingPaymentOrderByWithRelationInput = {
   provider?: Prisma.SortOrder
   providerInvoiceId?: Prisma.SortOrderInput | Prisma.SortOrder
   checkoutUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  customerPaysFees?: Prisma.SortOrder
   plan?: Prisma.SortOrder
   isTest?: Prisma.SortOrder
   amountMinor?: Prisma.SortOrder
@@ -392,6 +401,7 @@ export type BillingPaymentWhereUniqueInput = Prisma.AtLeast<{
   provider?: Prisma.StringFilter<"BillingPayment"> | string
   providerInvoiceId?: Prisma.StringNullableFilter<"BillingPayment"> | string | null
   checkoutUrl?: Prisma.StringNullableFilter<"BillingPayment"> | string | null
+  customerPaysFees?: Prisma.BoolFilter<"BillingPayment"> | boolean
   plan?: Prisma.StringFilter<"BillingPayment"> | string
   isTest?: Prisma.BoolFilter<"BillingPayment"> | boolean
   amountMinor?: Prisma.BigIntFilter<"BillingPayment"> | bigint | number
@@ -418,6 +428,7 @@ export type BillingPaymentOrderByWithAggregationInput = {
   provider?: Prisma.SortOrder
   providerInvoiceId?: Prisma.SortOrderInput | Prisma.SortOrder
   checkoutUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  customerPaysFees?: Prisma.SortOrder
   plan?: Prisma.SortOrder
   isTest?: Prisma.SortOrder
   amountMinor?: Prisma.SortOrder
@@ -450,6 +461,7 @@ export type BillingPaymentScalarWhereWithAggregatesInput = {
   provider?: Prisma.StringWithAggregatesFilter<"BillingPayment"> | string
   providerInvoiceId?: Prisma.StringNullableWithAggregatesFilter<"BillingPayment"> | string | null
   checkoutUrl?: Prisma.StringNullableWithAggregatesFilter<"BillingPayment"> | string | null
+  customerPaysFees?: Prisma.BoolWithAggregatesFilter<"BillingPayment"> | boolean
   plan?: Prisma.StringWithAggregatesFilter<"BillingPayment"> | string
   isTest?: Prisma.BoolWithAggregatesFilter<"BillingPayment"> | boolean
   amountMinor?: Prisma.BigIntWithAggregatesFilter<"BillingPayment"> | bigint | number
@@ -472,6 +484,7 @@ export type BillingPaymentCreateInput = {
   provider: string
   providerInvoiceId?: string | null
   checkoutUrl?: string | null
+  customerPaysFees?: boolean
   plan: string
   isTest?: boolean
   amountMinor: bigint | number
@@ -499,6 +512,7 @@ export type BillingPaymentUncheckedCreateInput = {
   provider: string
   providerInvoiceId?: string | null
   checkoutUrl?: string | null
+  customerPaysFees?: boolean
   plan: string
   isTest?: boolean
   amountMinor: bigint | number
@@ -522,6 +536,7 @@ export type BillingPaymentUpdateInput = {
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   providerInvoiceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checkoutUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerPaysFees?: Prisma.BoolFieldUpdateOperationsInput | boolean
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   isTest?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amountMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
@@ -549,6 +564,7 @@ export type BillingPaymentUncheckedUpdateInput = {
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   providerInvoiceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checkoutUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerPaysFees?: Prisma.BoolFieldUpdateOperationsInput | boolean
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   isTest?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amountMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
@@ -574,6 +590,7 @@ export type BillingPaymentCreateManyInput = {
   provider: string
   providerInvoiceId?: string | null
   checkoutUrl?: string | null
+  customerPaysFees?: boolean
   plan: string
   isTest?: boolean
   amountMinor: bigint | number
@@ -596,6 +613,7 @@ export type BillingPaymentUpdateManyMutationInput = {
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   providerInvoiceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checkoutUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerPaysFees?: Prisma.BoolFieldUpdateOperationsInput | boolean
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   isTest?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amountMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
@@ -620,6 +638,7 @@ export type BillingPaymentUncheckedUpdateManyInput = {
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   providerInvoiceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checkoutUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerPaysFees?: Prisma.BoolFieldUpdateOperationsInput | boolean
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   isTest?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amountMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
@@ -654,6 +673,7 @@ export type BillingPaymentCountOrderByAggregateInput = {
   provider?: Prisma.SortOrder
   providerInvoiceId?: Prisma.SortOrder
   checkoutUrl?: Prisma.SortOrder
+  customerPaysFees?: Prisma.SortOrder
   plan?: Prisma.SortOrder
   isTest?: Prisma.SortOrder
   amountMinor?: Prisma.SortOrder
@@ -683,6 +703,7 @@ export type BillingPaymentMaxOrderByAggregateInput = {
   provider?: Prisma.SortOrder
   providerInvoiceId?: Prisma.SortOrder
   checkoutUrl?: Prisma.SortOrder
+  customerPaysFees?: Prisma.SortOrder
   plan?: Prisma.SortOrder
   isTest?: Prisma.SortOrder
   amountMinor?: Prisma.SortOrder
@@ -707,6 +728,7 @@ export type BillingPaymentMinOrderByAggregateInput = {
   provider?: Prisma.SortOrder
   providerInvoiceId?: Prisma.SortOrder
   checkoutUrl?: Prisma.SortOrder
+  customerPaysFees?: Prisma.SortOrder
   plan?: Prisma.SortOrder
   isTest?: Prisma.SortOrder
   amountMinor?: Prisma.SortOrder
@@ -863,6 +885,7 @@ export type BillingPaymentCreateWithoutUserInput = {
   provider: string
   providerInvoiceId?: string | null
   checkoutUrl?: string | null
+  customerPaysFees?: boolean
   plan: string
   isTest?: boolean
   amountMinor: bigint | number
@@ -888,6 +911,7 @@ export type BillingPaymentUncheckedCreateWithoutUserInput = {
   provider: string
   providerInvoiceId?: string | null
   checkoutUrl?: string | null
+  customerPaysFees?: boolean
   plan: string
   isTest?: boolean
   amountMinor: bigint | number
@@ -942,6 +966,7 @@ export type BillingPaymentScalarWhereInput = {
   provider?: Prisma.StringFilter<"BillingPayment"> | string
   providerInvoiceId?: Prisma.StringNullableFilter<"BillingPayment"> | string | null
   checkoutUrl?: Prisma.StringNullableFilter<"BillingPayment"> | string | null
+  customerPaysFees?: Prisma.BoolFilter<"BillingPayment"> | boolean
   plan?: Prisma.StringFilter<"BillingPayment"> | string
   isTest?: Prisma.BoolFilter<"BillingPayment"> | boolean
   amountMinor?: Prisma.BigIntFilter<"BillingPayment"> | bigint | number
@@ -964,6 +989,7 @@ export type BillingPaymentCreateWithoutSubscriptionInput = {
   provider: string
   providerInvoiceId?: string | null
   checkoutUrl?: string | null
+  customerPaysFees?: boolean
   plan: string
   isTest?: boolean
   amountMinor: bigint | number
@@ -989,6 +1015,7 @@ export type BillingPaymentUncheckedCreateWithoutSubscriptionInput = {
   provider: string
   providerInvoiceId?: string | null
   checkoutUrl?: string | null
+  customerPaysFees?: boolean
   plan: string
   isTest?: boolean
   amountMinor: bigint | number
@@ -1038,6 +1065,7 @@ export type BillingPaymentCreateWithoutChainTransfersInput = {
   provider: string
   providerInvoiceId?: string | null
   checkoutUrl?: string | null
+  customerPaysFees?: boolean
   plan: string
   isTest?: boolean
   amountMinor: bigint | number
@@ -1064,6 +1092,7 @@ export type BillingPaymentUncheckedCreateWithoutChainTransfersInput = {
   provider: string
   providerInvoiceId?: string | null
   checkoutUrl?: string | null
+  customerPaysFees?: boolean
   plan: string
   isTest?: boolean
   amountMinor: bigint | number
@@ -1102,6 +1131,7 @@ export type BillingPaymentUpdateWithoutChainTransfersInput = {
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   providerInvoiceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checkoutUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerPaysFees?: Prisma.BoolFieldUpdateOperationsInput | boolean
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   isTest?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amountMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
@@ -1128,6 +1158,7 @@ export type BillingPaymentUncheckedUpdateWithoutChainTransfersInput = {
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   providerInvoiceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checkoutUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerPaysFees?: Prisma.BoolFieldUpdateOperationsInput | boolean
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   isTest?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amountMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
@@ -1151,6 +1182,7 @@ export type BillingPaymentCreateManyUserInput = {
   provider: string
   providerInvoiceId?: string | null
   checkoutUrl?: string | null
+  customerPaysFees?: boolean
   plan: string
   isTest?: boolean
   amountMinor: bigint | number
@@ -1173,6 +1205,7 @@ export type BillingPaymentUpdateWithoutUserInput = {
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   providerInvoiceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checkoutUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerPaysFees?: Prisma.BoolFieldUpdateOperationsInput | boolean
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   isTest?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amountMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
@@ -1198,6 +1231,7 @@ export type BillingPaymentUncheckedUpdateWithoutUserInput = {
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   providerInvoiceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checkoutUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerPaysFees?: Prisma.BoolFieldUpdateOperationsInput | boolean
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   isTest?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amountMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
@@ -1222,6 +1256,7 @@ export type BillingPaymentUncheckedUpdateManyWithoutUserInput = {
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   providerInvoiceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checkoutUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerPaysFees?: Prisma.BoolFieldUpdateOperationsInput | boolean
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   isTest?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amountMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
@@ -1245,6 +1280,7 @@ export type BillingPaymentCreateManySubscriptionInput = {
   provider: string
   providerInvoiceId?: string | null
   checkoutUrl?: string | null
+  customerPaysFees?: boolean
   plan: string
   isTest?: boolean
   amountMinor: bigint | number
@@ -1267,6 +1303,7 @@ export type BillingPaymentUpdateWithoutSubscriptionInput = {
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   providerInvoiceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checkoutUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerPaysFees?: Prisma.BoolFieldUpdateOperationsInput | boolean
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   isTest?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amountMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
@@ -1292,6 +1329,7 @@ export type BillingPaymentUncheckedUpdateWithoutSubscriptionInput = {
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   providerInvoiceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checkoutUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerPaysFees?: Prisma.BoolFieldUpdateOperationsInput | boolean
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   isTest?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amountMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
@@ -1316,6 +1354,7 @@ export type BillingPaymentUncheckedUpdateManyWithoutSubscriptionInput = {
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   providerInvoiceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checkoutUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerPaysFees?: Prisma.BoolFieldUpdateOperationsInput | boolean
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   isTest?: Prisma.BoolFieldUpdateOperationsInput | boolean
   amountMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
@@ -1371,6 +1410,7 @@ export type BillingPaymentSelect<ExtArgs extends runtime.Types.Extensions.Intern
   provider?: boolean
   providerInvoiceId?: boolean
   checkoutUrl?: boolean
+  customerPaysFees?: boolean
   plan?: boolean
   isTest?: boolean
   amountMinor?: boolean
@@ -1399,6 +1439,7 @@ export type BillingPaymentSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   provider?: boolean
   providerInvoiceId?: boolean
   checkoutUrl?: boolean
+  customerPaysFees?: boolean
   plan?: boolean
   isTest?: boolean
   amountMinor?: boolean
@@ -1425,6 +1466,7 @@ export type BillingPaymentSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   provider?: boolean
   providerInvoiceId?: boolean
   checkoutUrl?: boolean
+  customerPaysFees?: boolean
   plan?: boolean
   isTest?: boolean
   amountMinor?: boolean
@@ -1451,6 +1493,7 @@ export type BillingPaymentSelectScalar = {
   provider?: boolean
   providerInvoiceId?: boolean
   checkoutUrl?: boolean
+  customerPaysFees?: boolean
   plan?: boolean
   isTest?: boolean
   amountMinor?: boolean
@@ -1467,7 +1510,7 @@ export type BillingPaymentSelectScalar = {
   updatedAt?: boolean
 }
 
-export type BillingPaymentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "subscriptionId" | "invoiceId" | "provider" | "providerInvoiceId" | "checkoutUrl" | "plan" | "isTest" | "amountMinor" | "paymentAmountAtomic" | "currency" | "network" | "status" | "providerTransactionId" | "transactionHash" | "receivedAt" | "confirmedAt" | "failureReason" | "createdAt" | "updatedAt", ExtArgs["result"]["billingPayment"]>
+export type BillingPaymentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "subscriptionId" | "invoiceId" | "provider" | "providerInvoiceId" | "checkoutUrl" | "customerPaysFees" | "plan" | "isTest" | "amountMinor" | "paymentAmountAtomic" | "currency" | "network" | "status" | "providerTransactionId" | "transactionHash" | "receivedAt" | "confirmedAt" | "failureReason" | "createdAt" | "updatedAt", ExtArgs["result"]["billingPayment"]>
 export type BillingPaymentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   subscription?: boolean | Prisma.BillingPayment$subscriptionArgs<ExtArgs>
@@ -1498,6 +1541,7 @@ export type $BillingPaymentPayload<ExtArgs extends runtime.Types.Extensions.Inte
     provider: string
     providerInvoiceId: string | null
     checkoutUrl: string | null
+    customerPaysFees: boolean
     plan: string
     isTest: boolean
     amountMinor: bigint
@@ -1945,6 +1989,7 @@ export interface BillingPaymentFieldRefs {
   readonly provider: Prisma.FieldRef<"BillingPayment", 'String'>
   readonly providerInvoiceId: Prisma.FieldRef<"BillingPayment", 'String'>
   readonly checkoutUrl: Prisma.FieldRef<"BillingPayment", 'String'>
+  readonly customerPaysFees: Prisma.FieldRef<"BillingPayment", 'Boolean'>
   readonly plan: Prisma.FieldRef<"BillingPayment", 'String'>
   readonly isTest: Prisma.FieldRef<"BillingPayment", 'Boolean'>
   readonly amountMinor: Prisma.FieldRef<"BillingPayment", 'BigInt'>

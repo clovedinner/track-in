@@ -1634,6 +1634,7 @@ export const BillingPaymentScalarFieldEnum = {
   provider: 'provider',
   providerInvoiceId: 'providerInvoiceId',
   checkoutUrl: 'checkoutUrl',
+  customerPaysFees: 'customerPaysFees',
   plan: 'plan',
   isTest: 'isTest',
   amountMinor: 'amountMinor',

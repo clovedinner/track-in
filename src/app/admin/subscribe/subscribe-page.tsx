@@ -226,12 +226,12 @@ export default function SubscribePage({ showTestPayment = false, paymentProvider
                 {invoiceError && paymentProvider === "nowpayments" && selectedPlan && !invoiceWorking ? <button type="button" onClick={() => void openPayment(selectedPlan)} className="mb-5 min-h-11 border-2 border-[#121212] bg-[#F0C020] px-4 py-2.5 text-sm font-bold shadow-[3px_3px_0_#121212] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#121212]">Create a new invoice</button> : null}
                 <div>
                     <div className="flex flex-wrap items-end justify-between gap-4 border-b-2 border-[#121212] pb-4">
-                      <div><p className="text-xs font-bold uppercase tracking-[0.14em] text-[#D02020]">Exact invoice amount</p><p className="mt-1 text-3xl font-black">{invoice ? formatUsdt(invoice.paymentAmountAtomic, invoice.amountMinor, invoice.currency) : `${Number(selectedPlan.price.replace("$", "")).toFixed(2)} USDT`}</p></div>
+                      <div><p className="text-xs font-bold uppercase tracking-[0.14em] text-[#D02020]">{paymentProvider === "nowpayments" ? "Plan price" : "Exact invoice amount"}</p><p className="mt-1 text-3xl font-black">{paymentProvider === "nowpayments" ? `$${(Number(invoice?.amountMinor ?? String(Number(selectedPlan.price.replace("$", "")) * 100)) / 100).toFixed(2)} USD` : invoice ? formatUsdt(invoice.paymentAmountAtomic, invoice.amountMinor, invoice.currency) : `${Number(selectedPlan.price.replace("$", "")).toFixed(2)} USDT`}</p></div>
                       <div className="text-left sm:text-right"><p className="text-xs font-bold uppercase tracking-[0.14em]">Network</p><p className="mt-1 text-lg font-bold">USDT / TRC20</p></div>
                     </div>
                     {invoice?.checkoutUrl ? (
                       <>
-                        <p className="mt-5 text-sm font-bold">Continue to NOWPayments to complete your USDT transfer. Trakio activates the subscription after the provider confirms payment.</p>
+                        <p className="mt-5 text-sm font-bold">Continue to NOWPayments to pay in USDT. The checkout converts this plan price to the current USDT amount and adds its applicable payment fees. Your wallet may show a separate network fee. Trakio activates your subscription after payment is confirmed.</p>
                         <a href={invoice.checkoutUrl} target="_blank" rel="noreferrer" className="mt-4 inline-flex min-h-11 items-center justify-center border-2 border-[#121212] bg-[#D02020] px-5 py-3 text-sm font-bold text-[#FFFFFF] shadow-[4px_4px_0_#121212] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D02020]">Continue to secure payment</a>
                         <p className="mt-4 font-mono text-xs">Invoice reference: {invoice.invoiceId}</p>
                       </>

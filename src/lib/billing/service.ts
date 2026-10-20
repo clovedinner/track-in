@@ -4,7 +4,7 @@ import { prisma } from "@/lib/database/prisma";
 import { MAX_INVOICE_REFERENCE_ATOMIC, TRON_PAYMENT_PROVIDER, toUsdtAtomicFromCents } from "@/lib/billing/tron";
 import { canUseBillingTestMode } from "@/lib/billing/test-access";
 import { queueInvoiceEmail } from "@/lib/email/outbox";
-import { NOWPAYMENTS_PAY_CURRENCY, NOWPAYMENTS_PROVIDER, isNowPaymentsInvoiceUrl, parseUsdCents } from "@/lib/billing/nowpayments";
+import { NOWPAYMENTS_PAY_CURRENCY, NOWPAYMENTS_PROVIDER, buildNowPaymentsInvoiceRequest, isNowPaymentsInvoiceUrl, parseUsdCents } from "@/lib/billing/nowpayments";
 
 export const BILLING_PLANS = {
   Starter: { amountMinor: 30_000, currency: "USDT" },
@@ -83,7 +83,7 @@ async function createNowPaymentsInvoice(userId: string, plan: BillingPlan, amoun
   if (process.env.NODE_ENV === "production" && origin.protocol !== "https:") throw new Error("NEXT_PUBLIC_APP_URL must use HTTPS in production.");
 
   const existing = await prisma.billingPayment.findFirst({
-    where: { userId, plan, provider: NOWPAYMENTS_PROVIDER, status: "pending", currency: "USD" },
+    where: { userId, plan, provider: NOWPAYMENTS_PROVIDER, status: "pending", currency: "USD", customerPaysFees: true },
     orderBy: { createdAt: "desc" },
   });
   let payment = existing;
@@ -93,6 +93,7 @@ async function createNowPaymentsInvoice(userId: string, plan: BillingPlan, amoun
         userId,
         invoiceId: `trk_inv_${randomUUID()}`,
         provider: NOWPAYMENTS_PROVIDER,
+        customerPaysFees: true,
         plan,
         amountMinor: BigInt(amountMinor),
         currency: "USD",
@@ -110,16 +111,14 @@ async function createNowPaymentsInvoice(userId: string, plan: BillingPlan, amoun
       response = await fetch("https://api.nowpayments.io/v1/invoice", {
         method: "POST",
         headers: { "content-type": "application/json", "x-api-key": apiKey },
-        body: JSON.stringify({
-          price_amount: amountMinor / 100,
-          price_currency: "usd",
-          pay_currency: NOWPAYMENTS_PAY_CURRENCY,
-          ipn_callback_url: callbackUrl,
-          order_id: payment.invoiceId,
-          order_description: `Trakio ${plan} subscription`,
-          success_url: successUrl,
-          cancel_url: cancelUrl,
-        }),
+        body: JSON.stringify(buildNowPaymentsInvoiceRequest({
+          amountMinor,
+          callbackUrl,
+          invoiceId: payment.invoiceId,
+          plan,
+          successUrl,
+          cancelUrl,
+        })),
         signal: AbortSignal.timeout(12_000),
       });
     } catch {
