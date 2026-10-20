@@ -221,9 +221,25 @@ export default function SubscribePage({ showTestPayment = false, paymentProvider
               </div>
             ) : (
               <div className="px-5 py-6 sm:px-7 sm:py-8">
-                {invoiceWorking ? <p className="mb-5 border-2 border-[#121212] bg-[#F0C020] px-4 py-3 text-sm font-bold">Creating your invoice…</p> : null}
-                {invoiceError ? <p role="alert" className="mb-5 border-2 border-[#D02020] bg-[#FFF4F0] px-4 py-3 text-sm text-[#D02020]">{invoiceError}</p> : null}
+                {invoiceWorking ? (
+                  <div role="status" aria-label="Creating your invoice" className="animate-pulse space-y-6">
+                    <span className="sr-only">Creating your invoice…</span>
+                    <div className="flex items-end justify-between gap-5 border-b-2 border-[#121212] pb-4">
+                      <div className="space-y-3"><div className="h-3 w-24 bg-[#E0E0E0]" /><div className="h-9 w-48 bg-[#E0E0E0]" /></div>
+                      <div className="space-y-3"><div className="ml-auto h-3 w-20 bg-[#E0E0E0]" /><div className="h-6 w-28 bg-[#E0E0E0]" /></div>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="h-3 w-full bg-[#E0E0E0]" />
+                      <div className="h-3 w-4/5 bg-[#E0E0E0]" />
+                      <div className="h-11 w-56 bg-[#E0E0E0]" />
+                      <div className="h-3 w-64 bg-[#E0E0E0]" />
+                    </div>
+                    <div className="border-t-2 border-[#121212] pt-5"><div className="ml-auto h-11 w-24 bg-[#E0E0E0]" /></div>
+                  </div>
+                ) : null}
+                {invoiceError && !invoiceWorking ? <p role="alert" className="mb-5 border-2 border-[#D02020] bg-[#FFF4F0] px-4 py-3 text-sm text-[#D02020]">{invoiceError}</p> : null}
                 {invoiceError && paymentProvider === "nowpayments" && selectedPlan && !invoiceWorking ? <button type="button" onClick={() => void openPayment(selectedPlan)} className="mb-5 min-h-11 border-2 border-[#121212] bg-[#F0C020] px-4 py-2.5 text-sm font-bold shadow-[3px_3px_0_#121212] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#121212]">Create a new invoice</button> : null}
+                {!invoiceWorking && !invoiceError && invoice ? <>
                 <div>
                     <div className="flex flex-wrap items-end justify-between gap-4 border-b-2 border-[#121212] pb-4">
                       <div><p className="text-xs font-bold uppercase tracking-[0.14em] text-[#D02020]">{paymentProvider === "nowpayments" ? "Plan price" : "Exact invoice amount"}</p><p className="mt-1 text-3xl font-black">{paymentProvider === "nowpayments" ? `$${(Number(invoice?.amountMinor ?? String(Number(selectedPlan.price.replace("$", "")) * 100)) / 100).toFixed(2)} USD` : invoice ? formatUsdt(invoice.paymentAmountAtomic, invoice.amountMinor, invoice.currency) : `${Number(selectedPlan.price.replace("$", "")).toFixed(2)} USDT`}</p></div>
@@ -231,7 +247,8 @@ export default function SubscribePage({ showTestPayment = false, paymentProvider
                     </div>
                     {invoice?.checkoutUrl ? (
                       <>
-                        <p className="mt-5 text-sm font-bold">Continue to NOWPayments to pay in USDT. The checkout converts this plan price to the current USDT amount and adds its applicable payment fees. Your wallet may show a separate network fee. Trakio activates your subscription after payment is confirmed.</p>
+                        <p className="mt-5 text-sm font-bold">Continue to NOWPayments to pay in USDT.</p>
+                        <p className="mt-1 text-xs leading-5">The checkout shows the current USDT total, including applicable NOWPayments fees. Your wallet may list its own network fee separately. Trakio activates your subscription after payment is confirmed.</p>
                         <a href={invoice.checkoutUrl} target="_blank" rel="noreferrer" className="mt-4 inline-flex min-h-11 items-center justify-center border-2 border-[#121212] bg-[#D02020] px-5 py-3 text-sm font-bold text-[#FFFFFF] shadow-[4px_4px_0_#121212] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D02020]">Continue to secure payment</a>
                         <p className="mt-4 font-mono text-xs">Invoice reference: {invoice.invoiceId}</p>
                       </>
@@ -243,10 +260,11 @@ export default function SubscribePage({ showTestPayment = false, paymentProvider
                       </>
                     )}
                 </div>
-                <p className="mt-7 border-l-4 border-[#D02020] bg-[#F0F0F0] px-4 py-3 text-sm leading-6">Use USDT on TRC20 only. Sending another asset or network can result in a permanent loss.</p>
+                {!invoice.checkoutUrl ? <p className="mt-7 border-l-4 border-[#D02020] bg-[#F0F0F0] px-4 py-3 text-sm leading-6">Use USDT on TRC20 only. Sending another asset or network can result in a permanent loss.</p> : null}
                 <div className="mt-7 flex flex-col-reverse gap-3 border-t-2 border-[#121212] pt-5 sm:flex-row sm:justify-end">
                   <button type="button" onClick={() => setSelectedPlan(null)} className="min-h-11 border-2 border-[#121212] bg-[#FFFFFF] px-5 py-3 text-sm font-bold text-[#121212] hover:bg-[#E0E0E0] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#121212]">Cancel</button>
                 </div>
+                </> : null}
               </div>
             )}
           </section>
