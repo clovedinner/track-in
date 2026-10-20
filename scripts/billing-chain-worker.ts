@@ -118,22 +118,31 @@ async function scanConfirmedTransfers() {
         continue;
       }
       if (payment.isTest) {
-        await prisma.$transaction(async (transaction) => {
-          await transaction.billingPayment.update({
-            where: { id: payment.id },
-            data: {
-              status: "confirmed",
-              paymentAmountAtomic: null,
-              providerTransactionId: transfer.transaction_id,
-              transactionHash: transfer.transaction_id,
-              receivedAt: new Date(transfer.block_timestamp),
-              confirmedAt: new Date(),
-            },
-          });
-          await transaction.billingChainTransfer.update({ where: { id: eventId }, data: { paymentId: payment.id } });
-        });
-        matched += 1;
-        console.info(`[billing] test transfer confirmed; no subscription activated invoice=${payment.invoiceId} tx=${transfer.transaction_id.slice(0, 12)}`);
+        if (!process.env.BILLING_TEST_USER_ID?.trim() || payment.userId !== process.env.BILLING_TEST_USER_ID.trim()) {
+          console.error(`[billing] test invoice is not assigned to the configured test account; leaving transfer unmatched invoice=${payment.invoiceId}`);
+          continue;
+        }
+        const now = new Date();
+        const periodEnd = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+        const accepted = await processBillingWebhook(TRON_PAYMENT_PROVIDER, {
+          eventId,
+          eventType: "usdt_test_transfer_confirmed",
+          invoiceId: payment.invoiceId,
+          status: "confirmed",
+          plan: "Starter",
+          providerTransactionId: transfer.transaction_id,
+          transactionHash: transfer.transaction_id,
+          amountMinor: Number(payment.amountMinor),
+          currency: "USDT",
+          periodStart: now.toISOString(),
+          periodEnd: periodEnd.toISOString(),
+          nextInvoiceAt: periodEnd.toISOString(),
+        }, hashBillingPayload(JSON.stringify(transfer)));
+        if (accepted.status === "accepted") {
+          await prisma.billingChainTransfer.update({ where: { id: eventId }, data: { paymentId: payment.id } });
+          matched += 1;
+          console.info(`[billing] test transfer confirmed; Starter activated for 30 days invoice=${payment.invoiceId} tx=${transfer.transaction_id.slice(0, 12)}`);
+        }
         continue;
       }
       if (!isBillingPlan(payment.plan)) {

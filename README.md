@@ -82,7 +82,8 @@ Use `npm run db:migrate:create` only on a non-production Neon branch when a sche
 - `BILLING_WALLET_ADDRESS`: the public TRON address that receives USDT TRC20 payments. Trakio never needs its private key.
 - `TRONGRID_API_KEY`: server-only key for reading confirmed TRON transfers. TronGrid provides a free tier; quotas and rate limits can change.
 - `BILLING_POLL_INTERVAL_MS`: optional polling interval for the payment monitor, default 15000 ms.
-- `BILLING_TEST_MODE`: set to `true` temporarily to show a 0.10 USDT monitor-test invoice. Confirming it records the transfer only and never activates a subscription; turn it back off after testing.
+- `BILLING_TEST_MODE`: set to `true` temporarily to enable the 0.10 USDT payment-monitor test for one account only.
+- `BILLING_TEST_USER_ID`: database user ID for the dedicated test account. After TronGrid confirms the test transfer, the monitor activates Starter for 30 days for this account.
 - `RESEND_API_KEY`: server-only Resend key used by the transactional email worker; required in production.
 - `EMAIL_FROM_VERIFICATION`: verified sender identity for signup confirmation, default `Trakio <team@trakio.org>`.
 - `EMAIL_FROM_INVOICE`: verified sender identity for invoice messages, default `Trakio Billing <billing@trakio.org>`.

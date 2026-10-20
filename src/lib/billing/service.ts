@@ -2,6 +2,7 @@ import { createHash, createHmac, timingSafeEqual, randomUUID } from "node:crypto
 
 import { prisma } from "@/lib/database/prisma";
 import { MAX_INVOICE_REFERENCE_ATOMIC, TRON_PAYMENT_PROVIDER, toUsdtAtomicFromCents } from "@/lib/billing/tron";
+import { canUseBillingTestMode } from "@/lib/billing/test-access";
 import { queueInvoiceEmail } from "@/lib/email/outbox";
 
 export const BILLING_PLANS = {
@@ -74,15 +75,20 @@ export async function createInvoice(userId: string, plan: BillingPlan) {
 const TEST_PAYMENT_AMOUNT_ATOMIC = BigInt(100_000);
 
 export async function createBillingTestInvoice(userId: string) {
-  if (process.env.BILLING_TEST_MODE?.trim().toLowerCase() !== "true") {
-    throw new Error("Billing test mode is disabled.");
+  if (!canUseBillingTestMode(userId)) {
+    throw new Error("Payment monitor tests are unavailable for this account.");
   }
   const walletAddress = process.env.BILLING_WALLET_ADDRESS?.trim() ?? "";
   if (!/^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(walletAddress)) throw new Error("BILLING_WALLET_ADDRESS is missing or invalid.");
   if (!process.env.TRONGRID_API_KEY?.trim()) throw new Error("TRONGRID_API_KEY is required for automatic payment verification.");
 
   const payment = await prisma.$transaction(async (transaction) => {
-    await transaction.$queryRaw<unknown[]>`SELECT pg_advisory_xact_lock(hashtext('trakio:billing:tron-usdt-amount'))`;
+    await transaction.$queryRaw<{ locked: number }[]>`
+      WITH lock AS MATERIALIZED (
+        SELECT pg_advisory_xact_lock(hashtext('trakio:billing:tron-usdt-amount'))
+      )
+      SELECT 1 AS locked FROM lock
+    `;
     const pendingTest = await transaction.billingPayment.findFirst({
       where: { isTest: true, status: "pending", paymentAmountAtomic: TEST_PAYMENT_AMOUNT_ATOMIC },
       orderBy: { createdAt: "desc" },
@@ -91,6 +97,16 @@ export async function createBillingTestInvoice(userId: string) {
       if (pendingTest.userId !== userId) throw new Error("A test payment is already pending. Finish it before creating another.");
       return pendingTest;
     }
+    const completedTest = await transaction.billingPayment.findFirst({
+      where: { userId, isTest: true, status: "confirmed" },
+      select: { id: true },
+    });
+    if (completedTest) throw new Error("The payment monitor test has already been completed for this account.");
+    const activeSubscription = await transaction.subscription.findFirst({
+      where: { userId, status: { in: ["active", "past_due"] } },
+      select: { id: true },
+    });
+    if (activeSubscription) throw new Error("A test invoice requires a dedicated account without an active subscription.");
 
     return transaction.billingPayment.create({
       data: {
@@ -228,11 +244,12 @@ export async function processBillingWebhook(provider: string, input: WebhookInpu
       if (!end || (input.nextInvoiceAt !== null && !nextInvoiceAt)) throw new BillingWebhookError("invalid_period", 422);
 
       const current = await transaction.subscription.findFirst({ where: { userId: payment.userId, status: { in: ["active", "past_due"] } }, orderBy: { createdAt: "desc" } });
+      if (payment.isTest && current) throw new BillingWebhookError("test_account_already_subscribed", 409);
       const subscription = current
         ? await transaction.subscription.update({ where: { id: current.id }, data: { plan, status: "active", provider, externalId: input.externalId, currentPeriodStart: start, currentPeriodEnd: end, nextInvoiceAt, canceledAt: null } })
         : await transaction.subscription.create({ data: { userId: payment.userId, plan, provider, externalId: input.externalId, currentPeriodStart: start, currentPeriodEnd: end, nextInvoiceAt, status: "active" } });
 
-      await transaction.billingPayment.update({ where: { id: payment.id }, data: { status: "confirmed", subscriptionId: subscription.id, providerTransactionId: input.providerTransactionId, transactionHash: input.transactionHash, receivedAt: now, confirmedAt: now, failureReason: null } });
+      await transaction.billingPayment.update({ where: { id: payment.id }, data: { status: "confirmed", subscriptionId: subscription.id, paymentAmountAtomic: payment.isTest ? null : undefined, providerTransactionId: input.providerTransactionId, transactionHash: input.transactionHash, receivedAt: now, confirmedAt: now, failureReason: null } });
       await transaction.user.update({ where: { id: payment.userId }, data: { accountStatus: "active" } });
       await transaction.billingEvent.update({ where: { id: event.id }, data: { status: "processed", processedAt: now } });
       return { status: "accepted" as const, eventId: event.eventId, accountStatus: "active" as const };

@@ -201,14 +201,16 @@ amount and are not auto-credited. Ask the user to create a new invoice or
 reconcile the older transfer carefully. Never activate an account based only
 on a browser's “payment sent” claim or an unconfirmed transaction.
 
-For a controlled monitor test, temporarily set `BILLING_TEST_MODE=true` on the
-web app and restart it. Sign in, open the subscription page, and create the
-dedicated 0.10 USDT test invoice. Send exactly 0.10 USDT over TRC20 to the
-displayed wallet, then check `pm2 logs trakio-billing --lines 100` and the
-invoice status in the app. The worker records the confirmed transfer against
-the test invoice and explicitly does not create or modify a subscription.
-After verification, set `BILLING_TEST_MODE=false` and restart the web app. Do
-not use this test invoice as a production payment method.
+For a controlled end-to-end test, use a dedicated account with no existing
+subscription. Set `BILLING_TEST_MODE=true` and `BILLING_TEST_USER_ID` to that
+account's database user ID in `.env.production`, then restart the web app. Only
+that account can create the 0.10 USDT test invoice. Send exactly 0.10 USDT over
+TRC20 to the displayed wallet. After TronGrid confirms the transfer, the
+monitor marks the invoice paid and activates the Starter plan for 30 days.
+Check `pm2 logs trakio-billing --lines 100`, the invoice status, and the
+account's plan in the app. After testing, set `BILLING_TEST_MODE=false` and
+restart the web app. Do not use this test invoice as a production payment
+method.
 
 ## Transactional email
 

@@ -169,7 +169,7 @@ export default function SubscribePage({ showTestPayment = false }: { showTestPay
         <section className="mt-6 flex flex-col gap-4 border-2 border-[#121212] bg-[#FFFFFF] p-5 sm:flex-row sm:items-center sm:justify-between" aria-label="Payment monitor test">
           <div>
             <h2 className="font-black">Test payment monitoring</h2>
-            <p className="mt-1 max-w-2xl text-sm leading-6">Create a one-time 0.10 USDT TRC20 invoice to confirm the chain monitor sees a real transfer. This test never activates a subscription.</p>
+            <p className="mt-1 max-w-2xl text-sm leading-6">Create a one-time 0.10 USDT TRC20 invoice. After the monitor confirms the transfer, it activates the Starter plan for 30 days on the designated test account.</p>
           </div>
           <button type="button" onClick={() => void openPayment({ name: "Payment monitor test", price: "$0.10", note: "Detection test only", features: [] }, true)} className="min-h-11 shrink-0 border-2 border-[#121212] bg-[#FFFFFF] px-4 py-2.5 text-sm font-bold shadow-[3px_3px_0_#121212] hover:bg-[#E0E0E0] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#121212]">Create $0.10 test invoice</button>
         </section>
@@ -181,7 +181,7 @@ export default function SubscribePage({ showTestPayment = false }: { showTestPay
             <div className="flex items-start justify-between border-b-2 border-[#121212] bg-[#1040C0] px-5 py-4 text-[#FFFFFF] sm:px-7">
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#F0C020]">Payment</p>
-                <h2 id="payment-title" className="mt-1 text-2xl font-black">{submitted ? (invoice?.isTest ? "Test transfer detected" : "Payment confirmed") : invoice?.isTest ? "Payment monitor test" : `Subscribe to ${selectedPlan.name}`}</h2>
+                <h2 id="payment-title" className="mt-1 text-2xl font-black">{submitted ? (invoice?.isTest ? "Starter plan activated" : "Payment confirmed") : invoice?.isTest ? "Payment monitor test" : `Subscribe to ${selectedPlan.name}`}</h2>
               </div>
               <button type="button" aria-label="Close payment dialog" onClick={() => setSelectedPlan(null)} className="min-h-11 min-w-11 border-2 border-[#FFFFFF] bg-transparent text-2xl leading-none text-[#FFFFFF] shadow-[3px_3px_0_#121212] hover:bg-[#D02020] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F0C020]">×</button>
             </div>
@@ -191,8 +191,8 @@ export default function SubscribePage({ showTestPayment = false }: { showTestPay
                 <div className="flex flex-col gap-4 border-2 border-[#121212] bg-[#F0C020] p-5 sm:flex-row sm:items-start sm:justify-between">
                   <div>
                     <p className="text-xs font-bold uppercase tracking-[0.16em]">Payment status</p>
-                    <h3 className="mt-2 text-3xl font-black tracking-[-0.04em]">Payment confirmed</h3>
-                    <p className="mt-2 text-sm leading-6">{invoice?.isTest ? "The confirmed 0.10 USDT transfer was matched. No subscription was activated or changed." : "The confirmed USDT transfer was matched to this invoice and your subscription is active."}</p>
+                    <h3 className="mt-2 text-3xl font-black tracking-[-0.04em]">{invoice?.isTest ? "Starter plan activated" : "Payment confirmed"}</h3>
+                    <p className="mt-2 text-sm leading-6">{invoice?.isTest ? "The confirmed 0.10 USDT test transfer activated Starter for 30 days on this test account." : "The confirmed USDT transfer was matched to this invoice and your subscription is active."}</p>
                   </div>
                   <span className="w-fit border-2 border-[#121212] bg-[#FFFFFF] px-3 py-2 text-xs font-bold uppercase tracking-[0.12em]">Invoice</span>
                 </div>
@@ -200,12 +200,12 @@ export default function SubscribePage({ showTestPayment = false }: { showTestPay
                   <div className="flex flex-col gap-3 border-b-2 border-[#121212] px-5 py-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                       <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#D02020]">Invoice</p>
-                      <h3 id="invoice-heading" className="mt-1 text-xl font-black">{selectedPlan.name} subscription</h3>
+                      <h3 id="invoice-heading" className="mt-1 text-xl font-black">{invoice?.isTest ? "Starter plan" : `${selectedPlan.name} subscription`}</h3>
                     </div>
                     <p className="font-mono text-xs font-bold">{invoice?.invoiceId ?? "Invoice pending"}</p>
                   </div>
                   <dl className="divide-y-2 divide-[#121212] px-5 text-sm">
-                    <div className="flex items-start justify-between gap-5 py-4"><dt className="font-bold">Item</dt><dd className="text-right">{selectedPlan.name} plan</dd></div>
+                    <div className="flex items-start justify-between gap-5 py-4"><dt className="font-bold">Item</dt><dd className="text-right">{invoice?.isTest ? "Starter plan" : `${selectedPlan.name} plan`}</dd></div>
                     <div className="flex items-start justify-between gap-5 py-4"><dt className="font-bold">Billing period</dt><dd className="text-right">Monthly</dd></div>
                     <div className="flex items-start justify-between gap-5 py-4"><dt className="font-bold">Payment method</dt><dd className="text-right">USDT on {invoice?.network ?? "TRC20"}</dd></div>
                     <div className="flex items-start justify-between gap-5 py-4"><dt className="font-bold">Wallet destination</dt><dd className="max-w-[220px] break-all text-right font-mono text-xs">{invoice?.walletAddress}</dd></div>
@@ -224,7 +224,7 @@ export default function SubscribePage({ showTestPayment = false }: { showTestPay
                 {invoiceError ? <p role="alert" className="mb-5 border-2 border-[#D02020] bg-[#FFF4F0] px-4 py-3 text-sm text-[#D02020]">{invoiceError}</p> : null}
                 <div>
                     <div className="flex flex-wrap items-end justify-between gap-4 border-b-2 border-[#121212] pb-4">
-                      <div><p className="text-xs font-bold uppercase tracking-[0.14em] text-[#D02020]">Exact invoice amount</p><p className="mt-1 text-3xl font-black">{invoice ? formatUsdt(invoice.paymentAmountAtomic, invoice.amountMinor, invoice.currency) : `${selectedPlan.price.replace("$", "")}.00 USDT`}</p></div>
+                      <div><p className="text-xs font-bold uppercase tracking-[0.14em] text-[#D02020]">Exact invoice amount</p><p className="mt-1 text-3xl font-black">{invoice ? formatUsdt(invoice.paymentAmountAtomic, invoice.amountMinor, invoice.currency) : `${Number(selectedPlan.price.replace("$", "")).toFixed(2)} USDT`}</p></div>
                       <div className="text-left sm:text-right"><p className="text-xs font-bold uppercase tracking-[0.14em]">Network</p><p className="mt-1 text-lg font-bold">TRON / TRC20</p></div>
                     </div>
                     <p className="mt-5 text-sm font-bold">Send the exact amount shown. It includes a unique payment reference of up to 0.10 USDT so Trakio can match this transfer to your invoice.</p>
