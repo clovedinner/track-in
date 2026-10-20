@@ -3,8 +3,13 @@ import os from "node:os";
 
 import { config } from "dotenv";
 
-const environmentFile = process.env.NODE_ENV === "production" ? ".env.production" : ".env.local";
-config({ path: environmentFile });
+const envFileOption = process.argv.findIndex((argument) => argument === "--env-file");
+const explicitEnvironmentFile = envFileOption >= 0 ? process.argv[envFileOption + 1] : undefined;
+if (envFileOption >= 0 && (!explicitEnvironmentFile || explicitEnvironmentFile.startsWith("--"))) {
+  throw new Error("Pass a file after --env-file, for example --env-file .env.production.");
+}
+const environmentFile = explicitEnvironmentFile ?? process.env.EMAIL_ENV_FILE?.trim() ?? (process.env.NODE_ENV === "production" ? ".env.production" : ".env.local");
+config({ path: environmentFile, override: true });
 
 const pollIntervalMs = readPositiveInteger(process.env.EMAIL_POLL_INTERVAL_MS, 5_000);
 const workerId = `email-${os.hostname()}-${process.pid}`;

@@ -212,7 +212,7 @@ times; inspect terminal failures before asking a user to retry signup or
 invoice creation.
 
 ```bash
-pm2 start npm --name trakio-email -- run worker:email
+pm2 start npm --name trakio-email -- run worker:email -- --env-file .env.production
 pm2 save
 pm2 logs trakio-email --lines 100
 ```
