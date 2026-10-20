@@ -15,6 +15,10 @@ const productionEnvironment: RuntimeEnvironment = {
   authSessionSecret: "test-auth-session-secret-0123456789",
   databaseUrl: "postgresql://test:test@localhost:5432/test",
   directDatabaseUrl: "postgresql://test:test@localhost:5433/test",
+  billingProvider: "tron",
+  billingWalletAddress: "TDmAYs4GfJLo3WHwbduMCRRK22XKsfw3uR",
+  tronGridApiKey: "test-trongrid-key",
+  resendApiKey: "re_test-resend-key",
   nodeEnv: "production",
 };
 
@@ -29,6 +33,7 @@ describe("validateRuntimeEnvironment", () => {
         ...productionEnvironment,
         conversionWebhookSecret: undefined,
         authSessionSecret: undefined,
+        resendApiKey: undefined,
       }),
     ).toThrow(EnvironmentValidationError);
 
@@ -38,12 +43,14 @@ describe("validateRuntimeEnvironment", () => {
         adminPassword: undefined,
         conversionWebhookSecret: undefined,
         authSessionSecret: undefined,
+        resendApiKey: undefined,
       });
     } catch (error) {
       expect(error).toBeInstanceOf(EnvironmentValidationError);
       expect((error as EnvironmentValidationError).missingVariables).toEqual([
         "CONVERSION_WEBHOOK_SECRET",
         "AUTH_SESSION_SECRET",
+        "RESEND_API_KEY",
       ]);
     }
   });
@@ -69,5 +76,10 @@ describe("validateRuntimeEnvironment", () => {
     expect(() =>
       validateRuntimeEnvironment({ ...productionEnvironment, trackerUrl: "http://go.tracker.example.com" }),
     ).toThrow(/NEXT_PUBLIC_TRACKER_URL/);
+  });
+
+  it("requires a configured TRON wallet and TronGrid key for production billing", () => {
+    expect(() => validateRuntimeEnvironment({ ...productionEnvironment, tronGridApiKey: undefined })).toThrow(/TRONGRID_API_KEY/);
+    expect(() => validateRuntimeEnvironment({ ...productionEnvironment, billingWalletAddress: "invalid" })).toThrow(/valid TRON address/);
   });
 });

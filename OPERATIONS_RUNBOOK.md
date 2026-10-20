@@ -166,3 +166,82 @@ After an accepted test conversion, confirm its Delivery Health row moves from
 `pending` to `delivered`. A row with `attempts: 0` and no diagnostic means the
 worker has not claimed it; restart the worker and inspect its logs before
 retrying the conversion.
+
+## USDT payment monitor
+
+The `trakio-billing` PM2 process polls TronGrid for confirmed incoming USDT
+TRC20 transfers. It needs `BILLING_PROVIDER=tron`, the receiving public address
+in `BILLING_WALLET_ADDRESS`, and a server-only `TRONGRID_API_KEY`. Do not put a
+wallet private key in the app. Apply the Prisma migration before starting it.
+
+```bash
+pm2 start npm --name trakio-billing -- run worker:billing
+pm2 save
+pm2 logs trakio-billing --lines 100
+```
+
+Only one instance of this monitor should run. Check `pm2 status` for duplicate
+instances. The worker matches only confirmed transfers of the official TRON
+USDT contract and the exact invoice amount. Transfers without a matching
+invoice are retained, not credited. Their amounts are reserved so future
+invoices cannot accidentally reuse them. Review them with this read-only query
+in Neon; `amount_atomic` is in USDT micro-units, so divide by 1,000,000 to see
+the token amount:
+
+```sql
+SELECT transaction_hash, amount_atomic, from_address, block_timestamp
+FROM billing_chain_transfers
+WHERE payment_id IS NULL
+ORDER BY block_timestamp DESC
+LIMIT 100;
+```
+
+Invoices created before automatic payment monitoring have no unique payment
+amount and are not auto-credited. Ask the user to create a new invoice or
+reconcile the older transfer carefully. Never activate an account based only
+on a browser's “payment sent” claim or an unconfirmed transaction.
+
+## Transactional email
+
+The `trakio-email` PM2 process sends verification and invoice messages from
+the database-backed email outbox through Resend. Apply migrations, set
+`RESEND_API_KEY`, and set `EMAIL_FROM` to an address on the verified sending
+domain before starting the worker. The outbox retains queued messages while
+Resend is unavailable and retries transient failures. It retries up to eight
+times; inspect terminal failures before asking a user to retry signup or
+invoice creation.
+
+```bash
+pm2 start npm --name trakio-email -- run worker:email
+pm2 save
+pm2 logs trakio-email --lines 100
+```
+
+Inspect only operational fields when debugging. Verification links are
+encrypted in the outbox, and the email payload is cleared after delivery:
+
+```sql
+SELECT kind, recipient, status, attempts, next_attempt_at, last_error, created_at
+FROM email_outbox
+ORDER BY created_at DESC
+LIMIT 100;
+```
+
+Keep the outbox payload private. The worker derives its encryption key from
+`AUTH_SESSION_SECRET`; drain pending welcome emails before rotating that key.
+For a terminal invoice-email failure, fix the Resend configuration first, then
+requeue only that invoice by its outbox ID. The idempotency key is retained so
+the provider can avoid sending the same invoice twice:
+
+```sql
+UPDATE email_outbox
+SET status = 'pending', attempts = 0, next_attempt_at = CURRENT_TIMESTAMP,
+    last_error = NULL, updated_at = CURRENT_TIMESTAMP
+WHERE id = 'email-outbox-uuid'
+  AND kind = 'invoice_created'
+  AND status = 'permanently_failed'
+  AND payload <> '{}'::jsonb;
+```
+
+For an unverified account, have the user sign in with the correct password and
+use **Resend confirmation email** to create a fresh link.

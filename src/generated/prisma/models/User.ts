@@ -28,6 +28,10 @@ export type UserMinAggregateOutputType = {
   id: string | null
   email: string | null
   passwordHash: string | null
+  emailVerifiedAt: Date | null
+  verificationTokenHash: string | null
+  verificationTokenExpiresAt: Date | null
+  verificationEmailSentAt: Date | null
   accountStatus: $Enums.AccountStatus | null
   timezone: string | null
   createdAt: Date | null
@@ -38,6 +42,10 @@ export type UserMaxAggregateOutputType = {
   id: string | null
   email: string | null
   passwordHash: string | null
+  emailVerifiedAt: Date | null
+  verificationTokenHash: string | null
+  verificationTokenExpiresAt: Date | null
+  verificationEmailSentAt: Date | null
   accountStatus: $Enums.AccountStatus | null
   timezone: string | null
   createdAt: Date | null
@@ -48,6 +56,10 @@ export type UserCountAggregateOutputType = {
   id: number
   email: number
   passwordHash: number
+  emailVerifiedAt: number
+  verificationTokenHash: number
+  verificationTokenExpiresAt: number
+  verificationEmailSentAt: number
   accountStatus: number
   timezone: number
   createdAt: number
@@ -60,6 +72,10 @@ export type UserMinAggregateInputType = {
   id?: true
   email?: true
   passwordHash?: true
+  emailVerifiedAt?: true
+  verificationTokenHash?: true
+  verificationTokenExpiresAt?: true
+  verificationEmailSentAt?: true
   accountStatus?: true
   timezone?: true
   createdAt?: true
@@ -70,6 +86,10 @@ export type UserMaxAggregateInputType = {
   id?: true
   email?: true
   passwordHash?: true
+  emailVerifiedAt?: true
+  verificationTokenHash?: true
+  verificationTokenExpiresAt?: true
+  verificationEmailSentAt?: true
   accountStatus?: true
   timezone?: true
   createdAt?: true
@@ -80,6 +100,10 @@ export type UserCountAggregateInputType = {
   id?: true
   email?: true
   passwordHash?: true
+  emailVerifiedAt?: true
+  verificationTokenHash?: true
+  verificationTokenExpiresAt?: true
+  verificationEmailSentAt?: true
   accountStatus?: true
   timezone?: true
   createdAt?: true
@@ -163,6 +187,10 @@ export type UserGroupByOutputType = {
   id: string
   email: string
   passwordHash: string
+  emailVerifiedAt: Date | null
+  verificationTokenHash: string | null
+  verificationTokenExpiresAt: Date | null
+  verificationEmailSentAt: Date | null
   accountStatus: $Enums.AccountStatus
   timezone: string
   createdAt: Date
@@ -194,6 +222,10 @@ export type UserWhereInput = {
   id?: Prisma.UuidFilter<"User"> | string
   email?: Prisma.StringFilter<"User"> | string
   passwordHash?: Prisma.StringFilter<"User"> | string
+  emailVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  verificationTokenHash?: Prisma.StringNullableFilter<"User"> | string | null
+  verificationTokenExpiresAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  verificationEmailSentAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   accountStatus?: Prisma.EnumAccountStatusFilter<"User"> | $Enums.AccountStatus
   timezone?: Prisma.StringFilter<"User"> | string
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
@@ -211,6 +243,10 @@ export type UserOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   email?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
+  emailVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  verificationTokenHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  verificationTokenExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  verificationEmailSentAt?: Prisma.SortOrderInput | Prisma.SortOrder
   accountStatus?: Prisma.SortOrder
   timezone?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -227,10 +263,14 @@ export type UserOrderByWithRelationInput = {
 export type UserWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   email?: string
+  verificationTokenHash?: string
   AND?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   passwordHash?: Prisma.StringFilter<"User"> | string
+  emailVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  verificationTokenExpiresAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  verificationEmailSentAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   accountStatus?: Prisma.EnumAccountStatusFilter<"User"> | $Enums.AccountStatus
   timezone?: Prisma.StringFilter<"User"> | string
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
@@ -242,12 +282,16 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   payments?: Prisma.BillingPaymentListRelationFilter
   billingEvents?: Prisma.BillingEventListRelationFilter
   customConversions?: Prisma.CustomConversionListRelationFilter
-}, "id" | "email">
+}, "id" | "email" | "verificationTokenHash">
 
 export type UserOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   email?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
+  emailVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  verificationTokenHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  verificationTokenExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  verificationEmailSentAt?: Prisma.SortOrderInput | Prisma.SortOrder
   accountStatus?: Prisma.SortOrder
   timezone?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -264,6 +308,10 @@ export type UserScalarWhereWithAggregatesInput = {
   id?: Prisma.UuidWithAggregatesFilter<"User"> | string
   email?: Prisma.StringWithAggregatesFilter<"User"> | string
   passwordHash?: Prisma.StringWithAggregatesFilter<"User"> | string
+  emailVerifiedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  verificationTokenHash?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  verificationTokenExpiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  verificationEmailSentAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   accountStatus?: Prisma.EnumAccountStatusWithAggregatesFilter<"User"> | $Enums.AccountStatus
   timezone?: Prisma.StringWithAggregatesFilter<"User"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
@@ -274,6 +322,10 @@ export type UserCreateInput = {
   id?: string
   email: string
   passwordHash: string
+  emailVerifiedAt?: Date | string | null
+  verificationTokenHash?: string | null
+  verificationTokenExpiresAt?: Date | string | null
+  verificationEmailSentAt?: Date | string | null
   accountStatus?: $Enums.AccountStatus
   timezone?: string
   createdAt?: Date | string
@@ -291,6 +343,10 @@ export type UserUncheckedCreateInput = {
   id?: string
   email: string
   passwordHash: string
+  emailVerifiedAt?: Date | string | null
+  verificationTokenHash?: string | null
+  verificationTokenExpiresAt?: Date | string | null
+  verificationEmailSentAt?: Date | string | null
   accountStatus?: $Enums.AccountStatus
   timezone?: string
   createdAt?: Date | string
@@ -308,6 +364,10 @@ export type UserUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationEmailSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   accountStatus?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -325,6 +385,10 @@ export type UserUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationEmailSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   accountStatus?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -342,6 +406,10 @@ export type UserCreateManyInput = {
   id?: string
   email: string
   passwordHash: string
+  emailVerifiedAt?: Date | string | null
+  verificationTokenHash?: string | null
+  verificationTokenExpiresAt?: Date | string | null
+  verificationEmailSentAt?: Date | string | null
   accountStatus?: $Enums.AccountStatus
   timezone?: string
   createdAt?: Date | string
@@ -352,6 +420,10 @@ export type UserUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationEmailSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   accountStatus?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -362,6 +434,10 @@ export type UserUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationEmailSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   accountStatus?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -372,6 +448,10 @@ export type UserCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   email?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
+  emailVerifiedAt?: Prisma.SortOrder
+  verificationTokenHash?: Prisma.SortOrder
+  verificationTokenExpiresAt?: Prisma.SortOrder
+  verificationEmailSentAt?: Prisma.SortOrder
   accountStatus?: Prisma.SortOrder
   timezone?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -382,6 +462,10 @@ export type UserMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   email?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
+  emailVerifiedAt?: Prisma.SortOrder
+  verificationTokenHash?: Prisma.SortOrder
+  verificationTokenExpiresAt?: Prisma.SortOrder
+  verificationEmailSentAt?: Prisma.SortOrder
   accountStatus?: Prisma.SortOrder
   timezone?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -392,6 +476,10 @@ export type UserMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   email?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
+  emailVerifiedAt?: Prisma.SortOrder
+  verificationTokenHash?: Prisma.SortOrder
+  verificationTokenExpiresAt?: Prisma.SortOrder
+  verificationEmailSentAt?: Prisma.SortOrder
   accountStatus?: Prisma.SortOrder
   timezone?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -410,6 +498,14 @@ export type UserNullableScalarRelationFilter = {
 
 export type StringFieldUpdateOperationsInput = {
   set?: string
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
+}
+
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
 }
 
 export type EnumAccountStatusFieldUpdateOperationsInput = {
@@ -524,6 +620,10 @@ export type UserCreateWithoutSubscriptionsInput = {
   id?: string
   email: string
   passwordHash: string
+  emailVerifiedAt?: Date | string | null
+  verificationTokenHash?: string | null
+  verificationTokenExpiresAt?: Date | string | null
+  verificationEmailSentAt?: Date | string | null
   accountStatus?: $Enums.AccountStatus
   timezone?: string
   createdAt?: Date | string
@@ -540,6 +640,10 @@ export type UserUncheckedCreateWithoutSubscriptionsInput = {
   id?: string
   email: string
   passwordHash: string
+  emailVerifiedAt?: Date | string | null
+  verificationTokenHash?: string | null
+  verificationTokenExpiresAt?: Date | string | null
+  verificationEmailSentAt?: Date | string | null
   accountStatus?: $Enums.AccountStatus
   timezone?: string
   createdAt?: Date | string
@@ -572,6 +676,10 @@ export type UserUpdateWithoutSubscriptionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationEmailSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   accountStatus?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -588,6 +696,10 @@ export type UserUncheckedUpdateWithoutSubscriptionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationEmailSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   accountStatus?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -604,6 +716,10 @@ export type UserCreateWithoutPaymentsInput = {
   id?: string
   email: string
   passwordHash: string
+  emailVerifiedAt?: Date | string | null
+  verificationTokenHash?: string | null
+  verificationTokenExpiresAt?: Date | string | null
+  verificationEmailSentAt?: Date | string | null
   accountStatus?: $Enums.AccountStatus
   timezone?: string
   createdAt?: Date | string
@@ -620,6 +736,10 @@ export type UserUncheckedCreateWithoutPaymentsInput = {
   id?: string
   email: string
   passwordHash: string
+  emailVerifiedAt?: Date | string | null
+  verificationTokenHash?: string | null
+  verificationTokenExpiresAt?: Date | string | null
+  verificationEmailSentAt?: Date | string | null
   accountStatus?: $Enums.AccountStatus
   timezone?: string
   createdAt?: Date | string
@@ -652,6 +772,10 @@ export type UserUpdateWithoutPaymentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationEmailSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   accountStatus?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -668,6 +792,10 @@ export type UserUncheckedUpdateWithoutPaymentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationEmailSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   accountStatus?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -684,6 +812,10 @@ export type UserCreateWithoutBillingEventsInput = {
   id?: string
   email: string
   passwordHash: string
+  emailVerifiedAt?: Date | string | null
+  verificationTokenHash?: string | null
+  verificationTokenExpiresAt?: Date | string | null
+  verificationEmailSentAt?: Date | string | null
   accountStatus?: $Enums.AccountStatus
   timezone?: string
   createdAt?: Date | string
@@ -700,6 +832,10 @@ export type UserUncheckedCreateWithoutBillingEventsInput = {
   id?: string
   email: string
   passwordHash: string
+  emailVerifiedAt?: Date | string | null
+  verificationTokenHash?: string | null
+  verificationTokenExpiresAt?: Date | string | null
+  verificationEmailSentAt?: Date | string | null
   accountStatus?: $Enums.AccountStatus
   timezone?: string
   createdAt?: Date | string
@@ -732,6 +868,10 @@ export type UserUpdateWithoutBillingEventsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationEmailSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   accountStatus?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -748,6 +888,10 @@ export type UserUncheckedUpdateWithoutBillingEventsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationEmailSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   accountStatus?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -764,6 +908,10 @@ export type UserCreateWithoutTrafficSourcesInput = {
   id?: string
   email: string
   passwordHash: string
+  emailVerifiedAt?: Date | string | null
+  verificationTokenHash?: string | null
+  verificationTokenExpiresAt?: Date | string | null
+  verificationEmailSentAt?: Date | string | null
   accountStatus?: $Enums.AccountStatus
   timezone?: string
   createdAt?: Date | string
@@ -780,6 +928,10 @@ export type UserUncheckedCreateWithoutTrafficSourcesInput = {
   id?: string
   email: string
   passwordHash: string
+  emailVerifiedAt?: Date | string | null
+  verificationTokenHash?: string | null
+  verificationTokenExpiresAt?: Date | string | null
+  verificationEmailSentAt?: Date | string | null
   accountStatus?: $Enums.AccountStatus
   timezone?: string
   createdAt?: Date | string
@@ -812,6 +964,10 @@ export type UserUpdateWithoutTrafficSourcesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationEmailSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   accountStatus?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -828,6 +984,10 @@ export type UserUncheckedUpdateWithoutTrafficSourcesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationEmailSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   accountStatus?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -844,6 +1004,10 @@ export type UserCreateWithoutCampaignsInput = {
   id?: string
   email: string
   passwordHash: string
+  emailVerifiedAt?: Date | string | null
+  verificationTokenHash?: string | null
+  verificationTokenExpiresAt?: Date | string | null
+  verificationEmailSentAt?: Date | string | null
   accountStatus?: $Enums.AccountStatus
   timezone?: string
   createdAt?: Date | string
@@ -860,6 +1024,10 @@ export type UserUncheckedCreateWithoutCampaignsInput = {
   id?: string
   email: string
   passwordHash: string
+  emailVerifiedAt?: Date | string | null
+  verificationTokenHash?: string | null
+  verificationTokenExpiresAt?: Date | string | null
+  verificationEmailSentAt?: Date | string | null
   accountStatus?: $Enums.AccountStatus
   timezone?: string
   createdAt?: Date | string
@@ -892,6 +1060,10 @@ export type UserUpdateWithoutCampaignsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationEmailSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   accountStatus?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -908,6 +1080,10 @@ export type UserUncheckedUpdateWithoutCampaignsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationEmailSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   accountStatus?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -924,6 +1100,10 @@ export type UserCreateWithoutOffersInput = {
   id?: string
   email: string
   passwordHash: string
+  emailVerifiedAt?: Date | string | null
+  verificationTokenHash?: string | null
+  verificationTokenExpiresAt?: Date | string | null
+  verificationEmailSentAt?: Date | string | null
   accountStatus?: $Enums.AccountStatus
   timezone?: string
   createdAt?: Date | string
@@ -940,6 +1120,10 @@ export type UserUncheckedCreateWithoutOffersInput = {
   id?: string
   email: string
   passwordHash: string
+  emailVerifiedAt?: Date | string | null
+  verificationTokenHash?: string | null
+  verificationTokenExpiresAt?: Date | string | null
+  verificationEmailSentAt?: Date | string | null
   accountStatus?: $Enums.AccountStatus
   timezone?: string
   createdAt?: Date | string
@@ -972,6 +1156,10 @@ export type UserUpdateWithoutOffersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationEmailSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   accountStatus?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -988,6 +1176,10 @@ export type UserUncheckedUpdateWithoutOffersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationEmailSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   accountStatus?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1004,6 +1196,10 @@ export type UserCreateWithoutCustomConversionsInput = {
   id?: string
   email: string
   passwordHash: string
+  emailVerifiedAt?: Date | string | null
+  verificationTokenHash?: string | null
+  verificationTokenExpiresAt?: Date | string | null
+  verificationEmailSentAt?: Date | string | null
   accountStatus?: $Enums.AccountStatus
   timezone?: string
   createdAt?: Date | string
@@ -1020,6 +1216,10 @@ export type UserUncheckedCreateWithoutCustomConversionsInput = {
   id?: string
   email: string
   passwordHash: string
+  emailVerifiedAt?: Date | string | null
+  verificationTokenHash?: string | null
+  verificationTokenExpiresAt?: Date | string | null
+  verificationEmailSentAt?: Date | string | null
   accountStatus?: $Enums.AccountStatus
   timezone?: string
   createdAt?: Date | string
@@ -1052,6 +1252,10 @@ export type UserUpdateWithoutCustomConversionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationEmailSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   accountStatus?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1068,6 +1272,10 @@ export type UserUncheckedUpdateWithoutCustomConversionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationEmailSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   accountStatus?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1169,6 +1377,10 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   id?: boolean
   email?: boolean
   passwordHash?: boolean
+  emailVerifiedAt?: boolean
+  verificationTokenHash?: boolean
+  verificationTokenExpiresAt?: boolean
+  verificationEmailSentAt?: boolean
   accountStatus?: boolean
   timezone?: boolean
   createdAt?: boolean
@@ -1187,6 +1399,10 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   id?: boolean
   email?: boolean
   passwordHash?: boolean
+  emailVerifiedAt?: boolean
+  verificationTokenHash?: boolean
+  verificationTokenExpiresAt?: boolean
+  verificationEmailSentAt?: boolean
   accountStatus?: boolean
   timezone?: boolean
   createdAt?: boolean
@@ -1197,6 +1413,10 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   id?: boolean
   email?: boolean
   passwordHash?: boolean
+  emailVerifiedAt?: boolean
+  verificationTokenHash?: boolean
+  verificationTokenExpiresAt?: boolean
+  verificationEmailSentAt?: boolean
   accountStatus?: boolean
   timezone?: boolean
   createdAt?: boolean
@@ -1207,13 +1427,17 @@ export type UserSelectScalar = {
   id?: boolean
   email?: boolean
   passwordHash?: boolean
+  emailVerifiedAt?: boolean
+  verificationTokenHash?: boolean
+  verificationTokenExpiresAt?: boolean
+  verificationEmailSentAt?: boolean
   accountStatus?: boolean
   timezone?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "passwordHash" | "accountStatus" | "timezone" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "passwordHash" | "emailVerifiedAt" | "verificationTokenHash" | "verificationTokenExpiresAt" | "verificationEmailSentAt" | "accountStatus" | "timezone" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   campaigns?: boolean | Prisma.User$campaignsArgs<ExtArgs>
   offers?: boolean | Prisma.User$offersArgs<ExtArgs>
@@ -1242,6 +1466,10 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     id: string
     email: string
     passwordHash: string
+    emailVerifiedAt: Date | null
+    verificationTokenHash: string | null
+    verificationTokenExpiresAt: Date | null
+    verificationEmailSentAt: Date | null
     accountStatus: $Enums.AccountStatus
     timezone: string
     createdAt: Date
@@ -1679,6 +1907,10 @@ export interface UserFieldRefs {
   readonly id: Prisma.FieldRef<"User", 'String'>
   readonly email: Prisma.FieldRef<"User", 'String'>
   readonly passwordHash: Prisma.FieldRef<"User", 'String'>
+  readonly emailVerifiedAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly verificationTokenHash: Prisma.FieldRef<"User", 'String'>
+  readonly verificationTokenExpiresAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly verificationEmailSentAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly accountStatus: Prisma.FieldRef<"User", 'AccountStatus'>
   readonly timezone: Prisma.FieldRef<"User", 'String'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>

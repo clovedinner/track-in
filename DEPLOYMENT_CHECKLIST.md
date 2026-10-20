@@ -9,7 +9,10 @@ This checklist is host-neutral. Complete it before sending paid traffic to a pro
 - [ ] If using a dedicated tracking subdomain, set `NEXT_PUBLIC_TRACKER_URL` to its canonical `https://` origin and route it to the same application.
 - [ ] Set the pooled runtime `DATABASE_URL` and direct migration `DIRECT_URL` for the same PostgreSQL database.
 - [ ] Set a unique `AUTH_SESSION_SECRET` with at least 32 random characters. Do not use the example value.
-- [ ] Open `/auth/sign-up` once to create the first operator account, then verify sign-in and sign-out. Keep account creation restricted at the deployment layer if public signup is not desired.
+- [ ] Add `trakio.org` to Resend, publish its SPF/DKIM records, and wait for domain verification.
+- [ ] Set `RESEND_API_KEY` and `EMAIL_FROM=Trakio <billing@trakio.org>` in the production environment.
+- [ ] Apply migrations before deploying email verification. Existing accounts are grandfathered as verified.
+- [ ] Create a new account, confirm the welcome email arrives, verify it, then sign in. Check that a plan is required before dashboard access.
 - [ ] Set a unique `CONVERSION_WEBHOOK_SECRET` and share it only with the money-site backend.
 - [ ] Confirm no `.env.local`, deployment export, build log, or error report contains credentials.
 
@@ -19,6 +22,7 @@ This checklist is host-neutral. Complete it before sending paid traffic to a pro
 - [ ] Optionally add `VPS_PORT` and `VPS_APP_DIR` (the defaults are `22` and `/root/app`).
 - [ ] Confirm the VPS user can update the application directory, run npm, run Prisma migrations, and restart the `trakio` PM2 process.
 - [ ] Confirm PM2 runs the `trakio-outbox` worker alongside the web process; verify accepted conversions move from `pending` to `delivered` or a visible retry/failure state.
+- [ ] Confirm PM2 runs the `trakio-email` worker; verify welcome and invoice messages move from `pending` to `delivered` or a visible failure state.
 - [ ] Run the workflow manually once, then verify that a push to `main` creates one successful deployment.
 - [ ] Keep production environment files only on the VPS; the workflow never copies `.env.production` from GitHub.
 

@@ -23,6 +23,11 @@ export * from './enums';
  */
 export type User = Prisma.UserModel
 /**
+ * Model EmailOutbox
+ * 
+ */
+export type EmailOutbox = Prisma.EmailOutboxModel
+/**
  * Model Subscription
  * 
  */
@@ -32,6 +37,16 @@ export type Subscription = Prisma.SubscriptionModel
  * 
  */
 export type BillingPayment = Prisma.BillingPaymentModel
+/**
+ * Model BillingChainCheckpoint
+ * 
+ */
+export type BillingChainCheckpoint = Prisma.BillingChainCheckpointModel
+/**
+ * Model BillingChainTransfer
+ * 
+ */
+export type BillingChainTransfer = Prisma.BillingChainTransferModel
 /**
  * Model BillingEvent
  * 

@@ -5,13 +5,15 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { FormEvent } from "react";
 
-export default function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
+export default function AuthForm({ mode, verified = false, verificationIssue = false }: { mode: "sign-in" | "sign-up"; verified?: boolean; verificationIssue?: boolean }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [errorCode, setErrorCode] = useState<string | null>(null);
   const [working, setWorking] = useState(false);
+  const [resendWorking, setResendWorking] = useState(false);
+  const [resendMessage, setResendMessage] = useState<string | null>(null);
   const router = useRouter();
   const isSignUp = mode === "sign-up";
   const passwordRequirements = [
@@ -38,6 +40,10 @@ export default function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
         setErrorCode(payload?.code ?? null);
         throw new Error(payload?.error ?? "Authentication failed.");
       }
+      if (isSignUp) {
+        router.push(`/auth/verify-email?email=${encodeURIComponent(email.trim())}`);
+        return;
+      }
       const next = new URLSearchParams(window.location.search).get("next");
       const destination = payload?.accountStatus !== "active"
         ? "/admin/subscribe"
@@ -50,6 +56,27 @@ export default function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
     }
   }
 
+  async function resendVerification() {
+    setResendWorking(true);
+    setResendMessage(null);
+    try {
+      const response = await fetch("/api/auth/resend-verification", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const payload = await response.json().catch(() => null) as { retryAfterSeconds?: number } | null;
+      const retryAfter = payload?.retryAfterSeconds;
+      setResendMessage(retryAfter && retryAfter > 0
+        ? `Please wait ${retryAfter} seconds before requesting another email.`
+        : "If your account still needs confirmation, we sent a new link. Check your inbox and spam folder.");
+    } catch {
+      setResendMessage("Unable to send the email right now. Please try again shortly.");
+    } finally {
+      setResendWorking(false);
+    }
+  }
+
   return (
     <main className="min-h-screen bg-[#F0F0F0] px-5 py-10 text-[#121212] sm:px-8 sm:py-16">
       <div className="mx-auto max-w-md">
@@ -57,7 +84,9 @@ export default function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
         <section className="mt-10 border-2 border-[#121212] bg-[#FFFFFF] p-6 shadow-[6px_6px_0_#121212] sm:p-8">
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#D02020]">Start your tracking</p>
           <h1 className="mt-3 text-4xl font-black tracking-[-0.05em]">{isSignUp ? "Create your account." : "Welcome back."}</h1>
-          <p className="mt-3 text-sm leading-6">{isSignUp ? "Create an email and password account for the Trakio dashboard." : "Sign in to manage campaigns, sources, offers, and delivery health."}</p>
+          <p className="mt-3 text-sm leading-6">{isSignUp ? "Create your account. We will email you a link to confirm your address." : "Sign in to manage campaigns, sources, offers, and delivery health."}</p>
+          {verified ? <p role="status" className="mt-5 border-2 border-[#121212] bg-[#F0C020] px-3 py-3 text-sm font-semibold">Your email is confirmed. Sign in to continue to plan selection.</p> : null}
+          {verificationIssue ? <p role="alert" className="mt-5 border-2 border-[#D02020] bg-[#FFF4F0] px-3 py-3 text-sm text-[#D02020]">That confirmation link is invalid, expired, or already used. Sign in to request another.</p> : null}
           <form className="mt-7 space-y-5" onSubmit={submit}>
             <label className="block text-sm font-bold">Email<input required autoComplete="email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} className="mt-2 block min-h-11 w-full border-2 border-[#121212] bg-[#FFFFFF] px-3 py-2.5 text-sm font-normal focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D02020]" /></label>
             <label className="block text-sm font-bold">Password
@@ -67,7 +96,8 @@ export default function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
               </span>
               {isSignUp && password.length > 0 && !passwordComplete ? <span role="alert" className="mt-2 block border-2 border-[#D02020] bg-[#FFF4F0] px-3 py-2 text-xs font-normal text-[#D02020]">Password needs {passwordRequirements.filter((requirement) => !requirement.met).map((requirement) => requirement.label).join(", ")}.</span> : null}
             </label>
-            {error ? <div role="alert" className="border-2 border-[#D02020] bg-[#F0F0F0] px-3 py-3 text-sm text-[#D02020]"><p>{error}</p>{errorCode === "account_not_found" ? <Link href="/auth/sign-up" className="mt-2 inline-block font-bold underline underline-offset-4">Create an account</Link> : null}</div> : null}
+            {error ? <div role="alert" className="border-2 border-[#D02020] bg-[#F0F0F0] px-3 py-3 text-sm text-[#D02020]"><p>{error}</p>{errorCode === "email_not_verified" ? <button type="button" disabled={resendWorking || password.length === 0} onClick={resendVerification} className="mt-2 min-h-10 font-bold underline underline-offset-4 disabled:cursor-not-allowed disabled:opacity-60">{resendWorking ? "Sending…" : "Resend confirmation email"}</button> : null}</div> : null}
+            {resendMessage ? <p role="status" className="border-2 border-[#121212] bg-[#F0C020] px-3 py-3 text-sm">{resendMessage}</p> : null}
             <button type="submit" disabled={working} className="min-h-11 w-full bg-[#1040C0] px-5 py-3 text-sm font-bold text-[#FFFFFF] hover:bg-[#D02020] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1040C0]">{working ? "Please wait" : isSignUp ? "Create account" : "Sign in"}</button>
           </form>
           <p className="mt-6 border-t-2 border-[#121212] pt-5 text-sm">{isSignUp ? "Already have an account?" : "Need an account?"} <Link href={isSignUp ? "/auth/sign-in" : "/auth/sign-up"} className="font-bold text-[#D02020] underline underline-offset-4">{isSignUp ? "Sign in" : "Sign up"}</Link></p>

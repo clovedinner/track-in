@@ -14,9 +14,12 @@ type Plan = {
 type Invoice = {
   invoiceId: string;
   amountMinor: string;
+  paymentAmountAtomic: string | null;
   currency: string;
   network: string | null;
   status: string;
+  walletAddress: string;
+  transactionHash?: string | null;
   checkoutUrl: string | null;
 };
 
@@ -42,28 +45,16 @@ const plans: Plan[] = [
   },
 ];
 
-const walletAddress = "TDmAYs4GfJLo3WHwbduMCRRK22XKsfw3uR";
-const qrPattern = [
-  "1111111001011111111",
-  "1000001011011000001",
-  "1011101000011011101",
-  "1011101110111011101",
-  "1011101001011011101",
-  "1000001010111000001",
-  "1111111010101111111",
-  "0000000011010000000",
-  "1101011110111010111",
-  "0010110011100101100",
-  "1110001110111110001",
-  "0101110001010011110",
-  "1111111011101010011",
-  "1000001110011110100",
-  "1011101011110011111",
-  "1011101110001010001",
-  "1011101001111110110",
-  "1000001010100111001",
-  "1111111011111010111",
-];
+function formatUsdt(atomic: string | null | undefined, amountMinor: string | null | undefined, currency: string | undefined) {
+  if (atomic) {
+    const units = BigInt(atomic);
+    const scale = BigInt(1_000_000);
+    const whole = units / scale;
+    const fraction = (units % scale).toString().padStart(6, "0");
+    return `${whole}.${fraction} ${currency ?? "USDT"}`;
+  }
+  return `${(Number(amountMinor ?? "0") / 100).toFixed(2)} ${currency ?? "USDT"}`;
+}
 
 export default function SubscribePage() {
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
@@ -81,9 +72,30 @@ export default function SubscribePage() {
     return () => window.removeEventListener("keydown", closeOnEscape);
   }, []);
 
+  useEffect(() => {
+    if (!selectedPlan || !invoice?.invoiceId || invoice.status !== "pending") return;
+    let stopped = false;
+    const checkStatus = async () => {
+      try {
+        const response = await fetch(`/api/billing/invoices/${encodeURIComponent(invoice.invoiceId)}`, { cache: "no-store" });
+        if (!response.ok) return;
+        const status = await response.json() as { status?: string; transactionHash?: string | null; paymentAmountAtomic?: string | null };
+        if (stopped || typeof status.status !== "string") return;
+        setInvoice((current) => current ? { ...current, status: status.status!, transactionHash: status.transactionHash, paymentAmountAtomic: status.paymentAmountAtomic ?? current.paymentAmountAtomic } : current);
+        if (status.status === "confirmed") setSubmitted(true);
+      } catch {
+        // Keep showing the pending state; the next poll will retry the read.
+      }
+    };
+    void checkStatus();
+    const timer = window.setInterval(() => { void checkStatus(); }, 8_000);
+    return () => { stopped = true; window.clearInterval(timer); };
+  }, [selectedPlan, invoice?.invoiceId, invoice?.status]);
+
   async function copyAddress() {
+    if (!invoice?.walletAddress) return;
     try {
-      await navigator.clipboard.writeText(walletAddress);
+      await navigator.clipboard.writeText(invoice.walletAddress);
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1800);
     } catch {
@@ -145,7 +157,7 @@ export default function SubscribePage() {
         <div className="h-12 w-12 border-2 border-[#121212] bg-[#D02020]" aria-hidden="true" />
         <div>
           <h2 className="text-xl font-black">One payment method.</h2>
-          <p className="mt-2 max-w-3xl text-sm leading-6">Choose a plan to open the payment mockup. It displays the plan amount in USDT, the TRC20 network, a copyable address, and a QR placeholder for the final wallet integration.</p>
+          <p className="mt-2 max-w-3xl text-sm leading-6">Payments use one USDT wallet on TRC20. Trakio checks confirmed transfers automatically and activates the subscription when it finds the exact invoice amount.</p>
         </div>
       </section>
 
@@ -155,7 +167,7 @@ export default function SubscribePage() {
             <div className="flex items-start justify-between border-b-2 border-[#121212] bg-[#1040C0] px-5 py-4 text-[#FFFFFF] sm:px-7">
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#F0C020]">Payment</p>
-                <h2 id="payment-title" className="mt-1 text-2xl font-black">{submitted ? "Payment submitted for review" : `Subscribe to ${selectedPlan.name}`}</h2>
+                <h2 id="payment-title" className="mt-1 text-2xl font-black">{submitted ? "Payment confirmed" : `Subscribe to ${selectedPlan.name}`}</h2>
               </div>
               <button type="button" aria-label="Close payment dialog" onClick={() => setSelectedPlan(null)} className="min-h-11 min-w-11 border-2 border-[#FFFFFF] bg-transparent text-2xl leading-none text-[#FFFFFF] shadow-[3px_3px_0_#121212] hover:bg-[#D02020] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F0C020]">×</button>
             </div>
@@ -165,8 +177,8 @@ export default function SubscribePage() {
                 <div className="flex flex-col gap-4 border-2 border-[#121212] bg-[#F0C020] p-5 sm:flex-row sm:items-start sm:justify-between">
                   <div>
                     <p className="text-xs font-bold uppercase tracking-[0.16em]">Payment status</p>
-                    <h3 className="mt-2 text-3xl font-black tracking-[-0.04em]">Pending verification</h3>
-                    <p className="mt-2 text-sm leading-6">Your payment is not active until Trakio receives and verifies the provider confirmation.</p>
+                    <h3 className="mt-2 text-3xl font-black tracking-[-0.04em]">Payment confirmed</h3>
+                    <p className="mt-2 text-sm leading-6">The confirmed USDT transfer was matched to this invoice and your subscription is active.</p>
                   </div>
                   <span className="w-fit border-2 border-[#121212] bg-[#FFFFFF] px-3 py-2 text-xs font-bold uppercase tracking-[0.12em]">Invoice</span>
                 </div>
@@ -182,11 +194,11 @@ export default function SubscribePage() {
                     <div className="flex items-start justify-between gap-5 py-4"><dt className="font-bold">Item</dt><dd className="text-right">{selectedPlan.name} plan</dd></div>
                     <div className="flex items-start justify-between gap-5 py-4"><dt className="font-bold">Billing period</dt><dd className="text-right">Monthly</dd></div>
                     <div className="flex items-start justify-between gap-5 py-4"><dt className="font-bold">Payment method</dt><dd className="text-right">USDT on {invoice?.network ?? "TRC20"}</dd></div>
-                    <div className="flex items-start justify-between gap-5 py-4"><dt className="font-bold">Wallet destination</dt><dd className="max-w-[220px] break-all text-right font-mono text-xs">{walletAddress}</dd></div>
+                    <div className="flex items-start justify-between gap-5 py-4"><dt className="font-bold">Wallet destination</dt><dd className="max-w-[220px] break-all text-right font-mono text-xs">{invoice?.walletAddress}</dd></div>
                   </dl>
-                  <div className="flex items-center justify-between border-t-2 border-[#121212] bg-[#1040C0] px-5 py-4 text-[#FFFFFF]"><span className="text-sm font-bold uppercase tracking-[0.12em]">Invoice total</span><span className="text-2xl font-black">{invoice ? (Number(invoice.amountMinor) / 100).toFixed(2) : selectedPlan.price.replace("$", "")} {invoice?.currency ?? "USDT"}</span></div>
+                  <div className="flex items-center justify-between border-t-2 border-[#121212] bg-[#1040C0] px-5 py-4 text-[#FFFFFF]"><span className="text-sm font-bold uppercase tracking-[0.12em]">Invoice total</span><span className="text-2xl font-black">{formatUsdt(invoice?.paymentAmountAtomic, invoice?.amountMinor, invoice?.currency)}</span></div>
+                  {invoice?.transactionHash ? <p className="break-all px-5 py-3 font-mono text-xs">Transaction: {invoice.transactionHash}</p> : null}
                 </section>
-                {/* <p className="mt-5 border-l-4 border-[#D02020] bg-[#F0F0F0] px-4 py-3 text-sm leading-6">This invoice is a UI mockup. The tracker has not verified a blockchain transaction or activated the subscription automatically.</p> */}
                 <div className="mt-7 flex flex-col-reverse gap-3 border-t-2 border-[#121212] pt-5 sm:flex-row sm:justify-end">
                   <button type="button" onClick={() => setSelectedPlan(null)} className="min-h-11 border-2 border-[#121212] bg-[#FFFFFF] px-5 py-3 text-sm font-bold text-[#121212] hover:bg-[#E0E0E0] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#121212]">Close</button>
                   <Link href="/admin/profile" onClick={() => setSelectedPlan(null)} className="inline-flex min-h-11 items-center justify-center bg-[#1040C0] px-5 py-3 text-sm font-bold text-[#FFFFFF] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1040C0]">View profile</Link>
@@ -196,29 +208,20 @@ export default function SubscribePage() {
               <div className="px-5 py-6 sm:px-7 sm:py-8">
                 {invoiceWorking ? <p className="mb-5 border-2 border-[#121212] bg-[#F0C020] px-4 py-3 text-sm font-bold">Creating your invoice…</p> : null}
                 {invoiceError ? <p role="alert" className="mb-5 border-2 border-[#D02020] bg-[#FFF4F0] px-4 py-3 text-sm text-[#D02020]">{invoiceError}</p> : null}
-                <div className="grid gap-6 sm:grid-cols-[180px_1fr] sm:items-start">
-                  <div className="border-2 border-[#121212] bg-[#FFFFFF] p-3" role="img" aria-label="Mock USDT TRC20 QR code">
-                    <div className="grid aspect-square grid-cols-[repeat(19,minmax(0,1fr))] gap-px bg-[#FFFFFF] p-1">
-                      {qrPattern.flatMap((row, rowIndex) => [...row].map((cell, columnIndex) => <span key={`${rowIndex}-${columnIndex}`} className={cell === "1" ? "bg-[#121212]" : "bg-[#FFFFFF]"} />))}
-                    </div>
-                    <p className="mt-2 text-center text-[10px] font-bold uppercase tracking-[0.12em]">Dynamic QR</p>
-                  </div>
-                  <div>
+                <div>
                     <div className="flex flex-wrap items-end justify-between gap-4 border-b-2 border-[#121212] pb-4">
-                      <div><p className="text-xs font-bold uppercase tracking-[0.14em] text-[#D02020]">Amount</p><p className="mt-1 text-3xl font-black">{invoice ? (Number(invoice.amountMinor) / 100).toFixed(2) : selectedPlan.price.replace("$", "")} {invoice?.currency ?? "USDT"}</p></div>
+                      <div><p className="text-xs font-bold uppercase tracking-[0.14em] text-[#D02020]">Exact invoice amount</p><p className="mt-1 text-3xl font-black">{invoice ? formatUsdt(invoice.paymentAmountAtomic, invoice.amountMinor, invoice.currency) : `${selectedPlan.price.replace("$", "")}.00 USDT`}</p></div>
                       <div className="text-left sm:text-right"><p className="text-xs font-bold uppercase tracking-[0.14em]">Network</p><p className="mt-1 text-lg font-bold">TRON / TRC20</p></div>
                     </div>
-                    <p className="mt-5 text-sm font-bold">Send exactly the plan amount to this address.</p>
+                    <p className="mt-5 text-sm font-bold">Send the exact amount shown. It includes a unique payment reference of up to 0.10 USDT so Trakio can match this transfer to your invoice.</p>
                     <div className="mt-3 border-2 border-[#121212] bg-[#E0E0E0] p-3">
-                      <code className="block break-all font-mono text-xs leading-5">{walletAddress}</code>
+                      <code className="block break-all font-mono text-xs leading-5">{invoice?.walletAddress ?? "Wallet address not configured"}</code>
                     </div>
                     <button type="button" onClick={copyAddress} className="mt-3 min-h-11 bg-[#D02020] px-4 py-2.5 text-sm font-bold text-[#FFFFFF] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D02020]">{copied ? "Address copied" : "Copy address"}</button>
-                  </div>
                 </div>
                 <p className="mt-7 border-l-4 border-[#D02020] bg-[#F0F0F0] px-4 py-3 text-sm leading-6">Use USDT on TRC20 only. Sending another asset or network can result in a permanent loss.</p>
                 <div className="mt-7 flex flex-col-reverse gap-3 border-t-2 border-[#121212] pt-5 sm:flex-row sm:justify-end">
                   <button type="button" onClick={() => setSelectedPlan(null)} className="min-h-11 border-2 border-[#121212] bg-[#FFFFFF] px-5 py-3 text-sm font-bold text-[#121212] hover:bg-[#E0E0E0] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#121212]">Cancel</button>
-                  <button type="button" disabled={!invoice || invoiceWorking} onClick={() => setSubmitted(true)} className="min-h-11 bg-[#1040C0] px-5 py-3 text-sm font-bold text-[#FFFFFF] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1040C0]">I have sent payment</button>
                 </div>
               </div>
             )}

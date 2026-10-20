@@ -67,6 +67,10 @@ model User {
   id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   email        String   @unique
   passwordHash String   @map("password_hash")
+  emailVerifiedAt DateTime? @map("email_verified_at") @db.Timestamptz(6)
+  verificationTokenHash String? @unique @map("verification_token_hash") @db.Char(64)
+  verificationTokenExpiresAt DateTime? @map("verification_token_expires_at") @db.Timestamptz(6)
+  verificationEmailSentAt DateTime? @map("verification_email_sent_at") @db.Timestamptz(6)
   accountStatus AccountStatus @default(payment_required) @map("account_status")
   timezone String @default("UTC") @db.VarChar(64)
   createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
@@ -80,6 +84,24 @@ model User {
   customConversions CustomConversion[]
 
   @@map("users")
+}
+
+model EmailOutbox {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  kind           String
+  recipient      String
+  payload        Json
+  idempotencyKey String    @unique @map("idempotency_key")
+  status         String    @default("pending")
+  attempts       Int       @default(0)
+  nextAttemptAt  DateTime  @default(now()) @map("next_attempt_at") @db.Timestamptz(6)
+  lastError      String?   @map("last_error")
+  sentAt         DateTime? @map("sent_at") @db.Timestamptz(6)
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@index([status, nextAttemptAt])
+  @@map("email_outbox")
 }
 
 model Subscription {
@@ -112,6 +134,7 @@ model BillingPayment {
   provider              String
   plan                  String
   amountMinor           BigInt                @map("amount_minor")
+  paymentAmountAtomic   BigInt?               @unique @map("payment_amount_atomic")
   currency              String                @db.VarChar(10)
   network               String?
   status                BillingPaymentStatus @default(pending)
@@ -124,11 +147,37 @@ model BillingPayment {
   updatedAt             DateTime              @default(now()) @map("updated_at") @db.Timestamptz(6)
   user                  User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
   subscription          Subscription?         @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+  chainTransfers        BillingChainTransfer[]
 
   @@index([userId, status])
   @@index([providerTransactionId])
   @@index([transactionHash])
   @@map("billing_payments")
+}
+
+model BillingChainCheckpoint {
+  id            String   @id
+  lastScannedAt DateTime? @map("last_scanned_at") @db.Timestamptz(6)
+  updatedAt     DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@map("billing_chain_checkpoints")
+}
+
+model BillingChainTransfer {
+  id              String          @id
+  transactionHash String          @map("transaction_hash")
+  amountAtomic    BigInt          @map("amount_atomic")
+  fromAddress     String          @map("from_address")
+  toAddress       String          @map("to_address")
+  blockTimestamp  DateTime        @map("block_timestamp") @db.Timestamptz(6)
+  paymentId       String?         @map("payment_id") @db.Uuid
+  createdAt       DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  payment         BillingPayment? @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+
+  @@index([amountAtomic])
+  @@index([blockTimestamp])
+  @@index([paymentId])
+  @@map("billing_chain_transfers")
 }
 
 model BillingEvent {

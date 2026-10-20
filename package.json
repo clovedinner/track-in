@@ -8,6 +8,8 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "worker:outbox": "tsx scripts/outbox-worker.ts",
+    "worker:email": "tsx scripts/email-worker.ts",
+    "worker:billing": "tsx scripts/billing-chain-worker.ts",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "db:generate": "prisma generate",

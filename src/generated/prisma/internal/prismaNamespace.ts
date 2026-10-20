@@ -391,8 +391,11 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   User: 'User',
+  EmailOutbox: 'EmailOutbox',
   Subscription: 'Subscription',
   BillingPayment: 'BillingPayment',
+  BillingChainCheckpoint: 'BillingChainCheckpoint',
+  BillingChainTransfer: 'BillingChainTransfer',
   BillingEvent: 'BillingEvent',
   TrafficSource: 'TrafficSource',
   Campaign: 'Campaign',
@@ -417,7 +420,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "subscription" | "billingPayment" | "billingEvent" | "trafficSource" | "campaign" | "offer" | "customConversion" | "click" | "conversion" | "outboundPostback" | "auditEntry"
+    modelProps: "user" | "emailOutbox" | "subscription" | "billingPayment" | "billingChainCheckpoint" | "billingChainTransfer" | "billingEvent" | "trafficSource" | "campaign" | "offer" | "customConversion" | "click" | "conversion" | "outboundPostback" | "auditEntry"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -492,6 +495,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.UserCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.UserCountAggregateOutputType> | number
+        }
+      }
+    }
+    EmailOutbox: {
+      payload: Prisma.$EmailOutboxPayload<ExtArgs>
+      fields: Prisma.EmailOutboxFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.EmailOutboxFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailOutboxPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.EmailOutboxFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailOutboxPayload>
+        }
+        findFirst: {
+          args: Prisma.EmailOutboxFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailOutboxPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.EmailOutboxFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailOutboxPayload>
+        }
+        findMany: {
+          args: Prisma.EmailOutboxFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailOutboxPayload>[]
+        }
+        create: {
+          args: Prisma.EmailOutboxCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailOutboxPayload>
+        }
+        createMany: {
+          args: Prisma.EmailOutboxCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.EmailOutboxCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailOutboxPayload>[]
+        }
+        delete: {
+          args: Prisma.EmailOutboxDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailOutboxPayload>
+        }
+        update: {
+          args: Prisma.EmailOutboxUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailOutboxPayload>
+        }
+        deleteMany: {
+          args: Prisma.EmailOutboxDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.EmailOutboxUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.EmailOutboxUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailOutboxPayload>[]
+        }
+        upsert: {
+          args: Prisma.EmailOutboxUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailOutboxPayload>
+        }
+        aggregate: {
+          args: Prisma.EmailOutboxAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateEmailOutbox>
+        }
+        groupBy: {
+          args: Prisma.EmailOutboxGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EmailOutboxGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.EmailOutboxCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EmailOutboxCountAggregateOutputType> | number
         }
       }
     }
@@ -640,6 +717,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.BillingPaymentCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.BillingPaymentCountAggregateOutputType> | number
+        }
+      }
+    }
+    BillingChainCheckpoint: {
+      payload: Prisma.$BillingChainCheckpointPayload<ExtArgs>
+      fields: Prisma.BillingChainCheckpointFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.BillingChainCheckpointFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BillingChainCheckpointPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.BillingChainCheckpointFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BillingChainCheckpointPayload>
+        }
+        findFirst: {
+          args: Prisma.BillingChainCheckpointFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BillingChainCheckpointPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.BillingChainCheckpointFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BillingChainCheckpointPayload>
+        }
+        findMany: {
+          args: Prisma.BillingChainCheckpointFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BillingChainCheckpointPayload>[]
+        }
+        create: {
+          args: Prisma.BillingChainCheckpointCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BillingChainCheckpointPayload>
+        }
+        createMany: {
+          args: Prisma.BillingChainCheckpointCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.BillingChainCheckpointCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BillingChainCheckpointPayload>[]
+        }
+        delete: {
+          args: Prisma.BillingChainCheckpointDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BillingChainCheckpointPayload>
+        }
+        update: {
+          args: Prisma.BillingChainCheckpointUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BillingChainCheckpointPayload>
+        }
+        deleteMany: {
+          args: Prisma.BillingChainCheckpointDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.BillingChainCheckpointUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.BillingChainCheckpointUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BillingChainCheckpointPayload>[]
+        }
+        upsert: {
+          args: Prisma.BillingChainCheckpointUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BillingChainCheckpointPayload>
+        }
+        aggregate: {
+          args: Prisma.BillingChainCheckpointAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBillingChainCheckpoint>
+        }
+        groupBy: {
+          args: Prisma.BillingChainCheckpointGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BillingChainCheckpointGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.BillingChainCheckpointCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BillingChainCheckpointCountAggregateOutputType> | number
+        }
+      }
+    }
+    BillingChainTransfer: {
+      payload: Prisma.$BillingChainTransferPayload<ExtArgs>
+      fields: Prisma.BillingChainTransferFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.BillingChainTransferFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BillingChainTransferPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.BillingChainTransferFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BillingChainTransferPayload>
+        }
+        findFirst: {
+          args: Prisma.BillingChainTransferFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BillingChainTransferPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.BillingChainTransferFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BillingChainTransferPayload>
+        }
+        findMany: {
+          args: Prisma.BillingChainTransferFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BillingChainTransferPayload>[]
+        }
+        create: {
+          args: Prisma.BillingChainTransferCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BillingChainTransferPayload>
+        }
+        createMany: {
+          args: Prisma.BillingChainTransferCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.BillingChainTransferCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BillingChainTransferPayload>[]
+        }
+        delete: {
+          args: Prisma.BillingChainTransferDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BillingChainTransferPayload>
+        }
+        update: {
+          args: Prisma.BillingChainTransferUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BillingChainTransferPayload>
+        }
+        deleteMany: {
+          args: Prisma.BillingChainTransferDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.BillingChainTransferUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.BillingChainTransferUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BillingChainTransferPayload>[]
+        }
+        upsert: {
+          args: Prisma.BillingChainTransferUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BillingChainTransferPayload>
+        }
+        aggregate: {
+          args: Prisma.BillingChainTransferAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBillingChainTransfer>
+        }
+        groupBy: {
+          args: Prisma.BillingChainTransferGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BillingChainTransferGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.BillingChainTransferCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BillingChainTransferCountAggregateOutputType> | number
         }
       }
     }
@@ -1352,6 +1577,10 @@ export const UserScalarFieldEnum = {
   id: 'id',
   email: 'email',
   passwordHash: 'passwordHash',
+  emailVerifiedAt: 'emailVerifiedAt',
+  verificationTokenHash: 'verificationTokenHash',
+  verificationTokenExpiresAt: 'verificationTokenExpiresAt',
+  verificationEmailSentAt: 'verificationEmailSentAt',
   accountStatus: 'accountStatus',
   timezone: 'timezone',
   createdAt: 'createdAt',
@@ -1359,6 +1588,24 @@ export const UserScalarFieldEnum = {
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+export const EmailOutboxScalarFieldEnum = {
+  id: 'id',
+  kind: 'kind',
+  recipient: 'recipient',
+  payload: 'payload',
+  idempotencyKey: 'idempotencyKey',
+  status: 'status',
+  attempts: 'attempts',
+  nextAttemptAt: 'nextAttemptAt',
+  lastError: 'lastError',
+  sentAt: 'sentAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type EmailOutboxScalarFieldEnum = (typeof EmailOutboxScalarFieldEnum)[keyof typeof EmailOutboxScalarFieldEnum]
 
 
 export const SubscriptionScalarFieldEnum = {
@@ -1387,6 +1634,7 @@ export const BillingPaymentScalarFieldEnum = {
   provider: 'provider',
   plan: 'plan',
   amountMinor: 'amountMinor',
+  paymentAmountAtomic: 'paymentAmountAtomic',
   currency: 'currency',
   network: 'network',
   status: 'status',
@@ -1400,6 +1648,29 @@ export const BillingPaymentScalarFieldEnum = {
 } as const
 
 export type BillingPaymentScalarFieldEnum = (typeof BillingPaymentScalarFieldEnum)[keyof typeof BillingPaymentScalarFieldEnum]
+
+
+export const BillingChainCheckpointScalarFieldEnum = {
+  id: 'id',
+  lastScannedAt: 'lastScannedAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BillingChainCheckpointScalarFieldEnum = (typeof BillingChainCheckpointScalarFieldEnum)[keyof typeof BillingChainCheckpointScalarFieldEnum]
+
+
+export const BillingChainTransferScalarFieldEnum = {
+  id: 'id',
+  transactionHash: 'transactionHash',
+  amountAtomic: 'amountAtomic',
+  fromAddress: 'fromAddress',
+  toAddress: 'toAddress',
+  blockTimestamp: 'blockTimestamp',
+  paymentId: 'paymentId',
+  createdAt: 'createdAt'
+} as const
+
+export type BillingChainTransferScalarFieldEnum = (typeof BillingChainTransferScalarFieldEnum)[keyof typeof BillingChainTransferScalarFieldEnum]
 
 
 export const BillingEventScalarFieldEnum = {
@@ -1615,6 +1886,20 @@ export type ListStringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaMod
 
 
 /**
+ * Reference to a field of type 'DateTime'
+ */
+export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
+    
+
+
+/**
+ * Reference to a field of type 'DateTime[]'
+ */
+export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+/**
  * Reference to a field of type 'AccountStatus'
  */
 export type EnumAccountStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AccountStatus'>
@@ -1629,16 +1914,30 @@ export type ListEnumAccountStatusFieldRefInput<$PrismaModel> = FieldRefInputType
 
 
 /**
- * Reference to a field of type 'DateTime'
+ * Reference to a field of type 'Json'
  */
-export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
+export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
     
 
 
 /**
- * Reference to a field of type 'DateTime[]'
+ * Reference to a field of type 'QueryMode'
  */
-export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+/**
+ * Reference to a field of type 'Int'
+ */
+export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+/**
+ * Reference to a field of type 'Int[]'
+ */
+export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
     
 
 
@@ -1692,20 +1991,6 @@ export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
 
 
 /**
- * Reference to a field of type 'Json'
- */
-export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
-    
-
-
-/**
- * Reference to a field of type 'QueryMode'
- */
-export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
-    
-
-
-/**
  * Reference to a field of type 'CampaignStatus'
  */
 export type EnumCampaignStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CampaignStatus'>
@@ -1744,20 +2029,6 @@ export type EnumOutboundPostbackStatusFieldRefInput<$PrismaModel> = FieldRefInpu
  * Reference to a field of type 'OutboundPostbackStatus[]'
  */
 export type ListEnumOutboundPostbackStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OutboundPostbackStatus[]'>
-    
-
-
-/**
- * Reference to a field of type 'Int'
- */
-export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
-    
-
-
-/**
- * Reference to a field of type 'Int[]'
- */
-export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
     
 
 
@@ -1862,8 +2133,11 @@ export interface PrismaClientOptions {
 }
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
+  emailOutbox?: Prisma.EmailOutboxOmit
   subscription?: Prisma.SubscriptionOmit
   billingPayment?: Prisma.BillingPaymentOmit
+  billingChainCheckpoint?: Prisma.BillingChainCheckpointOmit
+  billingChainTransfer?: Prisma.BillingChainTransferOmit
   billingEvent?: Prisma.BillingEventOmit
   trafficSource?: Prisma.TrafficSourceOmit
   campaign?: Prisma.CampaignOmit

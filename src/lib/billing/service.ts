@@ -1,6 +1,8 @@
 import { createHash, createHmac, timingSafeEqual, randomUUID } from "node:crypto";
 
 import { prisma } from "@/lib/database/prisma";
+import { MAX_INVOICE_REFERENCE_ATOMIC, TRON_PAYMENT_PROVIDER, toUsdtAtomicFromCents } from "@/lib/billing/tron";
+import { queueInvoiceEmail } from "@/lib/email/outbox";
 
 export const BILLING_PLANS = {
   Starter: { amountMinor: 30_000, currency: "USDT" },
@@ -11,7 +13,7 @@ export const BILLING_PLANS = {
 export type BillingPlan = keyof typeof BILLING_PLANS;
 
 export function getBillingProvider(): string {
-  return process.env.BILLING_PROVIDER?.trim() || "manual";
+  return process.env.BILLING_PROVIDER?.trim() || TRON_PAYMENT_PROVIDER;
 }
 
 export function isBillingPlan(value: unknown): value is BillingPlan {
@@ -43,29 +45,84 @@ export function buildCheckoutUrl(invoiceId: string): string | null {
 
 export async function createInvoice(userId: string, plan: BillingPlan) {
   const details = BILLING_PLANS[plan];
-  const invoiceId = `trk_inv_${randomUUID()}`;
-  const payment = await prisma.billingPayment.create({
-    data: {
-      userId,
-      invoiceId,
-      provider: getBillingProvider(),
-      plan,
-      amountMinor: BigInt(details.amountMinor),
-      currency: details.currency,
-      network: process.env.BILLING_NETWORK?.trim() || "TRC20",
-    },
+  const walletAddress = process.env.BILLING_WALLET_ADDRESS?.trim() ?? "";
+  if (!/^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(walletAddress)) throw new Error("BILLING_WALLET_ADDRESS is missing or invalid.");
+  const provider = getBillingProvider();
+  if (provider !== TRON_PAYMENT_PROVIDER) throw new Error("BILLING_PROVIDER must be tron for automatic USDT verification.");
+  if (!process.env.TRONGRID_API_KEY?.trim()) throw new Error("TRONGRID_API_KEY is required for automatic payment verification.");
+  const amountMinor = BigInt(details.amountMinor);
+  const existing = await prisma.billingPayment.findFirst({
+    where: { userId, plan, status: "pending", currency: details.currency, paymentAmountAtomic: { not: null } },
+    orderBy: { createdAt: "desc" },
   });
+  const payment = existing ?? await createUniquelyPricedPayment({ userId, plan, provider, currency: details.currency, amountMinor });
 
   return {
     invoiceId: payment.invoiceId,
     provider: payment.provider,
     plan,
     amountMinor: payment.amountMinor.toString(),
+    paymentAmountAtomic: payment.paymentAmountAtomic?.toString() ?? null,
     currency: payment.currency,
     network: payment.network,
     status: payment.status,
+    walletAddress,
     checkoutUrl: buildCheckoutUrl(payment.invoiceId),
   };
+}
+
+async function createUniquelyPricedPayment(input: { userId: string; plan: BillingPlan; provider: string; currency: string; amountMinor: bigint }) {
+  const baseAtomic = toUsdtAtomicFromCents(input.amountMinor);
+  for (let attempt = 0; attempt < 4; attempt += 1) {
+    try {
+      return await prisma.$transaction(async (transaction) => {
+        await transaction.$queryRaw<unknown[]>`SELECT pg_advisory_xact_lock(hashtext('trakio:billing:tron-usdt-amount'))`;
+        const previous = await transaction.billingPayment.aggregate({
+          where: { currency: input.currency, amountMinor: input.amountMinor, paymentAmountAtomic: { not: null } },
+          _max: { paymentAmountAtomic: true },
+        });
+        let candidate = previous._max.paymentAmountAtomic === null ? baseAtomic + BigInt(1) : previous._max.paymentAmountAtomic + BigInt(1);
+        const upperBound = baseAtomic + MAX_INVOICE_REFERENCE_ATOMIC;
+        while (candidate <= upperBound) {
+          const usedByIncomingTransfer = await transaction.billingChainTransfer.findFirst({ where: { amountAtomic: candidate }, select: { id: true } });
+          if (usedByIncomingTransfer) {
+            candidate += BigInt(1);
+            continue;
+          }
+          const payment = await transaction.billingPayment.create({
+            data: {
+              userId: input.userId,
+              invoiceId: `trk_inv_${randomUUID()}`,
+              provider: input.provider,
+              plan: input.plan,
+              amountMinor: input.amountMinor,
+              paymentAmountAtomic: candidate,
+              currency: input.currency,
+              network: process.env.BILLING_NETWORK?.trim() || "TRC20",
+            },
+          });
+          await queueInvoiceEmail(transaction, {
+            userId: input.userId,
+            invoiceId: payment.invoiceId,
+            plan: input.plan,
+            currency: input.currency,
+            paymentAmountAtomic: candidate,
+            network: payment.network ?? "TRC20",
+            walletAddress: process.env.BILLING_WALLET_ADDRESS?.trim() ?? "",
+          });
+          return payment;
+        }
+        throw new Error("This plan has reached its unique payment-reference limit. Increase MAX_INVOICE_REFERENCE_ATOMIC before issuing another invoice.");
+      });
+    } catch (error) {
+      if (!hasPrismaErrorCode(error, "P2002") || attempt === 3) throw error;
+    }
+  }
+  throw new Error("Unable to allocate a unique payment amount.");
+}
+
+function hasPrismaErrorCode(error: unknown, code: string): boolean {
+  return typeof error === "object" && error !== null && "code" in error && error.code === code;
 }
 
 type WebhookInput = {
@@ -114,9 +171,9 @@ export async function processBillingWebhook(provider: string, input: WebhookInpu
       const nextInvoiceAt = parseDate(input.nextInvoiceAt, end);
       if (!end || (input.nextInvoiceAt !== null && !nextInvoiceAt)) throw new BillingWebhookError("invalid_period", 422);
 
-      const current = await transaction.subscription.findFirst({ where: { userId: payment.userId, provider, status: { in: ["active", "past_due"] } }, orderBy: { createdAt: "desc" } });
+      const current = await transaction.subscription.findFirst({ where: { userId: payment.userId, status: { in: ["active", "past_due"] } }, orderBy: { createdAt: "desc" } });
       const subscription = current
-        ? await transaction.subscription.update({ where: { id: current.id }, data: { plan, status: "active", externalId: input.externalId, currentPeriodStart: start, currentPeriodEnd: end, nextInvoiceAt, canceledAt: null } })
+        ? await transaction.subscription.update({ where: { id: current.id }, data: { plan, status: "active", provider, externalId: input.externalId, currentPeriodStart: start, currentPeriodEnd: end, nextInvoiceAt, canceledAt: null } })
         : await transaction.subscription.create({ data: { userId: payment.userId, plan, provider, externalId: input.externalId, currentPeriodStart: start, currentPeriodEnd: end, nextInvoiceAt, status: "active" } });
 
       await transaction.billingPayment.update({ where: { id: payment.id }, data: { status: "confirmed", subscriptionId: subscription.id, providerTransactionId: input.providerTransactionId, transactionHash: input.transactionHash, receivedAt: now, confirmedAt: now, failureReason: null } });

@@ -75,11 +75,26 @@ Use `npm run db:migrate:create` only on a non-production Neon branch when a sche
 - `NEXT_PUBLIC_TRACKER_URL`: optional dedicated tracking origin, such as `https://go.trakio.org`. Generated tracking URLs use this value while the dashboard remains on `NEXT_PUBLIC_APP_URL`.
 - `DATABASE_URL`: Neon pooled PostgreSQL connection string for runtime queries. Do not commit a real connection string.
 - `DIRECT_URL`: Neon direct PostgreSQL connection string used only by Prisma migration and Studio commands.
-- `AUTH_SESSION_SECRET`: at least 32 random characters used to sign dashboard sessions. It is required in production. Generate one with `openssl rand -base64 32`.
+- `AUTH_SESSION_SECRET`: at least 32 random characters used to sign dashboard sessions and encrypt queued verification links. It is required in production. Generate one with `openssl rand -base64 32`; drain pending welcome emails before rotating it.
 - `ADMIN_USERNAME` and `ADMIN_PASSWORD`: optional legacy Basic Auth fallback while migrating existing deployments. Email/password sessions are the normal dashboard login.
 - `CONVERSION_WEBHOOK_SECRET`: server-to-server conversion authentication secret. It is required in production.
+- `BILLING_PROVIDER`: set to `tron` for direct on-chain USDT verification.
+- `BILLING_WALLET_ADDRESS`: the public TRON address that receives USDT TRC20 payments. Trakio never needs its private key.
+- `TRONGRID_API_KEY`: server-only key for reading confirmed TRON transfers. TronGrid provides a free tier; quotas and rate limits can change.
+- `BILLING_POLL_INTERVAL_MS`: optional polling interval for the payment monitor, default 15000 ms.
+- `RESEND_API_KEY`: server-only Resend key used by the transactional email worker; required in production.
+- `EMAIL_FROM`: verified sender identity, default `Trakio <billing@trakio.org>`.
+- `EMAIL_POLL_INTERVAL_MS`: optional email outbox polling interval, default 5000 ms.
 
 Never commit `.env.local` or credentials. Do not route tracking traffic to this application until Phase 4 production-readiness checks are complete.
+
+### Automatic USDT billing
+
+The billing monitor polls TronGrid for confirmed incoming transfers of the official TRON USDT contract. It matches a transfer only when the destination, token contract, decimals, and exact invoice amount match. Invoice amounts carry a persistent micro-USDT reference increment so concurrent payments to the single wallet can be attributed safely; the exact amount is shown before payment. The reference increment starts at 0.000001 USDT and is capped at 0.1 USDT per plan. It is never reused for that plan and price. Legacy invoices without a payment reference remain manual-review only.
+
+After applying migrations and deploying the app, configure `BILLING_PROVIDER=tron`, `BILLING_WALLET_ADDRESS`, and `TRONGRID_API_KEY` in the production environment. Run exactly one `npm run worker:billing` process alongside `npm run worker:outbox`. The worker needs outbound HTTPS access to `api.trongrid.io`; it never signs transactions or needs wallet secrets. The invoice view polls its status and displays the confirmed transaction hash when the transfer is attributed. Keep a manual reconciliation path for underpayments, overpayments, or transfers sent on the wrong network/token.
+
+New signups must confirm their email before they can sign in. The app queues the welcome confirmation email in the same transaction as account creation. Invoice emails are queued in the transaction that creates the invoice. Deploy the email migration, set `RESEND_API_KEY` and `EMAIL_FROM`, then run `npm run worker:email` as a persistent service. Verify `trakio.org` in Resend and publish its SPF/DKIM records before sending production mail. Existing accounts are marked verified by the migration.
 
 Operational recovery procedures, including a disposable Neon restore rehearsal,
 are documented in [OPERATIONS_RUNBOOK.md](OPERATIONS_RUNBOOK.md).

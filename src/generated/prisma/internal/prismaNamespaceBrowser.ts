@@ -50,8 +50,11 @@ export const AnyNull = runtime.objectEnumValues.instances.AnyNull
 
 export const ModelName = {
   User: 'User',
+  EmailOutbox: 'EmailOutbox',
   Subscription: 'Subscription',
   BillingPayment: 'BillingPayment',
+  BillingChainCheckpoint: 'BillingChainCheckpoint',
+  BillingChainTransfer: 'BillingChainTransfer',
   BillingEvent: 'BillingEvent',
   TrafficSource: 'TrafficSource',
   Campaign: 'Campaign',
@@ -83,6 +86,10 @@ export const UserScalarFieldEnum = {
   id: 'id',
   email: 'email',
   passwordHash: 'passwordHash',
+  emailVerifiedAt: 'emailVerifiedAt',
+  verificationTokenHash: 'verificationTokenHash',
+  verificationTokenExpiresAt: 'verificationTokenExpiresAt',
+  verificationEmailSentAt: 'verificationEmailSentAt',
   accountStatus: 'accountStatus',
   timezone: 'timezone',
   createdAt: 'createdAt',
@@ -90,6 +97,24 @@ export const UserScalarFieldEnum = {
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+export const EmailOutboxScalarFieldEnum = {
+  id: 'id',
+  kind: 'kind',
+  recipient: 'recipient',
+  payload: 'payload',
+  idempotencyKey: 'idempotencyKey',
+  status: 'status',
+  attempts: 'attempts',
+  nextAttemptAt: 'nextAttemptAt',
+  lastError: 'lastError',
+  sentAt: 'sentAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type EmailOutboxScalarFieldEnum = (typeof EmailOutboxScalarFieldEnum)[keyof typeof EmailOutboxScalarFieldEnum]
 
 
 export const SubscriptionScalarFieldEnum = {
@@ -118,6 +143,7 @@ export const BillingPaymentScalarFieldEnum = {
   provider: 'provider',
   plan: 'plan',
   amountMinor: 'amountMinor',
+  paymentAmountAtomic: 'paymentAmountAtomic',
   currency: 'currency',
   network: 'network',
   status: 'status',
@@ -131,6 +157,29 @@ export const BillingPaymentScalarFieldEnum = {
 } as const
 
 export type BillingPaymentScalarFieldEnum = (typeof BillingPaymentScalarFieldEnum)[keyof typeof BillingPaymentScalarFieldEnum]
+
+
+export const BillingChainCheckpointScalarFieldEnum = {
+  id: 'id',
+  lastScannedAt: 'lastScannedAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BillingChainCheckpointScalarFieldEnum = (typeof BillingChainCheckpointScalarFieldEnum)[keyof typeof BillingChainCheckpointScalarFieldEnum]
+
+
+export const BillingChainTransferScalarFieldEnum = {
+  id: 'id',
+  transactionHash: 'transactionHash',
+  amountAtomic: 'amountAtomic',
+  fromAddress: 'fromAddress',
+  toAddress: 'toAddress',
+  blockTimestamp: 'blockTimestamp',
+  paymentId: 'paymentId',
+  createdAt: 'createdAt'
+} as const
+
+export type BillingChainTransferScalarFieldEnum = (typeof BillingChainTransferScalarFieldEnum)[keyof typeof BillingChainTransferScalarFieldEnum]
 
 
 export const BillingEventScalarFieldEnum = {

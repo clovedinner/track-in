@@ -7,6 +7,10 @@ export type RuntimeEnvironment = {
   authSessionSecret: string | undefined;
   databaseUrl: string | undefined;
   directDatabaseUrl: string | undefined;
+  billingProvider: string | undefined;
+  billingWalletAddress: string | undefined;
+  tronGridApiKey: string | undefined;
+  resendApiKey: string | undefined;
   nodeEnv: "development" | "production" | "test";
 };
 
@@ -32,6 +36,10 @@ export function getRuntimeEnvironment(): RuntimeEnvironment {
     authSessionSecret: readTrimmedVariable("AUTH_SESSION_SECRET"),
     databaseUrl: readTrimmedVariable("DATABASE_URL"),
     directDatabaseUrl: readTrimmedVariable("DIRECT_URL"),
+    billingProvider: readTrimmedVariable("BILLING_PROVIDER") ?? "tron",
+    billingWalletAddress: readTrimmedVariable("BILLING_WALLET_ADDRESS"),
+    tronGridApiKey: readTrimmedVariable("TRONGRID_API_KEY"),
+    resendApiKey: readTrimmedVariable("RESEND_API_KEY"),
     nodeEnv,
   };
 }
@@ -56,6 +64,9 @@ export function validateRuntimeEnvironment(
     ["AUTH_SESSION_SECRET", environment.authSessionSecret],
     ["DATABASE_URL", environment.databaseUrl],
     ["DIRECT_URL", environment.directDatabaseUrl],
+    ["BILLING_WALLET_ADDRESS", environment.billingWalletAddress],
+    ["TRONGRID_API_KEY", environment.tronGridApiKey],
+    ["RESEND_API_KEY", environment.resendApiKey],
   ] as const;
   const missingVariables = requiredVariables
     .filter(([, value]) => value === undefined)
@@ -63,6 +74,13 @@ export function validateRuntimeEnvironment(
 
   if (missingVariables.length > 0) {
     throw new EnvironmentValidationError(missingVariables);
+  }
+
+  if (environment.billingProvider !== "tron") {
+    throw new EnvironmentValidationError(["BILLING_PROVIDER (must be tron)"]);
+  }
+  if (!environment.billingWalletAddress || !/^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(environment.billingWalletAddress)) {
+    throw new EnvironmentValidationError(["BILLING_WALLET_ADDRESS (must be a valid TRON address)"]);
   }
 
   if (!environment.appUrl?.startsWith("https://")) {
