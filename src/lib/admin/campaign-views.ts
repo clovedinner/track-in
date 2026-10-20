@@ -1,6 +1,7 @@
 import { Prisma, type CampaignStatus } from "@/generated/prisma/client";
 
 import { prisma } from "@/lib/database/prisma";
+import { parseDateInTimezone } from "@/lib/timezone";
 import { getCampaignDailyMetrics, getOverviewMetrics, type DashboardFilters, type DailyMetric, type OverviewMetrics } from "@/lib/metrics/queries";
 import { getCustomConversionCounts, includedCustomConversionColumns, type CustomConversionColumn } from "@/lib/admin/custom-conversion-metrics";
 
@@ -155,20 +156,18 @@ export async function getCampaignList(filters: CampaignListFilters = {}): Promis
   return rows;
 }
 
-function detailDateFilters(params: URLSearchParams): DashboardFilters {
+function detailDateFilters(params: URLSearchParams, timezone: string): DashboardFilters {
   const fromValue = params.get("from");
   const toValue = params.get("to");
-  const from = fromValue ? new Date(`${fromValue}T00:00:00.000Z`) : undefined;
-  const to = toValue ? new Date(`${toValue}T00:00:00.000Z`) : undefined;
   return {
-    from: from && !Number.isNaN(from.valueOf()) ? from : undefined,
-    to: to && !Number.isNaN(to.valueOf()) ? to : undefined,
+    from: parseDateInTimezone(fromValue ?? undefined, timezone),
+    to: parseDateInTimezone(toValue ?? undefined, timezone, true),
     eventType: params.get("eventType")?.trim().slice(0, 100) || undefined,
   };
 }
 
-export function campaignDetailFilters(params: URLSearchParams): DashboardFilters {
-  return detailDateFilters(params);
+export function campaignDetailFilters(params: URLSearchParams, timezone: string): DashboardFilters {
+  return detailDateFilters(params, timezone);
 }
 
 export async function getCampaignDetail(campaignId: string, filters: DashboardFilters = {}): Promise<CampaignDetail | null> {

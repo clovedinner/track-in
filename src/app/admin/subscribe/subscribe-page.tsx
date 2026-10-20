@@ -18,6 +18,7 @@ type Invoice = {
   currency: string;
   network: string | null;
   status: string;
+  isTest?: boolean;
   walletAddress: string;
   transactionHash?: string | null;
   checkoutUrl: string | null;
@@ -56,7 +57,7 @@ function formatUsdt(atomic: string | null | undefined, amountMinor: string | nul
   return `${(Number(amountMinor ?? "0") / 100).toFixed(2)} ${currency ?? "USDT"}`;
 }
 
-export default function SubscribePage() {
+export default function SubscribePage({ showTestPayment = false }: { showTestPayment?: boolean }) {
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const [copied, setCopied] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -79,9 +80,9 @@ export default function SubscribePage() {
       try {
         const response = await fetch(`/api/billing/invoices/${encodeURIComponent(invoice.invoiceId)}`, { cache: "no-store" });
         if (!response.ok) return;
-        const status = await response.json() as { status?: string; transactionHash?: string | null; paymentAmountAtomic?: string | null };
+        const status = await response.json() as { status?: string; transactionHash?: string | null; paymentAmountAtomic?: string | null; isTest?: boolean };
         if (stopped || typeof status.status !== "string") return;
-        setInvoice((current) => current ? { ...current, status: status.status!, transactionHash: status.transactionHash, paymentAmountAtomic: status.paymentAmountAtomic ?? current.paymentAmountAtomic } : current);
+        setInvoice((current) => current ? { ...current, status: status.status!, transactionHash: status.transactionHash, paymentAmountAtomic: status.paymentAmountAtomic ?? current.paymentAmountAtomic, isTest: status.isTest ?? current.isTest } : current);
         if (status.status === "confirmed") setSubmitted(true);
       } catch {
         // Keep showing the pending state; the next poll will retry the read.
@@ -103,7 +104,7 @@ export default function SubscribePage() {
     }
   }
 
-  async function openPayment(plan: Plan) {
+  async function openPayment(plan: Plan, testOnly = false) {
     setSubmitted(false);
     setCopied(false);
     setInvoice(null);
@@ -111,7 +112,10 @@ export default function SubscribePage() {
     setSelectedPlan(plan);
     setInvoiceWorking(true);
     try {
-      const response = await fetch("/api/billing/invoices", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ plan: plan.name }) });
+      const response = await fetch(testOnly ? "/api/billing/test-invoices" : "/api/billing/invoices", {
+        method: "POST",
+        ...(testOnly ? {} : { headers: { "content-type": "application/json" }, body: JSON.stringify({ plan: plan.name }) }),
+      });
       const payload = await response.json().catch(() => null) as Invoice | { error?: string } | null;
       if (!response.ok || !payload || !("invoiceId" in payload)) throw new Error((payload as { error?: string } | null)?.error ?? "Unable to create invoice.");
       setInvoice(payload);
@@ -161,13 +165,23 @@ export default function SubscribePage() {
         </div>
       </section>
 
+      {showTestPayment ? (
+        <section className="mt-6 flex flex-col gap-4 border-2 border-[#121212] bg-[#FFFFFF] p-5 sm:flex-row sm:items-center sm:justify-between" aria-label="Payment monitor test">
+          <div>
+            <h2 className="font-black">Test payment monitoring</h2>
+            <p className="mt-1 max-w-2xl text-sm leading-6">Create a one-time 0.10 USDT TRC20 invoice to confirm the chain monitor sees a real transfer. This test never activates a subscription.</p>
+          </div>
+          <button type="button" onClick={() => void openPayment({ name: "Payment monitor test", price: "$0.10", note: "Detection test only", features: [] }, true)} className="min-h-11 shrink-0 border-2 border-[#121212] bg-[#FFFFFF] px-4 py-2.5 text-sm font-bold shadow-[3px_3px_0_#121212] hover:bg-[#E0E0E0] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#121212]">Create $0.10 test invoice</button>
+        </section>
+      ) : null}
+
       {selectedPlan ? (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-[#121212]/80 p-3 sm:items-center sm:p-6" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedPlan(null); }}>
           <section role="dialog" aria-modal="true" aria-labelledby="payment-title" className="max-h-[92vh] w-full max-w-2xl overflow-y-auto border-2 border-[#121212] bg-[#FFFFFF] shadow-[8px_8px_0_#F0C020]">
             <div className="flex items-start justify-between border-b-2 border-[#121212] bg-[#1040C0] px-5 py-4 text-[#FFFFFF] sm:px-7">
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#F0C020]">Payment</p>
-                <h2 id="payment-title" className="mt-1 text-2xl font-black">{submitted ? "Payment confirmed" : `Subscribe to ${selectedPlan.name}`}</h2>
+                <h2 id="payment-title" className="mt-1 text-2xl font-black">{submitted ? (invoice?.isTest ? "Test transfer detected" : "Payment confirmed") : invoice?.isTest ? "Payment monitor test" : `Subscribe to ${selectedPlan.name}`}</h2>
               </div>
               <button type="button" aria-label="Close payment dialog" onClick={() => setSelectedPlan(null)} className="min-h-11 min-w-11 border-2 border-[#FFFFFF] bg-transparent text-2xl leading-none text-[#FFFFFF] shadow-[3px_3px_0_#121212] hover:bg-[#D02020] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F0C020]">×</button>
             </div>
@@ -178,7 +192,7 @@ export default function SubscribePage() {
                   <div>
                     <p className="text-xs font-bold uppercase tracking-[0.16em]">Payment status</p>
                     <h3 className="mt-2 text-3xl font-black tracking-[-0.04em]">Payment confirmed</h3>
-                    <p className="mt-2 text-sm leading-6">The confirmed USDT transfer was matched to this invoice and your subscription is active.</p>
+                    <p className="mt-2 text-sm leading-6">{invoice?.isTest ? "The confirmed 0.10 USDT transfer was matched. No subscription was activated or changed." : "The confirmed USDT transfer was matched to this invoice and your subscription is active."}</p>
                   </div>
                   <span className="w-fit border-2 border-[#121212] bg-[#FFFFFF] px-3 py-2 text-xs font-bold uppercase tracking-[0.12em]">Invoice</span>
                 </div>
@@ -201,7 +215,7 @@ export default function SubscribePage() {
                 </section>
                 <div className="mt-7 flex flex-col-reverse gap-3 border-t-2 border-[#121212] pt-5 sm:flex-row sm:justify-end">
                   <button type="button" onClick={() => setSelectedPlan(null)} className="min-h-11 border-2 border-[#121212] bg-[#FFFFFF] px-5 py-3 text-sm font-bold text-[#121212] hover:bg-[#E0E0E0] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#121212]">Close</button>
-                  <Link href="/admin/profile" onClick={() => setSelectedPlan(null)} className="inline-flex min-h-11 items-center justify-center bg-[#1040C0] px-5 py-3 text-sm font-bold text-[#FFFFFF] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1040C0]">View profile</Link>
+                  {invoice?.isTest ? null : <Link href="/admin/profile" onClick={() => setSelectedPlan(null)} className="inline-flex min-h-11 items-center justify-center bg-[#1040C0] px-5 py-3 text-sm font-bold text-[#FFFFFF] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1040C0]">View profile</Link>}
                 </div>
               </div>
             ) : (

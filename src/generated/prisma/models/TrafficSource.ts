@@ -494,10 +494,6 @@ export type TrafficSourceUncheckedUpdateManyWithoutOwnerNestedInput = {
   deleteMany?: Prisma.TrafficSourceScalarWhereInput | Prisma.TrafficSourceScalarWhereInput[]
 }
 
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
-}
-
 export type TrafficSourceCreateNestedOneWithoutCampaignsInput = {
   create?: Prisma.XOR<Prisma.TrafficSourceCreateWithoutCampaignsInput, Prisma.TrafficSourceUncheckedCreateWithoutCampaignsInput>
   connectOrCreate?: Prisma.TrafficSourceCreateOrConnectWithoutCampaignsInput

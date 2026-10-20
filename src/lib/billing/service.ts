@@ -71,12 +71,68 @@ export async function createInvoice(userId: string, plan: BillingPlan) {
   };
 }
 
+const TEST_PAYMENT_AMOUNT_ATOMIC = BigInt(100_000);
+
+export async function createBillingTestInvoice(userId: string) {
+  if (process.env.BILLING_TEST_MODE?.trim().toLowerCase() !== "true") {
+    throw new Error("Billing test mode is disabled.");
+  }
+  const walletAddress = process.env.BILLING_WALLET_ADDRESS?.trim() ?? "";
+  if (!/^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(walletAddress)) throw new Error("BILLING_WALLET_ADDRESS is missing or invalid.");
+  if (!process.env.TRONGRID_API_KEY?.trim()) throw new Error("TRONGRID_API_KEY is required for automatic payment verification.");
+
+  const payment = await prisma.$transaction(async (transaction) => {
+    await transaction.$queryRaw<unknown[]>`SELECT pg_advisory_xact_lock(hashtext('trakio:billing:tron-usdt-amount'))`;
+    const pendingTest = await transaction.billingPayment.findFirst({
+      where: { isTest: true, status: "pending", paymentAmountAtomic: TEST_PAYMENT_AMOUNT_ATOMIC },
+      orderBy: { createdAt: "desc" },
+    });
+    if (pendingTest) {
+      if (pendingTest.userId !== userId) throw new Error("A test payment is already pending. Finish it before creating another.");
+      return pendingTest;
+    }
+
+    return transaction.billingPayment.create({
+      data: {
+        userId,
+        invoiceId: `trk_test_${randomUUID()}`,
+        provider: TRON_PAYMENT_PROVIDER,
+        plan: "Payment monitor test",
+        isTest: true,
+        amountMinor: BigInt(10),
+        paymentAmountAtomic: TEST_PAYMENT_AMOUNT_ATOMIC,
+        currency: "USDT",
+        network: "TRC20",
+      },
+    });
+  });
+
+  return {
+    invoiceId: payment.invoiceId,
+    provider: payment.provider,
+    plan: payment.plan,
+    isTest: true,
+    amountMinor: payment.amountMinor.toString(),
+    paymentAmountAtomic: payment.paymentAmountAtomic?.toString() ?? null,
+    currency: payment.currency,
+    network: payment.network,
+    status: payment.status,
+    walletAddress,
+    checkoutUrl: null,
+  };
+}
+
 async function createUniquelyPricedPayment(input: { userId: string; plan: BillingPlan; provider: string; currency: string; amountMinor: bigint }) {
   const baseAtomic = toUsdtAtomicFromCents(input.amountMinor);
   for (let attempt = 0; attempt < 4; attempt += 1) {
     try {
       return await prisma.$transaction(async (transaction) => {
-        await transaction.$queryRaw<unknown[]>`SELECT pg_advisory_xact_lock(hashtext('trakio:billing:tron-usdt-amount'))`;
+        await transaction.$queryRaw<{ locked: number }[]>`
+          WITH lock AS MATERIALIZED (
+            SELECT pg_advisory_xact_lock(hashtext('trakio:billing:tron-usdt-amount'))
+          )
+          SELECT 1 AS locked FROM lock
+        `;
         const previous = await transaction.billingPayment.aggregate({
           where: { currency: input.currency, amountMinor: input.amountMinor, paymentAmountAtomic: { not: null } },
           _max: { paymentAmountAtomic: true },

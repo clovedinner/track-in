@@ -201,12 +201,23 @@ amount and are not auto-credited. Ask the user to create a new invoice or
 reconcile the older transfer carefully. Never activate an account based only
 on a browser's “payment sent” claim or an unconfirmed transaction.
 
+For a controlled monitor test, temporarily set `BILLING_TEST_MODE=true` on the
+web app and restart it. Sign in, open the subscription page, and create the
+dedicated 0.10 USDT test invoice. Send exactly 0.10 USDT over TRC20 to the
+displayed wallet, then check `pm2 logs trakio-billing --lines 100` and the
+invoice status in the app. The worker records the confirmed transfer against
+the test invoice and explicitly does not create or modify a subscription.
+After verification, set `BILLING_TEST_MODE=false` and restart the web app. Do
+not use this test invoice as a production payment method.
+
 ## Transactional email
 
 The `trakio-email` PM2 process sends verification and invoice messages from
 the database-backed email outbox through Resend. Apply migrations, set
-`RESEND_API_KEY`, and set `EMAIL_FROM` to an address on the verified sending
-domain before starting the worker. The outbox retains queued messages while
+`RESEND_API_KEY`, `EMAIL_FROM_VERIFICATION`, and `EMAIL_FROM_INVOICE` to sender
+identities on the verified sending domain before starting the worker.
+Verification defaults to `Trakio <team@trakio.org>` and invoices to
+`Trakio Billing <billing@trakio.org>`. The outbox retains queued messages while
 Resend is unavailable and retries transient failures. It retries up to eight
 times; inspect terminal failures before asking a user to retry signup or
 invoice creation.

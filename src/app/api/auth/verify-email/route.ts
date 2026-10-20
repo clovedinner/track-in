@@ -3,8 +3,9 @@ import { NextResponse } from "next/server";
 
 import { prisma } from "@/lib/database/prisma";
 
-function verificationRedirect(request: Request, path: string) {
-  return NextResponse.redirect(new URL(path, request.url), {
+function verificationRedirect(path: string) {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL?.trim() || "http://localhost:3000";
+  return NextResponse.redirect(new URL(path, appUrl), {
     headers: { "Cache-Control": "no-store", "Referrer-Policy": "no-referrer" },
   });
 }
@@ -12,7 +13,7 @@ function verificationRedirect(request: Request, path: string) {
 export async function GET(request: Request) {
   const token = new URL(request.url).searchParams.get("token") ?? "";
   if (!/^[A-Za-z0-9_-]{40,50}$/.test(token)) {
-    return verificationRedirect(request, "/auth/sign-in?verification=invalid");
+    return verificationRedirect("/auth/sign-in?verification=invalid");
   }
 
   const tokenHash = createHash("sha256").update(token).digest("hex");
@@ -22,5 +23,5 @@ export async function GET(request: Request) {
     data: { emailVerifiedAt: now, verificationTokenHash: null, verificationTokenExpiresAt: null },
   });
 
-  return verificationRedirect(request, result.count === 1 ? "/auth/sign-in?verified=1" : "/auth/sign-in?verification=invalid");
+  return verificationRedirect(result.count === 1 ? "/auth/sign-in?verified=1" : "/auth/sign-in?verification=invalid");
 }

@@ -12,7 +12,7 @@ export default function SubscribeRoute() {
   return (
     <main className="min-h-screen bg-[#F0F0F0] text-[#121212]">
       <AdminNavigation pathname="/admin/subscribe" />
-      <SubscribePage />
+      <SubscribePage showTestPayment={process.env.BILLING_TEST_MODE?.trim().toLowerCase() === "true"} />
     </main>
   );
 }

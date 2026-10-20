@@ -78,7 +78,12 @@ async function scanConfirmedTransfers() {
       if (!transfer) continue;
       const eventId = createTronEventId(transfer);
       const ingested = await prisma.$transaction(async (transaction) => {
-        await transaction.$queryRaw<unknown[]>`SELECT pg_advisory_xact_lock(hashtext('trakio:billing:tron-usdt-amount'))`;
+        await transaction.$queryRaw<{ locked: number }[]>`
+          WITH lock AS MATERIALIZED (
+            SELECT pg_advisory_xact_lock(hashtext('trakio:billing:tron-usdt-amount'))
+          )
+          SELECT 1 AS locked FROM lock
+        `;
         const insertResult = await transaction.billingChainTransfer.createMany({
           data: {
             id: eventId,
@@ -101,15 +106,34 @@ async function scanConfirmedTransfers() {
       }
       const payment = ingested.payment;
       if (payment.provider !== TRON_PAYMENT_PROVIDER || payment.currency !== "USDT" || payment.network !== "TRC20") continue;
+      if (ingested.transferRecord.paymentId) continue;
       if (ingested.transferRecord.blockTimestamp.getTime() < payment.createdAt.getTime()) {
         if (ingested.isNew) console.warn(`[billing] pre-invoice USDT transfer left unmatched: tx=${transfer.transaction_id.slice(0, 12)} invoice=${payment.invoiceId}`);
         continue;
       }
-      if (ingested.transferRecord.paymentId === payment.id) continue;
       if (payment.status !== "pending") {
         if (payment.status === "confirmed" && payment.transactionHash === transfer.transaction_id) {
           await prisma.billingChainTransfer.update({ where: { id: eventId }, data: { paymentId: payment.id } });
         }
+        continue;
+      }
+      if (payment.isTest) {
+        await prisma.$transaction(async (transaction) => {
+          await transaction.billingPayment.update({
+            where: { id: payment.id },
+            data: {
+              status: "confirmed",
+              paymentAmountAtomic: null,
+              providerTransactionId: transfer.transaction_id,
+              transactionHash: transfer.transaction_id,
+              receivedAt: new Date(transfer.block_timestamp),
+              confirmedAt: new Date(),
+            },
+          });
+          await transaction.billingChainTransfer.update({ where: { id: eventId }, data: { paymentId: payment.id } });
+        });
+        matched += 1;
+        console.info(`[billing] test transfer confirmed; no subscription activated invoice=${payment.invoiceId} tx=${transfer.transaction_id.slice(0, 12)}`);
         continue;
       }
       if (!isBillingPlan(payment.plan)) {

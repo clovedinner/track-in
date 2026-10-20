@@ -51,7 +51,6 @@ function decryptVerificationPayload(value: unknown): unknown {
 async function main() {
   if (!process.env.RESEND_API_KEY?.trim()) throw new Error("RESEND_API_KEY is required to run the email worker.");
   const { prisma } = await import("@/lib/database/prisma");
-  const from = process.env.EMAIL_FROM?.trim() || "Trakio <billing@trakio.org>";
   const stop = () => { stopping = true; };
   process.on("SIGINT", stop);
   process.on("SIGTERM", stop);
@@ -107,6 +106,10 @@ async function main() {
           await prisma.emailOutbox.update({ where: { id: job.id }, data: { status: "suppressed", payload: {}, lastError: "Verification email expired before delivery." } });
           continue;
         }
+
+        const from = job.kind === "welcome_verification"
+          ? process.env.EMAIL_FROM_VERIFICATION?.trim() || "Trakio <team@trakio.org>"
+          : process.env.EMAIL_FROM_INVOICE?.trim() || "Trakio Billing <billing@trakio.org>";
 
         let httpStatus: number | null = null;
         let failure: string | null = null;

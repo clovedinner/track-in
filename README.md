@@ -82,8 +82,10 @@ Use `npm run db:migrate:create` only on a non-production Neon branch when a sche
 - `BILLING_WALLET_ADDRESS`: the public TRON address that receives USDT TRC20 payments. Trakio never needs its private key.
 - `TRONGRID_API_KEY`: server-only key for reading confirmed TRON transfers. TronGrid provides a free tier; quotas and rate limits can change.
 - `BILLING_POLL_INTERVAL_MS`: optional polling interval for the payment monitor, default 15000 ms.
+- `BILLING_TEST_MODE`: set to `true` temporarily to show a 0.10 USDT monitor-test invoice. Confirming it records the transfer only and never activates a subscription; turn it back off after testing.
 - `RESEND_API_KEY`: server-only Resend key used by the transactional email worker; required in production.
-- `EMAIL_FROM`: verified sender identity, default `Trakio <billing@trakio.org>`.
+- `EMAIL_FROM_VERIFICATION`: verified sender identity for signup confirmation, default `Trakio <team@trakio.org>`.
+- `EMAIL_FROM_INVOICE`: verified sender identity for invoice messages, default `Trakio Billing <billing@trakio.org>`.
 - `EMAIL_POLL_INTERVAL_MS`: optional email outbox polling interval, default 5000 ms.
 
 Never commit `.env.local` or credentials. Do not route tracking traffic to this application until Phase 4 production-readiness checks are complete.
@@ -94,7 +96,7 @@ The billing monitor polls TronGrid for confirmed incoming transfers of the offic
 
 After applying migrations and deploying the app, configure `BILLING_PROVIDER=tron`, `BILLING_WALLET_ADDRESS`, and `TRONGRID_API_KEY` in the production environment. Run exactly one `npm run worker:billing` process alongside `npm run worker:outbox`. The worker needs outbound HTTPS access to `api.trongrid.io`; it never signs transactions or needs wallet secrets. The invoice view polls its status and displays the confirmed transaction hash when the transfer is attributed. Keep a manual reconciliation path for underpayments, overpayments, or transfers sent on the wrong network/token.
 
-New signups must confirm their email before they can sign in. The app queues the welcome confirmation email in the same transaction as account creation. Invoice emails are queued in the transaction that creates the invoice. Deploy the email migration, set `RESEND_API_KEY` and `EMAIL_FROM`, then run `npm run worker:email` as a persistent service. Verify `trakio.org` in Resend and publish its SPF/DKIM records before sending production mail. Existing accounts are marked verified by the migration.
+New signups must confirm their email before they can sign in. The app queues the welcome confirmation email in the same transaction as account creation. Invoice emails are queued in the transaction that creates the invoice. Deploy the email migration, set `RESEND_API_KEY`, `EMAIL_FROM_VERIFICATION`, and `EMAIL_FROM_INVOICE`, then run `npm run worker:email` as a persistent service. Verify `trakio.org` in Resend and publish its SPF/DKIM records before sending production mail. Existing accounts are marked verified by the migration.
 
 Operational recovery procedures, including a disposable Neon restore rehearsal,
 are documented in [OPERATIONS_RUNBOOK.md](OPERATIONS_RUNBOOK.md).

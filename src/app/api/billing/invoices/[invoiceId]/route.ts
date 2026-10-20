@@ -13,11 +13,12 @@ export async function GET(_request: Request, context: { params: Promise<{ invoic
   const { invoiceId } = await context.params;
   const payment = await prisma.billingPayment.findFirst({
     where: { invoiceId, userId: user.id },
-    select: { invoiceId: true, status: true, transactionHash: true, confirmedAt: true, paymentAmountAtomic: true },
+    select: { invoiceId: true, status: true, transactionHash: true, confirmedAt: true, paymentAmountAtomic: true, isTest: true },
   });
   if (!payment) return NextResponse.json({ error: "Invoice not found." }, { status: 404 });
   return NextResponse.json({
     invoiceId: payment.invoiceId,
+    isTest: payment.isTest,
     status: payment.status,
     transactionHash: payment.transactionHash,
     confirmedAt: payment.confirmedAt?.toISOString() ?? null,

@@ -1633,6 +1633,7 @@ export const BillingPaymentScalarFieldEnum = {
   invoiceId: 'invoiceId',
   provider: 'provider',
   plan: 'plan',
+  isTest: 'isTest',
   amountMinor: 'amountMinor',
   paymentAmountAtomic: 'paymentAmountAtomic',
   currency: 'currency',
@@ -1956,6 +1957,13 @@ export type ListEnumSubscriptionStatusFieldRefInput<$PrismaModel> = FieldRefInpu
 
 
 /**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
  * Reference to a field of type 'BigInt'
  */
 export type BigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt'>
@@ -1980,13 +1988,6 @@ export type EnumBillingPaymentStatusFieldRefInput<$PrismaModel> = FieldRefInputT
  * Reference to a field of type 'BillingPaymentStatus[]'
  */
 export type ListEnumBillingPaymentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BillingPaymentStatus[]'>
-    
-
-
-/**
- * Reference to a field of type 'Boolean'
- */
-export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 

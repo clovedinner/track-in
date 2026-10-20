@@ -18,6 +18,8 @@ export function formatDateInTimezone(value: Date | string, timezone: string, inc
 export function parseDateInTimezone(value: string | undefined, timezone: string, endOfDay = false): Date | undefined {
   if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value) || !isValidTimezone(timezone)) return undefined;
   const [year, month, day] = value.split("-").map(Number);
+  const calendarDate = new Date(Date.UTC(year, month - 1, day));
+  if (calendarDate.getUTCFullYear() !== year || calendarDate.getUTCMonth() !== month - 1 || calendarDate.getUTCDate() !== day) return undefined;
   const candidate = Date.UTC(year, month - 1, day + (endOfDay ? 1 : 0));
   const parts = new Intl.DateTimeFormat("en-US", { timeZone: timezone, hour12: false, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit" }).formatToParts(new Date(candidate));
   const values = Object.fromEntries(parts.filter((part) => part.type !== "literal").map((part) => [part.type, Number(part.value)]));

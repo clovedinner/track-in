@@ -133,6 +133,7 @@ model BillingPayment {
   invoiceId             String                @unique @map("invoice_id")
   provider              String
   plan                  String
+  isTest                Boolean               @default(false) @map("is_test")
   amountMinor           BigInt                @map("amount_minor")
   paymentAmountAtomic   BigInt?               @unique @map("payment_amount_atomic")
   currency              String                @db.VarChar(10)
