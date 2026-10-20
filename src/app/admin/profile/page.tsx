@@ -69,8 +69,8 @@ export default async function ProfilePage() {
                 <div><dt className="text-xs font-bold uppercase tracking-[0.12em]">Next invoice</dt><dd className="mt-1 font-semibold">{nextInvoice}</dd></div>
               </dl>
               <p className="mt-5 text-sm leading-6">Payments are verified through the configured billing provider before access is activated.</p>
-              <Link href="/admin/subscribe" className="mt-5 inline-flex min-h-11 items-center border-2 border-[#121212] bg-[#1040C0] px-5 py-3 text-sm font-bold text-[#FFFFFF] shadow-[4px_4px_0_#121212] transition hover:bg-[#D02020] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#121212]">
-                Subscribe
+              <Link href="/admin/subscribe" className="mt-5 inline-flex min-h-11 items-center border-2 border-[#121212] bg-[#FFFFFF] px-3 py-2 text-xs font-bold text-[#121212] transition hover:bg-[#F0C020] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#121212]">
+                Change Plan
               </Link>
             </div>
           </section>
