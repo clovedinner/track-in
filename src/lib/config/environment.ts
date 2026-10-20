@@ -10,6 +10,8 @@ export type RuntimeEnvironment = {
   billingProvider: string | undefined;
   billingWalletAddress: string | undefined;
   tronGridApiKey: string | undefined;
+  nowPaymentsApiKey: string | undefined;
+  nowPaymentsIpnSecret: string | undefined;
   resendApiKey: string | undefined;
   nodeEnv: "development" | "production" | "test";
 };
@@ -39,6 +41,8 @@ export function getRuntimeEnvironment(): RuntimeEnvironment {
     billingProvider: readTrimmedVariable("BILLING_PROVIDER") ?? "tron",
     billingWalletAddress: readTrimmedVariable("BILLING_WALLET_ADDRESS"),
     tronGridApiKey: readTrimmedVariable("TRONGRID_API_KEY"),
+    nowPaymentsApiKey: readTrimmedVariable("NOWPAYMENTS_API_KEY"),
+    nowPaymentsIpnSecret: readTrimmedVariable("NOWPAYMENTS_IPN_SECRET"),
     resendApiKey: readTrimmedVariable("RESEND_API_KEY"),
     nodeEnv,
   };
@@ -64,8 +68,6 @@ export function validateRuntimeEnvironment(
     ["AUTH_SESSION_SECRET", environment.authSessionSecret],
     ["DATABASE_URL", environment.databaseUrl],
     ["DIRECT_URL", environment.directDatabaseUrl],
-    ["BILLING_WALLET_ADDRESS", environment.billingWalletAddress],
-    ["TRONGRID_API_KEY", environment.tronGridApiKey],
     ["RESEND_API_KEY", environment.resendApiKey],
   ] as const;
   const missingVariables = requiredVariables
@@ -76,11 +78,17 @@ export function validateRuntimeEnvironment(
     throw new EnvironmentValidationError(missingVariables);
   }
 
-  if (environment.billingProvider !== "tron") {
-    throw new EnvironmentValidationError(["BILLING_PROVIDER (must be tron)"]);
-  }
-  if (!environment.billingWalletAddress || !/^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(environment.billingWalletAddress)) {
-    throw new EnvironmentValidationError(["BILLING_WALLET_ADDRESS (must be a valid TRON address)"]);
+  if (environment.billingProvider === "tron") {
+    if (!environment.billingWalletAddress) throw new EnvironmentValidationError(["BILLING_WALLET_ADDRESS"]);
+    if (!environment.tronGridApiKey) throw new EnvironmentValidationError(["TRONGRID_API_KEY"]);
+    if (!/^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(environment.billingWalletAddress)) {
+      throw new EnvironmentValidationError(["BILLING_WALLET_ADDRESS (must be a valid TRON address)"]);
+    }
+  } else if (environment.billingProvider === "nowpayments") {
+    if (!environment.nowPaymentsApiKey) throw new EnvironmentValidationError(["NOWPAYMENTS_API_KEY"]);
+    if (!environment.nowPaymentsIpnSecret) throw new EnvironmentValidationError(["NOWPAYMENTS_IPN_SECRET"]);
+  } else {
+    throw new EnvironmentValidationError(["BILLING_PROVIDER (must be tron or nowpayments)"]);
   }
 
   if (!environment.appUrl?.startsWith("https://")) {

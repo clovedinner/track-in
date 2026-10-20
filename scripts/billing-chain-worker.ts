@@ -27,22 +27,21 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 async function scanConfirmedTransfers() {
-  const [{ prisma }, { processBillingWebhook, hashBillingPayload, getBillingProvider, isBillingPlan }, { createTronEventId, readIncomingUsdtTransfer, TRON_USDT_CONTRACT, TRON_PAYMENT_PROVIDER }] = await Promise.all([
+  const [{ prisma }, { processBillingWebhook, hashBillingPayload, isBillingPlan }, { createTronEventId, readIncomingUsdtTransfer, TRON_USDT_CONTRACT, TRON_PAYMENT_PROVIDER }] = await Promise.all([
     import("@/lib/database/prisma"),
     import("@/lib/billing/service"),
     import("@/lib/billing/tron"),
   ]);
-  const walletAddress = process.env.BILLING_WALLET_ADDRESS?.trim() ?? "";
-  const apiKey = process.env.TRONGRID_API_KEY?.trim() ?? "";
-  if (!/^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(walletAddress)) throw new Error("BILLING_WALLET_ADDRESS is missing or invalid.");
-  if (!apiKey) throw new Error("TRONGRID_API_KEY is required.");
-  if (getBillingProvider() !== TRON_PAYMENT_PROVIDER) throw new Error("BILLING_PROVIDER must be tron.");
-
   const oldestInvoice = await prisma.billingPayment.findFirst({
     where: { provider: TRON_PAYMENT_PROVIDER, status: "pending", paymentAmountAtomic: { not: null } },
     orderBy: { createdAt: "asc" },
     select: { createdAt: true },
   });
+  if (!oldestInvoice) return;
+  const walletAddress = process.env.BILLING_WALLET_ADDRESS?.trim() ?? "";
+  const apiKey = process.env.TRONGRID_API_KEY?.trim() ?? "";
+  if (!/^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(walletAddress)) throw new Error("BILLING_WALLET_ADDRESS is missing or invalid for pending TRON invoices.");
+  if (!apiKey) throw new Error("TRONGRID_API_KEY is required for pending TRON invoices.");
   const checkpoint = await prisma.billingChainCheckpoint.upsert({
     where: { id: checkpointId },
     update: {},

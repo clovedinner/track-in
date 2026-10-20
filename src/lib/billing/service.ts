@@ -4,6 +4,7 @@ import { prisma } from "@/lib/database/prisma";
 import { MAX_INVOICE_REFERENCE_ATOMIC, TRON_PAYMENT_PROVIDER, toUsdtAtomicFromCents } from "@/lib/billing/tron";
 import { canUseBillingTestMode } from "@/lib/billing/test-access";
 import { queueInvoiceEmail } from "@/lib/email/outbox";
+import { NOWPAYMENTS_PAY_CURRENCY, NOWPAYMENTS_PROVIDER, isNowPaymentsInvoiceUrl, parseUsdCents } from "@/lib/billing/nowpayments";
 
 export const BILLING_PLANS = {
   Starter: { amountMinor: 30_000, currency: "USDT" },
@@ -46,10 +47,11 @@ export function buildCheckoutUrl(invoiceId: string): string | null {
 
 export async function createInvoice(userId: string, plan: BillingPlan) {
   const details = BILLING_PLANS[plan];
+  const provider = getBillingProvider();
+  if (provider === NOWPAYMENTS_PROVIDER) return createNowPaymentsInvoice(userId, plan, details.amountMinor);
+  if (provider !== TRON_PAYMENT_PROVIDER) throw new Error("BILLING_PROVIDER must be tron or nowpayments.");
   const walletAddress = process.env.BILLING_WALLET_ADDRESS?.trim() ?? "";
   if (!/^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(walletAddress)) throw new Error("BILLING_WALLET_ADDRESS is missing or invalid.");
-  const provider = getBillingProvider();
-  if (provider !== TRON_PAYMENT_PROVIDER) throw new Error("BILLING_PROVIDER must be tron for automatic USDT verification.");
   if (!process.env.TRONGRID_API_KEY?.trim()) throw new Error("TRONGRID_API_KEY is required for automatic payment verification.");
   const amountMinor = BigInt(details.amountMinor);
   const existing = await prisma.billingPayment.findFirst({
@@ -72,9 +74,102 @@ export async function createInvoice(userId: string, plan: BillingPlan) {
   };
 }
 
+async function createNowPaymentsInvoice(userId: string, plan: BillingPlan, amountMinor: number) {
+  const apiKey = process.env.NOWPAYMENTS_API_KEY?.trim();
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL?.trim();
+  if (!apiKey) throw new Error("NOWPAYMENTS_API_KEY is required to create hosted invoices.");
+  if (!appUrl) throw new Error("NEXT_PUBLIC_APP_URL is required to create hosted invoices.");
+  const origin = new URL(appUrl);
+  if (process.env.NODE_ENV === "production" && origin.protocol !== "https:") throw new Error("NEXT_PUBLIC_APP_URL must use HTTPS in production.");
+
+  const existing = await prisma.billingPayment.findFirst({
+    where: { userId, plan, provider: NOWPAYMENTS_PROVIDER, status: "pending", currency: "USD" },
+    orderBy: { createdAt: "desc" },
+  });
+  let payment = existing;
+  if (!payment) {
+    payment = await prisma.billingPayment.create({
+      data: {
+        userId,
+        invoiceId: `trk_inv_${randomUUID()}`,
+        provider: NOWPAYMENTS_PROVIDER,
+        plan,
+        amountMinor: BigInt(amountMinor),
+        currency: "USD",
+        network: "TRC20",
+      },
+    });
+  }
+
+  if (!payment.checkoutUrl || !payment.providerInvoiceId) {
+    const callbackUrl = new URL("/api/billing/nowpayments", origin).toString();
+    const successUrl = new URL("/admin/profile", origin).toString();
+    const cancelUrl = new URL("/admin/subscribe?payment=cancelled", origin).toString();
+    let response: Response;
+    try {
+      response = await fetch("https://api.nowpayments.io/v1/invoice", {
+        method: "POST",
+        headers: { "content-type": "application/json", "x-api-key": apiKey },
+        body: JSON.stringify({
+          price_amount: amountMinor / 100,
+          price_currency: "usd",
+          pay_currency: NOWPAYMENTS_PAY_CURRENCY,
+          ipn_callback_url: callbackUrl,
+          order_id: payment.invoiceId,
+          order_description: `Trakio ${plan} subscription`,
+          success_url: successUrl,
+          cancel_url: cancelUrl,
+        }),
+        signal: AbortSignal.timeout(12_000),
+      });
+    } catch {
+      await prisma.billingPayment.update({ where: { id: payment.id }, data: { status: "failed", failureReason: "NOWPayments invoice request failed" } });
+      throw new Error("Unable to reach NOWPayments. Please try again.");
+    }
+    const responseBody: unknown = await response.json().catch(() => null);
+    if (!response.ok || !isRecord(responseBody) || !isNowPaymentsInvoiceUrl(responseBody.invoice_url) || (typeof responseBody.id !== "string" && typeof responseBody.id !== "number")) {
+      await prisma.billingPayment.update({ where: { id: payment.id }, data: { status: "failed", failureReason: "NOWPayments rejected invoice request" } });
+      throw new Error("NOWPayments could not create this invoice. Check your merchant account and try again.");
+    }
+    const providerInvoiceId = String(responseBody.id);
+    const checkoutUrl = responseBody.invoice_url;
+    payment = await prisma.$transaction(async (transaction) => {
+      const updated = await transaction.billingPayment.update({ where: { id: payment!.id }, data: { providerInvoiceId, checkoutUrl } });
+      await queueInvoiceEmail(transaction, {
+        userId,
+        invoiceId: updated.invoiceId,
+        plan,
+        currency: "USD",
+        amountMinor: updated.amountMinor,
+        network: "USDT on TRC20",
+        checkoutUrl,
+      });
+      return updated;
+    });
+  }
+
+  return {
+    invoiceId: payment.invoiceId,
+    provider: payment.provider,
+    plan,
+    amountMinor: payment.amountMinor.toString(),
+    paymentAmountAtomic: null,
+    currency: payment.currency,
+    network: payment.network,
+    status: payment.status,
+    walletAddress: "",
+    checkoutUrl: payment.checkoutUrl,
+  };
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
 const TEST_PAYMENT_AMOUNT_ATOMIC = BigInt(100_000);
 
 export async function createBillingTestInvoice(userId: string) {
+  if (getBillingProvider() !== TRON_PAYMENT_PROVIDER) throw new Error("Payment monitor tests require the legacy TRON payment provider.");
   if (!canUseBillingTestMode(userId)) {
     throw new Error("Payment monitor tests are unavailable for this account.");
   }
@@ -178,6 +273,7 @@ async function createUniquelyPricedPayment(input: { userId: string; plan: Billin
             invoiceId: payment.invoiceId,
             plan: input.plan,
             currency: input.currency,
+            amountMinor: payment.amountMinor,
             paymentAmountAtomic: candidate,
             network: payment.network ?? "TRC20",
             walletAddress: process.env.BILLING_WALLET_ADDRESS?.trim() ?? "",
@@ -214,6 +310,48 @@ type WebhookInput = {
   failureReason?: string;
 };
 
+export async function processNowPaymentsWebhook(value: unknown, payloadHash: string) {
+  if (!isRecord(value)) throw new BillingWebhookError("invalid_payload", 400);
+  const invoiceId = typeof value.order_id === "string" ? value.order_id.trim() : "";
+  const providerInvoiceId = String(value.invoice_id ?? "").trim();
+  const paymentId = typeof value.payment_id === "string" || typeof value.payment_id === "number" ? String(value.payment_id).trim() : "";
+  const paymentStatus = typeof value.payment_status === "string" ? value.payment_status.trim().toLowerCase() : "";
+  const priceCurrency = typeof value.price_currency === "string" ? value.price_currency.trim().toUpperCase() : "";
+  const payCurrency = typeof value.pay_currency === "string" ? value.pay_currency.trim().toLowerCase() : "";
+  const amountMinor = parseUsdCents(value.price_amount);
+  if (!invoiceId || invoiceId.length > 128 || !providerInvoiceId || providerInvoiceId.length > 128 || !paymentId || paymentId.length > 100 || !paymentStatus || !amountMinor) {
+    throw new BillingWebhookError("invalid_payload", 400);
+  }
+  const payment = await prisma.billingPayment.findUnique({ where: { invoiceId } });
+  if (!payment || payment.provider !== NOWPAYMENTS_PROVIDER) throw new BillingWebhookError("invoice_not_found", 404);
+  if (payment.providerInvoiceId !== providerInvoiceId) throw new BillingWebhookError("invoice_mismatch", 422);
+  if (priceCurrency !== "USD" || payment.currency !== "USD" || amountMinor !== Number(payment.amountMinor)) throw new BillingWebhookError("amount_mismatch", 422);
+  if (payCurrency !== NOWPAYMENTS_PAY_CURRENCY) throw new BillingWebhookError("currency_mismatch", 422);
+
+  const statusByProvider: Record<string, WebhookInput["status"] | undefined> = {
+    finished: "confirmed",
+    failed: "failed",
+    expired: "expired",
+    refunded: "refunded",
+  };
+  const status = statusByProvider[paymentStatus];
+  if (!status) return { status: "pending" as const };
+
+  const transactionHash = typeof value.payin_hash === "string" ? value.payin_hash.trim().slice(0, 256) : undefined;
+  return processBillingWebhook(NOWPAYMENTS_PROVIDER, {
+    eventId: `${paymentId}:${paymentStatus}`,
+    eventType: `nowpayments.${paymentStatus}`,
+    invoiceId,
+    status,
+    plan: isBillingPlan(payment.plan) ? payment.plan : undefined,
+    externalId: providerInvoiceId,
+    providerTransactionId: paymentId,
+    transactionHash,
+    amountMinor,
+    currency: "USD",
+  }, payloadHash);
+}
+
 function parseDate(value: string | null | undefined, fallback: Date | null): Date | null {
   if (value === null) return null;
   if (value === undefined) return fallback;
@@ -230,6 +368,7 @@ export async function processBillingWebhook(provider: string, input: WebhookInpu
     if (!payment || payment.provider !== provider) throw new BillingWebhookError("invoice_not_found", 404);
     if (input.amountMinor !== undefined && input.amountMinor !== Number(payment.amountMinor)) throw new BillingWebhookError("amount_mismatch", 422);
     if (input.currency !== undefined && input.currency.toUpperCase() !== payment.currency) throw new BillingWebhookError("currency_mismatch", 422);
+    if (payment.status === "confirmed") return { status: "duplicate" as const, eventId: input.eventId };
 
     const event = await transaction.billingEvent.create({ data: { userId: payment.userId, provider, eventId: input.eventId, eventType: input.eventType, payloadHash } });
     const now = new Date();
@@ -255,13 +394,6 @@ export async function processBillingWebhook(provider: string, input: WebhookInpu
       return { status: "accepted" as const, eventId: event.eventId, accountStatus: "active" as const };
     }
 
-    if (input.status === "canceled" || input.status === "expired") {
-      const subscription = await transaction.subscription.findFirst({ where: { userId: payment.userId, provider }, orderBy: { createdAt: "desc" } });
-      if (subscription) {
-        await transaction.subscription.update({ where: { id: subscription.id }, data: { status: input.status === "canceled" ? "canceled" : "expired", canceledAt: now } });
-      }
-      await transaction.user.update({ where: { id: payment.userId }, data: { accountStatus: input.status === "canceled" ? "canceled" : "suspended" } });
-    }
     const paymentStatus = input.status === "refunded" ? "refunded" : "failed";
     await transaction.billingPayment.update({ where: { id: payment.id }, data: { status: paymentStatus, failureReason: input.failureReason ?? input.status, providerTransactionId: input.providerTransactionId, transactionHash: input.transactionHash } });
     await transaction.billingEvent.update({ where: { id: event.id }, data: { status: "processed", processedAt: now } });

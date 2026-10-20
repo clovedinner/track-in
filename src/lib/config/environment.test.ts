@@ -18,6 +18,8 @@ const productionEnvironment: RuntimeEnvironment = {
   billingProvider: "tron",
   billingWalletAddress: "TDmAYs4GfJLo3WHwbduMCRRK22XKsfw3uR",
   tronGridApiKey: "test-trongrid-key",
+  nowPaymentsApiKey: undefined,
+  nowPaymentsIpnSecret: undefined,
   resendApiKey: "re_test-resend-key",
   nodeEnv: "production",
 };
@@ -81,5 +83,18 @@ describe("validateRuntimeEnvironment", () => {
   it("requires a configured TRON wallet and TronGrid key for production billing", () => {
     expect(() => validateRuntimeEnvironment({ ...productionEnvironment, tronGridApiKey: undefined })).toThrow(/TRONGRID_API_KEY/);
     expect(() => validateRuntimeEnvironment({ ...productionEnvironment, billingWalletAddress: "invalid" })).toThrow(/valid TRON address/);
+  });
+
+  it("requires NOWPayments credentials when hosted checkout is selected", () => {
+    const nowPaymentsEnvironment = {
+      ...productionEnvironment,
+      billingProvider: "nowpayments",
+      billingWalletAddress: undefined,
+      tronGridApiKey: undefined,
+      nowPaymentsApiKey: "test-nowpayments-key",
+      nowPaymentsIpnSecret: "test-nowpayments-ipn-secret",
+    } satisfies RuntimeEnvironment;
+    expect(validateRuntimeEnvironment(nowPaymentsEnvironment)).toEqual(nowPaymentsEnvironment);
+    expect(() => validateRuntimeEnvironment({ ...nowPaymentsEnvironment, nowPaymentsIpnSecret: undefined })).toThrow(/NOWPAYMENTS_IPN_SECRET/);
   });
 });

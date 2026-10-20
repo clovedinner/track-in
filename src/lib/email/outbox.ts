@@ -86,22 +86,28 @@ export async function queueInvoiceEmail(
     invoiceId: string;
     plan: string;
     currency: string;
-    paymentAmountAtomic: bigint;
+    amountMinor: bigint;
+    paymentAmountAtomic?: bigint;
     network: string;
-    walletAddress: string;
+    walletAddress?: string;
+    checkoutUrl?: string;
   },
 ) {
   const user = await transaction.user.findUnique({ where: { id: input.userId }, select: { email: true } });
   if (!user) throw new Error("Invoice owner was not found.");
 
   const atomicScale = BigInt(1_000_000);
-  const amount = `${input.paymentAmountAtomic / atomicScale}.${(input.paymentAmountAtomic % atomicScale).toString().padStart(6, "0")} ${input.currency}`;
+  const amount = input.paymentAmountAtomic === undefined
+    ? `${input.amountMinor / BigInt(100)}.${(input.amountMinor % BigInt(100)).toString().padStart(2, "0")} ${input.currency}`
+    : `${input.paymentAmountAtomic / atomicScale}.${(input.paymentAmountAtomic % atomicScale).toString().padStart(6, "0")} ${input.currency}`;
+  const displayAmount = amount;
   const safe = {
     plan: escapeHtml(input.plan),
-    amount: escapeHtml(amount),
+    amount: escapeHtml(displayAmount),
     invoiceId: escapeHtml(input.invoiceId),
     network: escapeHtml(input.network),
-    walletAddress: escapeHtml(input.walletAddress),
+    walletAddress: escapeHtml(input.walletAddress ?? ""),
+    checkoutUrl: escapeHtml(input.checkoutUrl ?? ""),
   };
   await queueEmail(transaction, {
     kind: "invoice_created",
@@ -109,8 +115,10 @@ export async function queueInvoiceEmail(
     idempotencyKey: `invoice:${input.invoiceId}`,
     message: {
       subject: `Your Trakio ${input.plan} invoice`,
-      text: `Invoice ${input.invoiceId}\nPlan: ${input.plan}\nAmount: ${amount}\nNetwork: ${input.network}\nWallet: ${input.walletAddress}\n\nSend the exact amount on the listed network. Your subscription activates after payment is confirmed.`,
-      html: `<div style="font-family:Arial,sans-serif;color:#121212;max-width:560px;margin:32px auto;padding:24px;border:2px solid #121212"><p style="color:#D02020;font-weight:bold">TRAKIO</p><h1>Your invoice is ready.</h1><p>Invoice <strong>${safe.invoiceId}</strong></p><p>Plan: <strong>${safe.plan}</strong></p><p style="font-size:24px;font-weight:bold">${safe.amount}</p><p>Network: ${safe.network}</p><p>Wallet: <code style="word-break:break-all">${safe.walletAddress}</code></p><p>Send the exact amount on the listed network. Your subscription activates after payment is confirmed.</p></div>`,
+      text: input.checkoutUrl
+        ? `Invoice ${input.invoiceId}\nPlan: ${input.plan}\nAmount: ${displayAmount}\nNetwork: ${input.network}\nPay securely: ${input.checkoutUrl}\n\nYour subscription activates after payment is confirmed.`
+        : `Invoice ${input.invoiceId}\nPlan: ${input.plan}\nAmount: ${displayAmount}\nNetwork: ${input.network}\nWallet: ${input.walletAddress ?? ""}\n\nSend the exact amount on the listed network. Your subscription activates after payment is confirmed.`,
+      html: `<div style="font-family:Arial,sans-serif;color:#121212;max-width:560px;margin:32px auto;padding:24px;border:2px solid #121212"><p style="color:#D02020;font-weight:bold">TRAKIO</p><h1>Your invoice is ready.</h1><p>Invoice <strong>${safe.invoiceId}</strong></p><p>Plan: <strong>${safe.plan}</strong></p><p style="font-size:24px;font-weight:bold">${safe.amount}</p><p>Network: ${safe.network}</p>${input.checkoutUrl ? `<p style="margin:28px 0"><a href="${safe.checkoutUrl}" style="display:inline-block;background:#1040C0;color:#fff;padding:14px 20px;text-decoration:none;font-weight:bold">Pay invoice</a></p>` : `<p>Wallet: <code style="word-break:break-all">${safe.walletAddress}</code></p><p>Send the exact amount on the listed network.</p>`}<p>Your subscription activates after payment is confirmed.</p></div>`,
     },
   });
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import AdminNavigation from "@/app/admin/admin-navigation";
 import { requireCurrentUser } from "@/lib/auth/current-user";
+import { getBillingProvider } from "@/lib/billing/service";
 import { canUseBillingTestMode } from "@/lib/billing/test-access";
 import SubscribePage from "./subscribe-page";
 
@@ -15,7 +16,7 @@ export default async function SubscribeRoute() {
   return (
     <main className="min-h-screen bg-[#F0F0F0] text-[#121212]">
       <AdminNavigation pathname="/admin/subscribe" />
-      <SubscribePage showTestPayment={canUseBillingTestMode(user.id)} />
+      <SubscribePage showTestPayment={getBillingProvider() === "tron" && canUseBillingTestMode(user.id)} paymentProvider={getBillingProvider()} />
     </main>
   );
 }

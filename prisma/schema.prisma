@@ -132,6 +132,8 @@ model BillingPayment {
   subscriptionId        String?               @map("subscription_id") @db.Uuid
   invoiceId             String                @unique @map("invoice_id")
   provider              String
+  providerInvoiceId     String?               @map("provider_invoice_id")
+  checkoutUrl           String?               @map("checkout_url")
   plan                  String
   isTest                Boolean               @default(false) @map("is_test")
   amountMinor           BigInt                @map("amount_minor")
