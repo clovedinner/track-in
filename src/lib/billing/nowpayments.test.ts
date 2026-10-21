@@ -11,7 +11,7 @@ describe("NOWPayments helpers", () => {
       cancelUrl: "https://trakio.org/admin/subscribe?payment=cancelled",
       invoiceId: "trk_inv_test",
       plan: "Operator",
-      successUrl: "https://trakio.org/admin/profile",
+      successUrl: "https://trakio.org/payment-done?invoice_id=trk_inv_test",
     })).toEqual({
       price_amount: 500,
       price_currency: "usd",
@@ -19,7 +19,7 @@ describe("NOWPayments helpers", () => {
       ipn_callback_url: "https://trakio.org/api/billing/nowpayments",
       order_id: "trk_inv_test",
       order_description: "Trakio Operator subscription",
-      success_url: "https://trakio.org/admin/profile",
+      success_url: "https://trakio.org/payment-done?invoice_id=trk_inv_test",
       cancel_url: "https://trakio.org/admin/subscribe?payment=cancelled",
       is_fee_paid_by_user: true,
     });

@@ -104,7 +104,8 @@ async function createNowPaymentsInvoice(userId: string, plan: BillingPlan, amoun
 
   if (!payment.checkoutUrl || !payment.providerInvoiceId) {
     const callbackUrl = new URL("/api/billing/nowpayments", origin).toString();
-    const successUrl = new URL("/admin/profile", origin).toString();
+    const successUrl = new URL("/payment-done", origin);
+    successUrl.searchParams.set("invoice_id", payment.invoiceId);
     const cancelUrl = new URL("/admin/subscribe?payment=cancelled", origin).toString();
     let response: Response;
     try {
@@ -116,7 +117,7 @@ async function createNowPaymentsInvoice(userId: string, plan: BillingPlan, amoun
           callbackUrl,
           invoiceId: payment.invoiceId,
           plan,
-          successUrl,
+          successUrl: successUrl.toString(),
           cancelUrl,
         })),
         signal: AbortSignal.timeout(12_000),

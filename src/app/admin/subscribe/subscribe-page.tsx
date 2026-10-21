@@ -249,7 +249,7 @@ export default function SubscribePage({ showTestPayment = false, paymentProvider
                       <>
                         <p className="mt-5 text-sm font-bold">Continue to NOWPayments to pay in USDT.</p>
                         <p className="mt-1 text-xs leading-5">The checkout shows the current USDT total, including applicable NOWPayments fees. Your wallet may list its own network fee separately. Trakio activates your subscription after payment is confirmed.</p>
-                        <a href={invoice.checkoutUrl} target="_blank" rel="noreferrer" className="mt-4 inline-flex min-h-11 items-center justify-center border-2 border-[#121212] bg-[#D02020] px-5 py-3 text-sm font-bold text-[#FFFFFF] shadow-[4px_4px_0_#121212] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D02020]">Continue to secure payment</a>
+                        <a href={invoice.checkoutUrl} className="mt-4 inline-flex min-h-11 items-center justify-center border-2 border-[#121212] bg-[#D02020] px-5 py-3 text-sm font-bold text-[#FFFFFF] shadow-[4px_4px_0_#121212] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D02020]">Continue to secure payment</a>
                         <p className="mt-4 font-mono text-xs">Invoice reference: {invoice.invoiceId}</p>
                       </>
                     ) : (
