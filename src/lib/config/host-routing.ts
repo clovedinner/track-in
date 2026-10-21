@@ -1,5 +1,5 @@
 const marketingHosts = new Set(["trakio.org", "www.trakio.org"]);
-const marketingPagePaths = ["/docs", "/articles"];
+const marketingPagePaths = ["/docs", "/articles", "/about", "/features", "/pricing"];
 
 export function resolveRequestHostname(input: {
   forwardedHost: string | null;

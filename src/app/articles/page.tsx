@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import PublicSiteNav from "@/app/public-site-nav";
+import { PublicSiteShell } from "@/app/public-site-shell";
 
 export const metadata: Metadata = {
   title: "Articles | Trakio",
@@ -10,8 +10,7 @@ export const metadata: Metadata = {
 
 export default function ArticlesPage() {
   return (
-    <main className="min-h-screen bg-[#F0F0F0] text-[#121212]">
-      <PublicSiteNav />
+    <PublicSiteShell>
       <div className="mx-auto max-w-7xl px-5 py-12 sm:px-8 sm:py-16 lg:px-12">
         <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#D02020]">Articles</p>
         <h1 className="mt-4 max-w-3xl text-5xl font-black leading-[0.95] tracking-[-0.06em] sm:text-6xl">Tracking that follows the whole journey.</h1>
@@ -25,6 +24,6 @@ export default function ArticlesPage() {
           <Link href="/articles/why-the-click-id-matters" className="inline-flex min-h-11 items-center border-2 border-[#121212] bg-white px-4 py-3 text-sm font-bold shadow-[3px_3px_0_#121212] hover:bg-[#F0C020] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D02020]">Read article</Link>
         </article>
       </div>
-    </main>
+    </PublicSiteShell>
   );
 }

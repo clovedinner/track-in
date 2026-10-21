@@ -34,8 +34,11 @@ describe("host routing", () => {
     expect(getHostRedirectTarget({ hostname: "trc01.trakio.org", pathname: "/", search: "", appUrl })).toBeNull();
   });
 
-  it("keeps public docs on the main domain", () => {
-    expect(getHostRedirectTarget({ hostname: "app.trakio.org", pathname: "/docs", search: "?topic=postbacks", appUrl }))
-      .toBe("https://trakio.org/docs?topic=postbacks");
+  it("keeps public site pages on the main domain and preserves query parameters", () => {
+    for (const pathname of ["/docs", "/articles", "/articles/why-the-click-id-matters", "/about", "/features", "/pricing"]) {
+      expect(getHostRedirectTarget({ hostname: "app.trakio.org", pathname, search: "?ref=campaign", appUrl }))
+        .toBe(`https://trakio.org${pathname}?ref=campaign`);
+      expect(getHostRedirectTarget({ hostname: "trakio.org", pathname, search: "", appUrl })).toBeNull();
+    }
   });
 });

@@ -1,21 +1,74 @@
-import Link from "next/link";
+"use client";
 
-const appUrl = (process.env.NEXT_PUBLIC_APP_URL?.trim() || "http://localhost:3000").replace(/\/$/, "");
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+
+import { publicAppUrl, publicLinks } from "@/app/public-site-content";
 
 export default function PublicSiteNav() {
+  const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setOpen(false);
+        document.getElementById("public-menu-toggle")?.focus();
+      }
+    }
+    if (open) window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [open]);
+
   return (
-    <header className="border-b-2 border-[#121212] bg-[#F0F0F0]">
-      <nav className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 py-5 sm:px-8 lg:px-12" aria-label="Main navigation">
-        <Link href="/" className="flex shrink-0 items-center gap-1 border-2 border-[#121212] bg-[#FFFFFF] px-2 py-1 text-lg font-black tracking-[-0.03em] shadow-[3px_3px_0_#121212]">
-          <span aria-hidden="true" className="h-3 w-3 rounded-full bg-[#D02020]" />
-          <span aria-hidden="true" className="h-3 w-3 bg-[#1040C0]" />
-          <span aria-hidden="true" className="h-0 w-0 border-x-[6px] border-b-[10px] border-x-transparent border-b-[#F0C020]" />
-          <span className="ml-1">Trakio</span>
+    <header className="public-header">
+      <nav className="public-container public-nav" aria-label="Main navigation">
+        <Link
+          href="/"
+          className="public-brand"
+          onClick={() => setOpen(false)}
+          aria-label="Trakio home"
+        >
+          <span aria-hidden="true" className="public-brand-marks">
+            <span />
+            <span />
+            <span />
+          </span>
+          Trakio
         </Link>
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm font-semibold">
-          <Link href="/docs" className="underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D02020]">Docs</Link>
-          <Link href="/articles" className="underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D02020]">Articles</Link>
-          <Link href={`${appUrl}/auth/sign-in`} className="text-[#D02020] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D02020]">Sign in</Link>
+        <button
+          id="public-menu-toggle"
+          className="public-menu-toggle"
+          type="button"
+          aria-expanded={open}
+          aria-controls="public-navigation"
+          onClick={() => setOpen(!open)}
+        >
+          {open ? "Close menu" : "Menu"}
+          <span aria-hidden="true">{open ? "−" : "+"}</span>
+        </button>
+        <div
+          id="public-navigation"
+          className={`public-nav-links ${open ? "is-open" : ""}`}
+        >
+          {publicLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              aria-current={
+                pathname === link.href || pathname.startsWith(`${link.href}/`)
+                  ? "page"
+                  : undefined
+              }
+              onClick={() => setOpen(false)}
+            >
+              {link.label}
+            </Link>
+          ))}
+          <a href={`${publicAppUrl}/auth/sign-in`} className="public-sign-in">
+            Sign in
+          </a>
         </div>
       </nav>
     </header>
