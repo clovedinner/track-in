@@ -6,7 +6,7 @@ import { PublicSiteShell } from "@/app/public-site-shell";
 export const metadata: Metadata = {
   title: "Pricing | Trakio",
   description:
-    "Trakio plans start at $300 per month. Compare Starter, Operator, and Expanded, with clear payment details and planned plan differences.",
+    "Trakio plans start at $300 per month. Compare Starter, Operator, and Expanded, including customer API access on Operator and Expanded.",
   alternates: { canonical: "https://trakio.org/pricing" },
 };
 
@@ -21,18 +21,16 @@ const plans = [
   {
     name: "Operator",
     price: "500",
-    description:
-      "Core tracking. Planned: 50 active campaigns and a customer API.",
+    description: "Core tracking and customer API access. Planned allowance: 50 active campaigns.",
     campaigns: "50",
-    extra: "Customer API access",
+    extra: "Customer API access; campaign allowance planned",
   },
   {
     name: "Expanded",
     price: "1,000",
-    description:
-      "Core tracking. Planned: 100 active campaigns, a customer API, and dedicated support.",
+    description: "Core tracking and customer API access. Planned: 100 active campaigns and dedicated customer service.",
     campaigns: "100",
-    extra: "Customer API access and dedicated customer service",
+    extra: "Customer API access; campaign allowance and dedicated service planned",
   },
 ];
 
@@ -87,31 +85,31 @@ export default function PricingPage() {
           <li>Campaign, offer, and traffic-source configuration</li>
           <li>Visits, conversions, conversion rates, and date filters</li>
           <li>Outbound postback delivery health and retries</li>
+          <li>Customer API for Operator and Expanded plans</li>
         </ul>
       </section>
       <section className="public-roadmap">
         <div className="public-container public-section">
           <div className="public-editorial">
             <div>
-              <p className="public-kicker">Planned plan differences</p>
-              <h2>Where the plans are heading.</h2>
+              <p className="public-kicker">Plan roadmap</p>
+              <h2>Campaign allowances and more to come.</h2>
             </div>
             <p>
-              These allowances and services are planned. The app does not
-              enforce these campaign limits yet. Customer API access and
-              dedicated customer service are not included in the current
-              release.
+              Campaign allowances are planned and are not enforced yet.
+              Dedicated customer service is also planned. The customer API is
+              available on Operator and Expanded now.
             </p>
           </div>
           <div
             className="public-comparison"
             role="region"
-            aria-label="Planned plan comparison"
+            aria-label="Plan comparison and roadmap"
             tabIndex={0}
           >
             <table>
               <caption>
-                Planned allowances and services, not currently available
+                Campaign allowances and services marked planned are not yet available
               </caption>
               <thead>
                 <tr>
@@ -132,9 +130,9 @@ export default function PricingPage() {
             </table>
           </div>
           <p className="public-price-note">
-            The planned customer API is for connecting your own tools. The
-            existing conversion intake and outbound postbacks remain part of
-            core tracking.
+            The customer API connects your own tools and AI agents to your
+            Trakio workspace. Existing conversion intake and outbound postbacks
+            remain part of core tracking.
           </p>
         </div>
       </section>
