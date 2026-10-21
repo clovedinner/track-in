@@ -1,6 +1,21 @@
 const marketingHosts = new Set(["trakio.org", "www.trakio.org"]);
 const marketingPagePaths = ["/docs", "/articles"];
 
+export function resolveRequestHostname(input: {
+  forwardedHost: string | null;
+  host: string | null;
+  fallback: string;
+}): string {
+  const candidate = input.forwardedHost?.split(",")[0]?.trim()
+    || input.host?.split(",")[0]?.trim()
+    || input.fallback;
+  try {
+    return new URL(`http://${candidate}`).hostname.toLowerCase();
+  } catch {
+    return input.fallback.toLowerCase();
+  }
+}
+
 function isAppPagePath(pathname: string): boolean {
   return pathname === "/admin" || pathname.startsWith("/admin/")
     || pathname === "/auth" || pathname.startsWith("/auth/")

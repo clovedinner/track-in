@@ -1,9 +1,16 @@
 import { describe, expect, it } from "vitest";
 
-import { getHostRedirectTarget } from "./host-routing";
+import { getHostRedirectTarget, resolveRequestHostname } from "./host-routing";
 
 describe("host routing", () => {
   const appUrl = "https://app.trakio.org";
+
+  it("prefers the reverse proxy host and removes its port", () => {
+    expect(resolveRequestHostname({ forwardedHost: "app.trakio.org:443", host: "127.0.0.1:3000", fallback: "localhost" }))
+      .toBe("app.trakio.org");
+    expect(resolveRequestHostname({ forwardedHost: null, host: "trakio.org:443", fallback: "localhost" }))
+      .toBe("trakio.org");
+  });
 
   it("opens the dashboard from the app subdomain root", () => {
     expect(getHostRedirectTarget({ hostname: "app.trakio.org", pathname: "/", search: "", appUrl }))

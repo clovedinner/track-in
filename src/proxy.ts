@@ -5,7 +5,7 @@ import { isAdminRequestAuthorized } from "@/lib/auth/admin";
 import { sessionCookieName, verifySessionToken } from "@/lib/auth/session";
 import { getCorrelationId } from "@/lib/observability/correlation-id";
 import { logger } from "@/lib/observability/logger";
-import { getHostRedirectTarget } from "@/lib/config/host-routing";
+import { getHostRedirectTarget, resolveRequestHostname } from "@/lib/config/host-routing";
 
 export async function proxy(request: NextRequest): Promise<NextResponse> {
   const correlationId = getCorrelationId(request);
@@ -13,7 +13,11 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
 
   if (process.env.NODE_ENV === "production") {
     const redirectTarget = getHostRedirectTarget({
-      hostname: request.nextUrl.hostname,
+      hostname: resolveRequestHostname({
+        forwardedHost: request.headers.get("x-forwarded-host"),
+        host: request.headers.get("host"),
+        fallback: request.nextUrl.hostname,
+      }),
       pathname: path,
       search: request.nextUrl.search,
       appUrl: process.env.NEXT_PUBLIC_APP_URL ?? "https://app.trakio.org",
@@ -49,7 +53,7 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "Authentication required." }, { headers: { "x-request-id": correlationId }, status: 401 });
   }
 
-  const signInUrl = new URL("/auth/sign-in", request.url);
+  const signInUrl = new URL("/auth/sign-in", process.env.NEXT_PUBLIC_APP_URL ?? request.url);
   signInUrl.searchParams.set("next", `${request.nextUrl.pathname}${request.nextUrl.search}`);
   return NextResponse.redirect(signInUrl, { headers: { "x-request-id": correlationId } });
 }
