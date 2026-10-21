@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   description:
     "Connect paid traffic to real conversions. Trakio keeps campaign tracking, attribution, postbacks, and reporting focused on the work you actually do.",
   alternates: { canonical: "https://trakio.org" },
+  verification: { google: "obVQKKtMBP4VD1iMNQDyzwFZOrIVivavfi_RkATWzsU" }
 };
 
 export default function Home() {
