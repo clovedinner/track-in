@@ -4,6 +4,20 @@ import { describe, expect, it } from "vitest";
 import { buildNowPaymentsInvoiceRequest, isNowPaymentsInvoiceUrl, parseUsdCents, stableNowPaymentsPayload, verifyNowPaymentsSignature } from "./nowpayments";
 
 describe("NOWPayments helpers", () => {
+  it("creates the $20 USD fee-paid-by-user test invoice amount", () => {
+    const request = buildNowPaymentsInvoiceRequest({
+      amountMinor: 2_000,
+      callbackUrl: "https://trakio.org/api/billing/nowpayments",
+      cancelUrl: "https://trakio.org/admin/subscribe?payment=cancelled",
+      invoiceId: "trk_test_invoice",
+      plan: "Payment monitor test",
+      successUrl: "https://trakio.org/payment-done?invoice_id=trk_test_invoice",
+    });
+
+    expect(request.price_amount).toBe(20);
+    expect(request.is_fee_paid_by_user).toBe(true);
+  });
+
   it("passes the plan price in USD and asks the customer to cover provider fees", () => {
     expect(buildNowPaymentsInvoiceRequest({
       amountMinor: 50_000,

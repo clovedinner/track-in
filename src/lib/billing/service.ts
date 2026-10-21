@@ -74,7 +74,7 @@ export async function createInvoice(userId: string, plan: BillingPlan) {
   };
 }
 
-async function createNowPaymentsInvoice(userId: string, plan: BillingPlan, amountMinor: number) {
+async function createNowPaymentsInvoice(userId: string, plan: string, amountMinor: number, isTest = false) {
   const apiKey = process.env.NOWPAYMENTS_API_KEY?.trim();
   const appUrl = process.env.NEXT_PUBLIC_APP_URL?.trim();
   if (!apiKey) throw new Error("NOWPAYMENTS_API_KEY is required to create hosted invoices.");
@@ -83,7 +83,7 @@ async function createNowPaymentsInvoice(userId: string, plan: BillingPlan, amoun
   if (process.env.NODE_ENV === "production" && origin.protocol !== "https:") throw new Error("NEXT_PUBLIC_APP_URL must use HTTPS in production.");
 
   const existing = await prisma.billingPayment.findFirst({
-    where: { userId, plan, provider: NOWPAYMENTS_PROVIDER, status: "pending", currency: "USD", customerPaysFees: true },
+    where: { userId, plan, provider: NOWPAYMENTS_PROVIDER, status: "pending", currency: "USD", customerPaysFees: true, isTest },
     orderBy: { createdAt: "desc" },
   });
   let payment = existing;
@@ -91,9 +91,10 @@ async function createNowPaymentsInvoice(userId: string, plan: BillingPlan, amoun
     payment = await prisma.billingPayment.create({
       data: {
         userId,
-        invoiceId: `trk_inv_${randomUUID()}`,
+        invoiceId: `${isTest ? "trk_test" : "trk_inv"}_${randomUUID()}`,
         provider: NOWPAYMENTS_PROVIDER,
         customerPaysFees: true,
+        isTest,
         plan,
         amountMinor: BigInt(amountMinor),
         currency: "USD",
@@ -157,6 +158,7 @@ async function createNowPaymentsInvoice(userId: string, plan: BillingPlan, amoun
     currency: payment.currency,
     network: payment.network,
     status: payment.status,
+    isTest: payment.isTest,
     walletAddress: "",
     checkoutUrl: payment.checkoutUrl,
   };
@@ -169,10 +171,11 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 const TEST_PAYMENT_AMOUNT_ATOMIC = BigInt(100_000);
 
 export async function createBillingTestInvoice(userId: string) {
-  if (getBillingProvider() !== TRON_PAYMENT_PROVIDER) throw new Error("Payment monitor tests require the legacy TRON payment provider.");
   if (!canUseBillingTestMode(userId)) {
     throw new Error("Payment monitor tests are unavailable for this account.");
   }
+  if (getBillingProvider() === NOWPAYMENTS_PROVIDER) return createNowPaymentsTestInvoice(userId);
+  if (getBillingProvider() !== TRON_PAYMENT_PROVIDER) throw new Error("Payment monitor tests require a supported payment provider.");
   const walletAddress = process.env.BILLING_WALLET_ADDRESS?.trim() ?? "";
   if (!/^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(walletAddress)) throw new Error("BILLING_WALLET_ADDRESS is missing or invalid.");
   if (!process.env.TRONGRID_API_KEY?.trim()) throw new Error("TRONGRID_API_KEY is required for automatic payment verification.");
@@ -231,6 +234,57 @@ export async function createBillingTestInvoice(userId: string) {
     walletAddress,
     checkoutUrl: null,
   };
+}
+
+const NOWPAYMENTS_TEST_AMOUNT_MINOR = 2_000;
+
+async function createNowPaymentsTestInvoice(userId: string) {
+  const payment = await prisma.$transaction(async (transaction) => {
+    await transaction.$queryRaw<{ locked: number }[]>`
+      WITH lock AS MATERIALIZED (
+        SELECT pg_advisory_xact_lock(hashtext(${`trakio:billing:nowpayments-test:${userId}`}))
+      )
+      SELECT 1 AS locked FROM lock
+    `;
+    const pendingTest = await transaction.billingPayment.findFirst({
+      where: { userId, provider: NOWPAYMENTS_PROVIDER, isTest: true, plan: "Payment monitor test", status: "pending" },
+      orderBy: { createdAt: "desc" },
+    });
+    if (pendingTest) return pendingTest;
+
+    const completedTest = await transaction.billingPayment.findFirst({
+      where: { userId, isTest: true, status: "confirmed" },
+      select: { id: true },
+    });
+    if (completedTest) throw new Error("The payment monitor test has already been completed for this account.");
+
+    const activeSubscription = await transaction.subscription.findFirst({
+      where: { userId, status: { in: ["active", "past_due"] } },
+      select: { id: true },
+    });
+    if (activeSubscription) throw new Error("A test invoice requires a dedicated account without an active subscription.");
+
+    await transaction.billingPayment.updateMany({
+      where: { userId, provider: TRON_PAYMENT_PROVIDER, isTest: true, status: "pending" },
+      data: { status: "failed", failureReason: "Replaced with a NOWPayments test invoice" },
+    });
+
+    return transaction.billingPayment.create({
+      data: {
+        userId,
+        invoiceId: `trk_test_${randomUUID()}`,
+        provider: NOWPAYMENTS_PROVIDER,
+        customerPaysFees: true,
+        plan: "Payment monitor test",
+        isTest: true,
+        amountMinor: BigInt(NOWPAYMENTS_TEST_AMOUNT_MINOR),
+        currency: "USD",
+        network: "TRC20",
+      },
+    });
+  });
+
+  return createNowPaymentsInvoice(userId, payment.plan, Number(payment.amountMinor), true);
 }
 
 async function createUniquelyPricedPayment(input: { userId: string; plan: BillingPlan; provider: string; currency: string; amountMinor: bigint }) {
@@ -374,7 +428,7 @@ export async function processBillingWebhook(provider: string, input: WebhookInpu
     const now = new Date();
 
     if (input.status === "confirmed") {
-      const plan = input.plan ?? (isBillingPlan(payment.plan) ? payment.plan : null);
+      const plan = input.plan ?? (payment.isTest ? "Starter" : isBillingPlan(payment.plan) ? payment.plan : null);
       if (!plan) throw new BillingWebhookError("plan_required", 422);
       const start = parseDate(input.periodStart, now);
       if (!start) throw new BillingWebhookError("invalid_period", 422);

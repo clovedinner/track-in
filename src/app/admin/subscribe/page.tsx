@@ -16,7 +16,7 @@ export default async function SubscribeRoute() {
   return (
     <main className="min-h-screen bg-[#F0F0F0] text-[#121212]">
       <AdminNavigation pathname="/admin/subscribe" />
-      <SubscribePage showTestPayment={getBillingProvider() === "tron" && canUseBillingTestMode(user.id)} paymentProvider={getBillingProvider()} />
+      <SubscribePage showTestPayment={["tron", "nowpayments"].includes(getBillingProvider()) && canUseBillingTestMode(user.id)} paymentProvider={getBillingProvider()} />
     </main>
   );
 }

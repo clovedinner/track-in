@@ -170,9 +170,9 @@ export default function SubscribePage({ showTestPayment = false, paymentProvider
         <section className="mt-6 flex flex-col gap-4 border-2 border-[#121212] bg-[#FFFFFF] p-5 sm:flex-row sm:items-center sm:justify-between" aria-label="Payment monitor test">
           <div>
             <h2 className="font-black">Test payment monitoring</h2>
-            <p className="mt-1 max-w-2xl text-sm leading-6">Create a one-time 0.10 USDT TRC20 invoice. After the monitor confirms the transfer, it activates the Starter plan for 30 days on the designated test account.</p>
+            <p className="mt-1 max-w-2xl text-sm leading-6">{paymentProvider === "nowpayments" ? "Create a one-time $20 USD invoice for USDT on TRC20. NOWPayments adds applicable fees at checkout. After its confirmation, Trakio activates Starter for 30 days on the designated test account." : "Create a one-time 0.10 USDT TRC20 invoice. After the monitor confirms the transfer, it activates the Starter plan for 30 days on the designated test account."}</p>
           </div>
-          <button type="button" onClick={() => void openPayment({ name: "Payment monitor test", price: "$0.10", note: "Detection test only", features: [] }, true)} className="min-h-11 shrink-0 border-2 border-[#121212] bg-[#FFFFFF] px-4 py-2.5 text-sm font-bold shadow-[3px_3px_0_#121212] hover:bg-[#E0E0E0] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#121212]">Create $0.10 test invoice</button>
+          <button type="button" onClick={() => void openPayment({ name: "Payment monitor test", price: paymentProvider === "nowpayments" ? "$20" : "$0.10", note: "Detection test only", features: [] }, true)} className="min-h-11 shrink-0 border-2 border-[#121212] bg-[#FFFFFF] px-4 py-2.5 text-sm font-bold shadow-[3px_3px_0_#121212] hover:bg-[#E0E0E0] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#121212]">{paymentProvider === "nowpayments" ? "Create $20 test invoice" : "Create $0.10 test invoice"}</button>
         </section>
       ) : null}
 
@@ -193,7 +193,7 @@ export default function SubscribePage({ showTestPayment = false, paymentProvider
                   <div>
                     <p className="text-xs font-bold uppercase tracking-[0.16em]">Payment status</p>
                     <h3 className="mt-2 text-3xl font-black tracking-[-0.04em]">{invoice?.isTest ? "Starter plan activated" : "Payment confirmed"}</h3>
-                    <p className="mt-2 text-sm leading-6">{invoice?.isTest ? "The confirmed 0.10 USDT test transfer activated Starter for 30 days on this test account." : "The payment provider confirmed this invoice and your subscription is active."}</p>
+                    <p className="mt-2 text-sm leading-6">{invoice?.isTest ? invoice.checkoutUrl ? "NOWPayments confirmed the $20 USD test invoice. Starter is active for 30 days on this test account." : "The confirmed 0.10 USDT test transfer activated Starter for 30 days on this test account." : "The payment provider confirmed this invoice and your subscription is active."}</p>
                   </div>
                   <span className="w-fit border-2 border-[#121212] bg-[#FFFFFF] px-3 py-2 text-xs font-bold uppercase tracking-[0.12em]">Invoice</span>
                 </div>
