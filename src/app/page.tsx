@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+const appUrl = (process.env.NEXT_PUBLIC_APP_URL?.trim() || "http://localhost:3000").replace(/\/$/, "");
+
 const workflow = [
   {
     number: "01",
@@ -91,8 +93,14 @@ export default function Home() {
           >
             Pricing
           </a>
+          <Link href="/docs" className="hidden text-[#121212] hover:underline hover:underline-offset-4 sm:inline">
+            Docs
+          </Link>
+          <Link href="/articles" className="hidden text-[#121212] hover:underline hover:underline-offset-4 sm:inline">
+            Articles
+          </Link>
           <Link
-            href="/auth/sign-in"
+            href={`${appUrl}/auth/sign-in`}
             className="hidden text-[#D02020] hover:underline hover:underline-offset-4 sm:inline"
           >
             Sign in
@@ -261,7 +269,7 @@ export default function Home() {
                 ))}
               </ul>
               <Link
-                href="/auth/sign-up"
+                href={`${appUrl}/auth/sign-up`}
                 className={`mt-10 border-2 px-4 py-3 text-center text-sm font-semibold transition ${plan.featured ? "border-white bg-white text-[#1040C0] hover:bg-[#FFFFFF]" : "border-[#121212] text-[#121212] hover:bg-[#121212] hover:text-white"}`}
               >
                 {plan.featured ? "Start with Starter" : `Choose ${plan.name}`}
@@ -315,6 +323,18 @@ export default function Home() {
                 >
                   Pricing
                 </a>
+                <Link
+                  href="/docs"
+                  className="text-white/80 hover:text-white hover:underline hover:underline-offset-4"
+                >
+                  Docs
+                </Link>
+                <Link
+                  href="/articles"
+                  className="text-white/80 hover:text-white hover:underline hover:underline-offset-4"
+                >
+                  Articles
+                </Link>
               </div>
             </div>
             <div>
@@ -323,13 +343,13 @@ export default function Home() {
               </p>
               <div className="mt-5 flex flex-col items-start gap-3 text-sm">
                 <Link
-                  href="/auth/sign-in"
+                  href={`${appUrl}/auth/sign-in`}
                   className="text-white/80 hover:text-white hover:underline hover:underline-offset-4"
                 >
                   Sign in
                 </Link>
                 <Link
-                  href="/auth/sign-up"
+                  href={`${appUrl}/auth/sign-up`}
                   className="text-white/80 hover:text-white hover:underline hover:underline-offset-4"
                 >
                   Create an account

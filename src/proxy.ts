@@ -5,9 +5,29 @@ import { isAdminRequestAuthorized } from "@/lib/auth/admin";
 import { sessionCookieName, verifySessionToken } from "@/lib/auth/session";
 import { getCorrelationId } from "@/lib/observability/correlation-id";
 import { logger } from "@/lib/observability/logger";
+import { getHostRedirectTarget } from "@/lib/config/host-routing";
 
 export async function proxy(request: NextRequest): Promise<NextResponse> {
   const correlationId = getCorrelationId(request);
+  const path = request.nextUrl.pathname;
+
+  if (process.env.NODE_ENV === "production") {
+    const redirectTarget = getHostRedirectTarget({
+      hostname: request.nextUrl.hostname,
+      pathname: path,
+      search: request.nextUrl.search,
+      appUrl: process.env.NEXT_PUBLIC_APP_URL ?? "https://app.trakio.org",
+    });
+    if (redirectTarget) {
+      return NextResponse.redirect(redirectTarget, {
+        headers: { "Cache-Control": "no-store", "x-request-id": correlationId },
+      });
+    }
+  }
+
+  if (!path.startsWith("/admin/") && path !== "/admin" && !path.startsWith("/api/admin/")) {
+    return NextResponse.next({ headers: { "x-request-id": correlationId } });
+  }
 
   const session = await verifySessionToken(request.cookies.get(sessionCookieName())?.value);
   if (session || isAdminRequestAuthorized(request)) {
@@ -35,5 +55,5 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/api/admin/:path*"],
+  matcher: ["/", "/admin/:path*", "/api/admin/:path*", "/auth/:path*", "/payment-done", "/docs/:path*", "/articles/:path*"],
 };
