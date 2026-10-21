@@ -2,11 +2,13 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import PublicSiteNav from "@/app/public-site-nav";
+import PublicSiteTagManager from "@/app/public-site-tag-manager";
 import { publicAppUrl, publicLinks } from "@/app/public-site-content";
 
 export function PublicSiteShell({ children }: { children: ReactNode }) {
   return (
     <div className="public-site">
+      <PublicSiteTagManager />
       <a className="public-skip-link" href="#main-content">
         Skip to content
       </a>
