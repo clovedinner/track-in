@@ -54,6 +54,12 @@ export type CampaignDetail = {
     destinationUrl: string;
     trackingTokens: Prisma.JsonValue;
   }>;
+  visitPagination: {
+    page: number;
+    pageSize: number;
+    total: number;
+    pageCount: number;
+  };
   recentConversions: Array<{
     id: string;
     eventType: string;
@@ -170,7 +176,11 @@ export function campaignDetailFilters(params: URLSearchParams, timezone: string)
   return detailDateFilters(params, timezone);
 }
 
-export async function getCampaignDetail(campaignId: string, filters: DashboardFilters = {}): Promise<CampaignDetail | null> {
+export async function getCampaignDetail(
+  campaignId: string,
+  filters: DashboardFilters = {},
+  options: { visitsPage?: number; visitsPageSize?: number } = {},
+): Promise<CampaignDetail | null> {
   const campaign = await prisma.campaign.findUnique({
     where: { id: campaignId, ...(filters.ownerId ? { ownerId: filters.ownerId } : {}) },
     select: {
@@ -185,15 +195,16 @@ export async function getCampaignDetail(campaignId: string, filters: DashboardFi
   });
   if (!campaign) return null;
 
-  const [metrics, dailyMetrics, recentClicks, recentConversions, deliveryFailures] = await Promise.all([
+  const pageSize = Math.min(100, Math.max(1, Math.floor(options.visitsPageSize ?? 25)));
+  const requestedPage = Math.max(1, Math.floor(options.visitsPage ?? 1));
+  const clickWhere: Prisma.ClickWhereInput = {
+    campaignId,
+    clickedAt: filters.from || filters.to ? { ...(filters.from ? { gte: filters.from } : {}), ...(filters.to ? { lt: filters.to } : {}) } : undefined,
+  };
+  const [metrics, dailyMetrics, totalVisits, recentConversions, deliveryFailures] = await Promise.all([
     getOverviewMetrics({ ...filters, campaignId }),
     getCampaignDailyMetrics(campaignId, filters),
-    prisma.click.findMany({
-    where: { campaignId, clickedAt: filters.from || filters.to ? { ...(filters.from ? { gte: filters.from } : {}), ...(filters.to ? { lt: filters.to } : {}) } : undefined },
-      orderBy: { clickedAt: "desc" },
-      take: 25,
-      select: { clickId: true, clickedAt: true, destinationUrl: true, trackingTokens: true },
-    }),
+    prisma.click.count({ where: clickWhere }),
     prisma.conversion.findMany({
       where: { click: { campaignId }, ...(filters.eventType ? { eventType: filters.eventType } : {}), occurredAt: filters.from || filters.to ? { ...(filters.from ? { gte: filters.from } : {}), ...(filters.to ? { lt: filters.to } : {}) } : undefined },
       orderBy: { receivedAt: "desc" },
@@ -208,11 +219,22 @@ export async function getCampaignDetail(campaignId: string, filters: DashboardFi
     }),
   ]);
 
+  const pageCount = Math.max(1, Math.ceil(totalVisits / pageSize));
+  const page = Math.min(requestedPage, pageCount);
+  const recentClicks = await prisma.click.findMany({
+    where: clickWhere,
+    orderBy: [{ clickedAt: "desc" }, { id: "desc" }],
+    skip: (page - 1) * pageSize,
+    take: pageSize,
+    select: { clickId: true, clickedAt: true, destinationUrl: true, trackingTokens: true },
+  });
+
   return {
     campaign: { ...campaign, trafficSourceName: campaign.trafficSource?.name ?? null },
     metrics,
     dailyMetrics,
     recentClicks,
+    visitPagination: { page, pageSize, total: totalVisits, pageCount },
     recentConversions,
     deliveryFailures,
   };
