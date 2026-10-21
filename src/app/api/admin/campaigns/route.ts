@@ -6,6 +6,7 @@ import { ApiError, apiErrorResponse } from "@/lib/http/api-error";
 import { getCorrelationId } from "@/lib/observability/correlation-id";
 import { logger } from "@/lib/observability/logger";
 import { requireCurrentUser } from "@/lib/auth/current-user";
+import { getCampaignList } from "@/lib/admin/campaign-views";
 
 function inputErrorResponse(error: CampaignInputError, correlationId: string): NextResponse {
   return apiErrorResponse(new ApiError("invalid_request", 400, `${error.field}: ${error.message}`), correlationId);
@@ -16,24 +17,7 @@ export async function GET(request: Request): Promise<NextResponse> {
 
   try {
     const user = await requireCurrentUser();
-    const campaigns = await prisma.campaign.findMany({
-      where: { ownerId: user.id },
-      orderBy: { createdAt: "desc" },
-      select: {
-        id: true,
-        slug: true,
-        name: true,
-        status: true,
-        trackingMode: true,
-        destinationUrl: true,
-        trafficSourceId: true,
-        defaultCurrency: true,
-        allowedTrackingParameters: true,
-        createdAt: true,
-        updatedAt: true,
-        archivedAt: true,
-      },
-    });
+    const campaigns = await getCampaignList({ ownerId: user.id });
 
     return NextResponse.json({ campaigns }, { headers: { "x-request-id": correlationId } });
   } catch (error) {

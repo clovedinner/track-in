@@ -20,6 +20,7 @@ const topics = [
   ["verify", "Verify the full loop"],
   ["troubleshooting", "Troubleshooting"],
   ["billing", "Account and billing"],
+  ["customer-api", "Customer API"],
 ] as const;
 
 export default function DocsPage() {
@@ -274,6 +275,36 @@ Content-Type: application/json
             <Link href="/pricing" className="public-text-link">
               Review plans and payment details
             </Link>
+          </section>
+          <section id="customer-api">
+            <h2>Connect your tools with the Customer API</h2>
+            <p>
+              Operator and Expanded accounts can create API keys from Dashboard → Profile. Choose read-only access for reporting agents or read and write access when a tool must change workspace settings. You can revoke a key at any time. Trakio shows the key only once, so store it in your server’s secret manager.
+            </p>
+            <pre><code>{`Base URL: https://app.trakio.org/api/v1
+Authorization: Bearer YOUR_TRAKIO_API_KEY`}</code></pre>
+            <p>Do not put API keys in browser code, public repositories, prompts shared outside your account, or client-side tracking tags. Send requests over HTTPS and keep one key per integration so you can revoke access independently.</p>
+            <h3>Available endpoints</h3>
+            <dl className="public-docs-fields">
+              <div><dt>GET /me</dt><dd>Read the account ID, email, and timezone.</dd></div>
+              <div><dt>GET /overview</dt><dd>Read dashboard metrics. Accepts from, to, campaign, source, and event filters.</dd></div>
+              <div><dt>GET /campaigns</dt><dd>List campaign configuration and performance. POST /campaigns creates a campaign. Resource lists accept limit (default 50, maximum 100) and offset (maximum 10000).</dd></div>
+              <div><dt>PATCH /campaigns/{"{id}"}</dt><dd>Change campaign status. POST /campaigns/{"{id}"}/setup-test creates a test click.</dd></div>
+              <div><dt>GET /campaigns/{"{id}"}/report</dt><dd>Read campaign metrics, daily totals, recent clicks and conversions, and delivery failures.</dd></div>
+              <div><dt>GET /activity/clicks</dt><dd>Read click activity. GET /activity/conversions reads conversion activity. Both accept limit and cursor; limit is capped at 100.</dd></div>
+              <div><dt>POST /conversions</dt><dd>Send an authenticated server-to-server conversion using the same click ID, stable event ID, event type, timestamp, value, and currency fields described above. A repeated event ID returns the original accepted result.</dd></div>
+              <div><dt>GET, POST /offers</dt><dd>List offers and performance, or create one. PATCH /offers/{"{id}"} updates an offer. Lists accept limit and offset.</dd></div>
+              <div><dt>GET, POST /traffic-sources</dt><dd>List and create sources. PUT /traffic-sources/{"{id}"} updates a source. Responses omit credential values. Lists accept limit and offset.</dd></div>
+              <div><dt>GET /traffic-sources/{"{id}"}/report</dt><dd>Read all-time visits, conversions, and event counts for an owned traffic source.</dd></div>
+              <div><dt>GET, POST /custom-conversions</dt><dd>List and create conversion rules. PATCH or DELETE /custom-conversions/{"{id}"} updates or removes a rule. Lists accept limit and offset.</dd></div>
+              <div><dt>GET /delivery-health</dt><dd>Read delivery status using limit and cursor. POST /delivery-health/{"{id}"}/retry retries an eligible failed postback.</dd></div>
+              <div><dt>PATCH /profile/timezone</dt><dd>Update the account reporting timezone.</dd></div>
+            </dl>
+            <h3>Example</h3>
+            <pre><code>{`curl https://app.trakio.org/api/v1/overview \\
+  -H "Authorization: Bearer $TRAKIO_API_KEY"`}</code></pre>
+            <p>Read-only keys can call GET endpoints. Read and write keys can also create or change resources, send conversion events, update the timezone, run a campaign setup test, and retry eligible deliveries. Requests are always limited to the account that owns the key. Each key is limited to 120 requests per minute; a limit response uses HTTP 429 and includes <code>Retry-After</code>. Responses include an <code>x-request-id</code> for support and troubleshooting.</p>
+            <p>The existing authenticated <code>POST /api/conversions</code> contract above remains available to sites using the separately provisioned webhook secret. You can use either that endpoint or <code>POST /api/v1/conversions</code> with an API key for a given integration. Never send either credential from browser JavaScript.</p>
           </section>
         </div>
       </div>

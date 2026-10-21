@@ -24,6 +24,10 @@ export async function GET(request: Request): Promise<NextResponse> {
   }
 
   let limit: number;
+  const cursor = new URL(request.url).searchParams.get("cursor") ?? undefined;
+  if (cursor && !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(cursor)) {
+    return apiErrorResponse(new ApiError("invalid_request", 400, "Invalid cursor."), correlationId);
+  }
   let user: Awaited<ReturnType<typeof requireCurrentUser>>;
   try {
     user = await requireCurrentUser();
@@ -43,7 +47,8 @@ export async function GET(request: Request): Promise<NextResponse> {
       prisma.outboundPostback.findMany({
         where: status ? { status, conversion: { click: { campaign: { ownerId: user.id } } } } : { conversion: { click: { campaign: { ownerId: user.id } } } },
         orderBy: [{ createdAt: "desc" }],
-        take: limit,
+        take: limit + 1,
+        ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
         select: {
           id: true,
           destination: true,
@@ -76,7 +81,7 @@ export async function GET(request: Request): Promise<NextResponse> {
       {
         status: status ?? "all",
         counts: statusCounts,
-        postbacks: postbacks.map((postback) => ({
+        postbacks: postbacks.slice(0, limit).map((postback) => ({
           id: postback.id,
           destination_host: destinationHost(postback.destination),
           status: postback.status,
@@ -99,6 +104,7 @@ export async function GET(request: Request): Promise<NextResponse> {
           },
           traffic_source: postback.trafficSource,
         })),
+        pagination: { limit, next_cursor: postbacks.length > limit ? postbacks[limit - 1]?.id ?? null : null },
       },
       { headers: { "x-request-id": correlationId } },
     );

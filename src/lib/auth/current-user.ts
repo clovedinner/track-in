@@ -2,8 +2,11 @@ import { cookies } from "next/headers";
 
 import { prisma } from "@/lib/database/prisma";
 import { sessionCookieName, verifySessionToken } from "@/lib/auth/session";
+import { getApiKeyPrincipal } from "@/lib/api/v1-context";
 
 export async function getCurrentUser() {
+  const apiPrincipal = getApiKeyPrincipal();
+  if (apiPrincipal) return apiPrincipal;
   const cookieStore = await cookies();
   const session = await verifySessionToken(cookieStore.get(sessionCookieName())?.value);
   if (!session) return null;

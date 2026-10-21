@@ -237,6 +237,7 @@ export type UserWhereInput = {
   payments?: Prisma.BillingPaymentListRelationFilter
   billingEvents?: Prisma.BillingEventListRelationFilter
   customConversions?: Prisma.CustomConversionListRelationFilter
+  apiKeys?: Prisma.ApiKeyListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -258,6 +259,7 @@ export type UserOrderByWithRelationInput = {
   payments?: Prisma.BillingPaymentOrderByRelationAggregateInput
   billingEvents?: Prisma.BillingEventOrderByRelationAggregateInput
   customConversions?: Prisma.CustomConversionOrderByRelationAggregateInput
+  apiKeys?: Prisma.ApiKeyOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -282,6 +284,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   payments?: Prisma.BillingPaymentListRelationFilter
   billingEvents?: Prisma.BillingEventListRelationFilter
   customConversions?: Prisma.CustomConversionListRelationFilter
+  apiKeys?: Prisma.ApiKeyListRelationFilter
 }, "id" | "email" | "verificationTokenHash">
 
 export type UserOrderByWithAggregationInput = {
@@ -337,6 +340,7 @@ export type UserCreateInput = {
   payments?: Prisma.BillingPaymentCreateNestedManyWithoutUserInput
   billingEvents?: Prisma.BillingEventCreateNestedManyWithoutUserInput
   customConversions?: Prisma.CustomConversionCreateNestedManyWithoutOwnerInput
+  apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutOwnerInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -358,6 +362,7 @@ export type UserUncheckedCreateInput = {
   payments?: Prisma.BillingPaymentUncheckedCreateNestedManyWithoutUserInput
   billingEvents?: Prisma.BillingEventUncheckedCreateNestedManyWithoutUserInput
   customConversions?: Prisma.CustomConversionUncheckedCreateNestedManyWithoutOwnerInput
+  apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutOwnerInput
 }
 
 export type UserUpdateInput = {
@@ -379,6 +384,7 @@ export type UserUpdateInput = {
   payments?: Prisma.BillingPaymentUpdateManyWithoutUserNestedInput
   billingEvents?: Prisma.BillingEventUpdateManyWithoutUserNestedInput
   customConversions?: Prisma.CustomConversionUpdateManyWithoutOwnerNestedInput
+  apiKeys?: Prisma.ApiKeyUpdateManyWithoutOwnerNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -400,6 +406,7 @@ export type UserUncheckedUpdateInput = {
   payments?: Prisma.BillingPaymentUncheckedUpdateManyWithoutUserNestedInput
   billingEvents?: Prisma.BillingEventUncheckedUpdateManyWithoutUserNestedInput
   customConversions?: Prisma.CustomConversionUncheckedUpdateManyWithoutOwnerNestedInput
+  apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutOwnerNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -516,6 +523,20 @@ export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
 
+export type UserCreateNestedOneWithoutApiKeysInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutApiKeysInput, Prisma.UserUncheckedCreateWithoutApiKeysInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutApiKeysInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutApiKeysNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutApiKeysInput, Prisma.UserUncheckedCreateWithoutApiKeysInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutApiKeysInput
+  upsert?: Prisma.UserUpsertWithoutApiKeysInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutApiKeysInput, Prisma.UserUpdateWithoutApiKeysInput>, Prisma.UserUncheckedUpdateWithoutApiKeysInput>
+}
+
 export type UserCreateNestedOneWithoutSubscriptionsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutSubscriptionsInput, Prisma.UserUncheckedCreateWithoutSubscriptionsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutSubscriptionsInput
@@ -616,6 +637,106 @@ export type UserUpdateOneRequiredWithoutCustomConversionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCustomConversionsInput, Prisma.UserUpdateWithoutCustomConversionsInput>, Prisma.UserUncheckedUpdateWithoutCustomConversionsInput>
 }
 
+export type UserCreateWithoutApiKeysInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  emailVerifiedAt?: Date | string | null
+  verificationTokenHash?: string | null
+  verificationTokenExpiresAt?: Date | string | null
+  verificationEmailSentAt?: Date | string | null
+  accountStatus?: $Enums.AccountStatus
+  timezone?: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  campaigns?: Prisma.CampaignCreateNestedManyWithoutOwnerInput
+  offers?: Prisma.OfferCreateNestedManyWithoutOwnerInput
+  trafficSources?: Prisma.TrafficSourceCreateNestedManyWithoutOwnerInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutUserInput
+  payments?: Prisma.BillingPaymentCreateNestedManyWithoutUserInput
+  billingEvents?: Prisma.BillingEventCreateNestedManyWithoutUserInput
+  customConversions?: Prisma.CustomConversionCreateNestedManyWithoutOwnerInput
+}
+
+export type UserUncheckedCreateWithoutApiKeysInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  emailVerifiedAt?: Date | string | null
+  verificationTokenHash?: string | null
+  verificationTokenExpiresAt?: Date | string | null
+  verificationEmailSentAt?: Date | string | null
+  accountStatus?: $Enums.AccountStatus
+  timezone?: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  campaigns?: Prisma.CampaignUncheckedCreateNestedManyWithoutOwnerInput
+  offers?: Prisma.OfferUncheckedCreateNestedManyWithoutOwnerInput
+  trafficSources?: Prisma.TrafficSourceUncheckedCreateNestedManyWithoutOwnerInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutUserInput
+  payments?: Prisma.BillingPaymentUncheckedCreateNestedManyWithoutUserInput
+  billingEvents?: Prisma.BillingEventUncheckedCreateNestedManyWithoutUserInput
+  customConversions?: Prisma.CustomConversionUncheckedCreateNestedManyWithoutOwnerInput
+}
+
+export type UserCreateOrConnectWithoutApiKeysInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutApiKeysInput, Prisma.UserUncheckedCreateWithoutApiKeysInput>
+}
+
+export type UserUpsertWithoutApiKeysInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutApiKeysInput, Prisma.UserUncheckedUpdateWithoutApiKeysInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutApiKeysInput, Prisma.UserUncheckedCreateWithoutApiKeysInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutApiKeysInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutApiKeysInput, Prisma.UserUncheckedUpdateWithoutApiKeysInput>
+}
+
+export type UserUpdateWithoutApiKeysInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationEmailSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  accountStatus?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  campaigns?: Prisma.CampaignUpdateManyWithoutOwnerNestedInput
+  offers?: Prisma.OfferUpdateManyWithoutOwnerNestedInput
+  trafficSources?: Prisma.TrafficSourceUpdateManyWithoutOwnerNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutUserNestedInput
+  payments?: Prisma.BillingPaymentUpdateManyWithoutUserNestedInput
+  billingEvents?: Prisma.BillingEventUpdateManyWithoutUserNestedInput
+  customConversions?: Prisma.CustomConversionUpdateManyWithoutOwnerNestedInput
+}
+
+export type UserUncheckedUpdateWithoutApiKeysInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationEmailSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  accountStatus?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  campaigns?: Prisma.CampaignUncheckedUpdateManyWithoutOwnerNestedInput
+  offers?: Prisma.OfferUncheckedUpdateManyWithoutOwnerNestedInput
+  trafficSources?: Prisma.TrafficSourceUncheckedUpdateManyWithoutOwnerNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  payments?: Prisma.BillingPaymentUncheckedUpdateManyWithoutUserNestedInput
+  billingEvents?: Prisma.BillingEventUncheckedUpdateManyWithoutUserNestedInput
+  customConversions?: Prisma.CustomConversionUncheckedUpdateManyWithoutOwnerNestedInput
+}
+
 export type UserCreateWithoutSubscriptionsInput = {
   id?: string
   email: string
@@ -634,6 +755,7 @@ export type UserCreateWithoutSubscriptionsInput = {
   payments?: Prisma.BillingPaymentCreateNestedManyWithoutUserInput
   billingEvents?: Prisma.BillingEventCreateNestedManyWithoutUserInput
   customConversions?: Prisma.CustomConversionCreateNestedManyWithoutOwnerInput
+  apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutOwnerInput
 }
 
 export type UserUncheckedCreateWithoutSubscriptionsInput = {
@@ -654,6 +776,7 @@ export type UserUncheckedCreateWithoutSubscriptionsInput = {
   payments?: Prisma.BillingPaymentUncheckedCreateNestedManyWithoutUserInput
   billingEvents?: Prisma.BillingEventUncheckedCreateNestedManyWithoutUserInput
   customConversions?: Prisma.CustomConversionUncheckedCreateNestedManyWithoutOwnerInput
+  apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutOwnerInput
 }
 
 export type UserCreateOrConnectWithoutSubscriptionsInput = {
@@ -690,6 +813,7 @@ export type UserUpdateWithoutSubscriptionsInput = {
   payments?: Prisma.BillingPaymentUpdateManyWithoutUserNestedInput
   billingEvents?: Prisma.BillingEventUpdateManyWithoutUserNestedInput
   customConversions?: Prisma.CustomConversionUpdateManyWithoutOwnerNestedInput
+  apiKeys?: Prisma.ApiKeyUpdateManyWithoutOwnerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSubscriptionsInput = {
@@ -710,6 +834,7 @@ export type UserUncheckedUpdateWithoutSubscriptionsInput = {
   payments?: Prisma.BillingPaymentUncheckedUpdateManyWithoutUserNestedInput
   billingEvents?: Prisma.BillingEventUncheckedUpdateManyWithoutUserNestedInput
   customConversions?: Prisma.CustomConversionUncheckedUpdateManyWithoutOwnerNestedInput
+  apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutOwnerNestedInput
 }
 
 export type UserCreateWithoutPaymentsInput = {
@@ -730,6 +855,7 @@ export type UserCreateWithoutPaymentsInput = {
   subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutUserInput
   billingEvents?: Prisma.BillingEventCreateNestedManyWithoutUserInput
   customConversions?: Prisma.CustomConversionCreateNestedManyWithoutOwnerInput
+  apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutOwnerInput
 }
 
 export type UserUncheckedCreateWithoutPaymentsInput = {
@@ -750,6 +876,7 @@ export type UserUncheckedCreateWithoutPaymentsInput = {
   subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutUserInput
   billingEvents?: Prisma.BillingEventUncheckedCreateNestedManyWithoutUserInput
   customConversions?: Prisma.CustomConversionUncheckedCreateNestedManyWithoutOwnerInput
+  apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutOwnerInput
 }
 
 export type UserCreateOrConnectWithoutPaymentsInput = {
@@ -786,6 +913,7 @@ export type UserUpdateWithoutPaymentsInput = {
   subscriptions?: Prisma.SubscriptionUpdateManyWithoutUserNestedInput
   billingEvents?: Prisma.BillingEventUpdateManyWithoutUserNestedInput
   customConversions?: Prisma.CustomConversionUpdateManyWithoutOwnerNestedInput
+  apiKeys?: Prisma.ApiKeyUpdateManyWithoutOwnerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPaymentsInput = {
@@ -806,6 +934,7 @@ export type UserUncheckedUpdateWithoutPaymentsInput = {
   subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutUserNestedInput
   billingEvents?: Prisma.BillingEventUncheckedUpdateManyWithoutUserNestedInput
   customConversions?: Prisma.CustomConversionUncheckedUpdateManyWithoutOwnerNestedInput
+  apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutOwnerNestedInput
 }
 
 export type UserCreateWithoutBillingEventsInput = {
@@ -826,6 +955,7 @@ export type UserCreateWithoutBillingEventsInput = {
   subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutUserInput
   payments?: Prisma.BillingPaymentCreateNestedManyWithoutUserInput
   customConversions?: Prisma.CustomConversionCreateNestedManyWithoutOwnerInput
+  apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutOwnerInput
 }
 
 export type UserUncheckedCreateWithoutBillingEventsInput = {
@@ -846,6 +976,7 @@ export type UserUncheckedCreateWithoutBillingEventsInput = {
   subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutUserInput
   payments?: Prisma.BillingPaymentUncheckedCreateNestedManyWithoutUserInput
   customConversions?: Prisma.CustomConversionUncheckedCreateNestedManyWithoutOwnerInput
+  apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutOwnerInput
 }
 
 export type UserCreateOrConnectWithoutBillingEventsInput = {
@@ -882,6 +1013,7 @@ export type UserUpdateWithoutBillingEventsInput = {
   subscriptions?: Prisma.SubscriptionUpdateManyWithoutUserNestedInput
   payments?: Prisma.BillingPaymentUpdateManyWithoutUserNestedInput
   customConversions?: Prisma.CustomConversionUpdateManyWithoutOwnerNestedInput
+  apiKeys?: Prisma.ApiKeyUpdateManyWithoutOwnerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBillingEventsInput = {
@@ -902,6 +1034,7 @@ export type UserUncheckedUpdateWithoutBillingEventsInput = {
   subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutUserNestedInput
   payments?: Prisma.BillingPaymentUncheckedUpdateManyWithoutUserNestedInput
   customConversions?: Prisma.CustomConversionUncheckedUpdateManyWithoutOwnerNestedInput
+  apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutOwnerNestedInput
 }
 
 export type UserCreateWithoutTrafficSourcesInput = {
@@ -922,6 +1055,7 @@ export type UserCreateWithoutTrafficSourcesInput = {
   payments?: Prisma.BillingPaymentCreateNestedManyWithoutUserInput
   billingEvents?: Prisma.BillingEventCreateNestedManyWithoutUserInput
   customConversions?: Prisma.CustomConversionCreateNestedManyWithoutOwnerInput
+  apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutOwnerInput
 }
 
 export type UserUncheckedCreateWithoutTrafficSourcesInput = {
@@ -942,6 +1076,7 @@ export type UserUncheckedCreateWithoutTrafficSourcesInput = {
   payments?: Prisma.BillingPaymentUncheckedCreateNestedManyWithoutUserInput
   billingEvents?: Prisma.BillingEventUncheckedCreateNestedManyWithoutUserInput
   customConversions?: Prisma.CustomConversionUncheckedCreateNestedManyWithoutOwnerInput
+  apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutOwnerInput
 }
 
 export type UserCreateOrConnectWithoutTrafficSourcesInput = {
@@ -978,6 +1113,7 @@ export type UserUpdateWithoutTrafficSourcesInput = {
   payments?: Prisma.BillingPaymentUpdateManyWithoutUserNestedInput
   billingEvents?: Prisma.BillingEventUpdateManyWithoutUserNestedInput
   customConversions?: Prisma.CustomConversionUpdateManyWithoutOwnerNestedInput
+  apiKeys?: Prisma.ApiKeyUpdateManyWithoutOwnerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTrafficSourcesInput = {
@@ -998,6 +1134,7 @@ export type UserUncheckedUpdateWithoutTrafficSourcesInput = {
   payments?: Prisma.BillingPaymentUncheckedUpdateManyWithoutUserNestedInput
   billingEvents?: Prisma.BillingEventUncheckedUpdateManyWithoutUserNestedInput
   customConversions?: Prisma.CustomConversionUncheckedUpdateManyWithoutOwnerNestedInput
+  apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutOwnerNestedInput
 }
 
 export type UserCreateWithoutCampaignsInput = {
@@ -1018,6 +1155,7 @@ export type UserCreateWithoutCampaignsInput = {
   payments?: Prisma.BillingPaymentCreateNestedManyWithoutUserInput
   billingEvents?: Prisma.BillingEventCreateNestedManyWithoutUserInput
   customConversions?: Prisma.CustomConversionCreateNestedManyWithoutOwnerInput
+  apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutOwnerInput
 }
 
 export type UserUncheckedCreateWithoutCampaignsInput = {
@@ -1038,6 +1176,7 @@ export type UserUncheckedCreateWithoutCampaignsInput = {
   payments?: Prisma.BillingPaymentUncheckedCreateNestedManyWithoutUserInput
   billingEvents?: Prisma.BillingEventUncheckedCreateNestedManyWithoutUserInput
   customConversions?: Prisma.CustomConversionUncheckedCreateNestedManyWithoutOwnerInput
+  apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutOwnerInput
 }
 
 export type UserCreateOrConnectWithoutCampaignsInput = {
@@ -1074,6 +1213,7 @@ export type UserUpdateWithoutCampaignsInput = {
   payments?: Prisma.BillingPaymentUpdateManyWithoutUserNestedInput
   billingEvents?: Prisma.BillingEventUpdateManyWithoutUserNestedInput
   customConversions?: Prisma.CustomConversionUpdateManyWithoutOwnerNestedInput
+  apiKeys?: Prisma.ApiKeyUpdateManyWithoutOwnerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCampaignsInput = {
@@ -1094,6 +1234,7 @@ export type UserUncheckedUpdateWithoutCampaignsInput = {
   payments?: Prisma.BillingPaymentUncheckedUpdateManyWithoutUserNestedInput
   billingEvents?: Prisma.BillingEventUncheckedUpdateManyWithoutUserNestedInput
   customConversions?: Prisma.CustomConversionUncheckedUpdateManyWithoutOwnerNestedInput
+  apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutOwnerNestedInput
 }
 
 export type UserCreateWithoutOffersInput = {
@@ -1114,6 +1255,7 @@ export type UserCreateWithoutOffersInput = {
   payments?: Prisma.BillingPaymentCreateNestedManyWithoutUserInput
   billingEvents?: Prisma.BillingEventCreateNestedManyWithoutUserInput
   customConversions?: Prisma.CustomConversionCreateNestedManyWithoutOwnerInput
+  apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutOwnerInput
 }
 
 export type UserUncheckedCreateWithoutOffersInput = {
@@ -1134,6 +1276,7 @@ export type UserUncheckedCreateWithoutOffersInput = {
   payments?: Prisma.BillingPaymentUncheckedCreateNestedManyWithoutUserInput
   billingEvents?: Prisma.BillingEventUncheckedCreateNestedManyWithoutUserInput
   customConversions?: Prisma.CustomConversionUncheckedCreateNestedManyWithoutOwnerInput
+  apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutOwnerInput
 }
 
 export type UserCreateOrConnectWithoutOffersInput = {
@@ -1170,6 +1313,7 @@ export type UserUpdateWithoutOffersInput = {
   payments?: Prisma.BillingPaymentUpdateManyWithoutUserNestedInput
   billingEvents?: Prisma.BillingEventUpdateManyWithoutUserNestedInput
   customConversions?: Prisma.CustomConversionUpdateManyWithoutOwnerNestedInput
+  apiKeys?: Prisma.ApiKeyUpdateManyWithoutOwnerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOffersInput = {
@@ -1190,6 +1334,7 @@ export type UserUncheckedUpdateWithoutOffersInput = {
   payments?: Prisma.BillingPaymentUncheckedUpdateManyWithoutUserNestedInput
   billingEvents?: Prisma.BillingEventUncheckedUpdateManyWithoutUserNestedInput
   customConversions?: Prisma.CustomConversionUncheckedUpdateManyWithoutOwnerNestedInput
+  apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutOwnerNestedInput
 }
 
 export type UserCreateWithoutCustomConversionsInput = {
@@ -1210,6 +1355,7 @@ export type UserCreateWithoutCustomConversionsInput = {
   subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutUserInput
   payments?: Prisma.BillingPaymentCreateNestedManyWithoutUserInput
   billingEvents?: Prisma.BillingEventCreateNestedManyWithoutUserInput
+  apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutOwnerInput
 }
 
 export type UserUncheckedCreateWithoutCustomConversionsInput = {
@@ -1230,6 +1376,7 @@ export type UserUncheckedCreateWithoutCustomConversionsInput = {
   subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutUserInput
   payments?: Prisma.BillingPaymentUncheckedCreateNestedManyWithoutUserInput
   billingEvents?: Prisma.BillingEventUncheckedCreateNestedManyWithoutUserInput
+  apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutOwnerInput
 }
 
 export type UserCreateOrConnectWithoutCustomConversionsInput = {
@@ -1266,6 +1413,7 @@ export type UserUpdateWithoutCustomConversionsInput = {
   subscriptions?: Prisma.SubscriptionUpdateManyWithoutUserNestedInput
   payments?: Prisma.BillingPaymentUpdateManyWithoutUserNestedInput
   billingEvents?: Prisma.BillingEventUpdateManyWithoutUserNestedInput
+  apiKeys?: Prisma.ApiKeyUpdateManyWithoutOwnerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCustomConversionsInput = {
@@ -1286,6 +1434,7 @@ export type UserUncheckedUpdateWithoutCustomConversionsInput = {
   subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutUserNestedInput
   payments?: Prisma.BillingPaymentUncheckedUpdateManyWithoutUserNestedInput
   billingEvents?: Prisma.BillingEventUncheckedUpdateManyWithoutUserNestedInput
+  apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutOwnerNestedInput
 }
 
 
@@ -1301,6 +1450,7 @@ export type UserCountOutputType = {
   payments: number
   billingEvents: number
   customConversions: number
+  apiKeys: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1311,6 +1461,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   payments?: boolean | UserCountOutputTypeCountPaymentsArgs
   billingEvents?: boolean | UserCountOutputTypeCountBillingEventsArgs
   customConversions?: boolean | UserCountOutputTypeCountCustomConversionsArgs
+  apiKeys?: boolean | UserCountOutputTypeCountApiKeysArgs
 }
 
 /**
@@ -1372,6 +1523,13 @@ export type UserCountOutputTypeCountCustomConversionsArgs<ExtArgs extends runtim
   where?: Prisma.CustomConversionWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountApiKeysArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ApiKeyWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1392,6 +1550,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   payments?: boolean | Prisma.User$paymentsArgs<ExtArgs>
   billingEvents?: boolean | Prisma.User$billingEventsArgs<ExtArgs>
   customConversions?: boolean | Prisma.User$customConversionsArgs<ExtArgs>
+  apiKeys?: boolean | Prisma.User$apiKeysArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1446,6 +1605,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   payments?: boolean | Prisma.User$paymentsArgs<ExtArgs>
   billingEvents?: boolean | Prisma.User$billingEventsArgs<ExtArgs>
   customConversions?: boolean | Prisma.User$customConversionsArgs<ExtArgs>
+  apiKeys?: boolean | Prisma.User$apiKeysArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1461,6 +1621,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     payments: Prisma.$BillingPaymentPayload<ExtArgs>[]
     billingEvents: Prisma.$BillingEventPayload<ExtArgs>[]
     customConversions: Prisma.$CustomConversionPayload<ExtArgs>[]
+    apiKeys: Prisma.$ApiKeyPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1875,6 +2036,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   payments<T extends Prisma.User$paymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$paymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BillingPaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   billingEvents<T extends Prisma.User$billingEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$billingEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BillingEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   customConversions<T extends Prisma.User$customConversionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$customConversionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CustomConversionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  apiKeys<T extends Prisma.User$apiKeysArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$apiKeysArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApiKeyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2468,6 +2630,30 @@ export type User$customConversionsArgs<ExtArgs extends runtime.Types.Extensions.
   take?: number
   skip?: number
   distinct?: Prisma.CustomConversionScalarFieldEnum | Prisma.CustomConversionScalarFieldEnum[]
+}
+
+/**
+ * User.apiKeys
+ */
+export type User$apiKeysArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ApiKey
+   */
+  select?: Prisma.ApiKeySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ApiKey
+   */
+  omit?: Prisma.ApiKeyOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ApiKeyInclude<ExtArgs> | null
+  where?: Prisma.ApiKeyWhereInput
+  orderBy?: Prisma.ApiKeyOrderByWithRelationInput | Prisma.ApiKeyOrderByWithRelationInput[]
+  cursor?: Prisma.ApiKeyWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ApiKeyScalarFieldEnum | Prisma.ApiKeyScalarFieldEnum[]
 }
 
 /**

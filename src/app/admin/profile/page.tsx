@@ -5,6 +5,7 @@ import AdminNavigation from "@/app/admin/admin-navigation";
 import { requireCurrentUser } from "@/lib/auth/current-user";
 import { prisma } from "@/lib/database/prisma";
 import { formatDateInTimezone } from "@/lib/timezone";
+import ApiKeyManager from "@/app/admin/profile/api-key-manager";
 
 export const metadata: Metadata = {
   title: "Profile | Trakio",
@@ -75,6 +76,7 @@ export default async function ProfilePage() {
             </div>
           </section>
         </div>
+        <ApiKeyManager />
       </div>
     </main>
   );

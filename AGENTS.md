@@ -25,7 +25,7 @@ Do not add these unless the owner explicitly changes this document:
 - Bot detection, anti-fraud scoring, device fingerprinting, or cloaking.
 - A generic integration catalog, visual workflow builder, report builder, or campaign automation.
 - Cookies, cross-device attribution, multi-touch attribution, or retargeting features. A narrowly scoped Voluum-compatible postback endpoint is allowed because the client's existing GTM workflow depends on it.
-- Native mobile apps, public APIs, or roles beyond a single private operator.
+- Native mobile apps or roles beyond a single private operator.
 - Metrics that cannot drive a decision for this operator.
 
 When a proposed feature does not directly improve click capture, conversion attribution, outbound reporting, or the dashboard's useful metrics, do not build it. Record it as a future idea instead.
@@ -216,6 +216,19 @@ MVP views:
 - Campaign detail: daily trend plus recent clicks, conversions, and delivery failures.
 - Delivery health: pending, retrying, and permanently failed outbound postbacks, with reason and manual retry.
 - Configuration: campaigns, destinations, money-site authentication, and traffic-source adapter settings.
+
+## Customer API (owner-approved addition)
+
+Provide a versioned, customer-facing API so Operator and Expanded plan customers can connect their own software and AI agents to the same account data and workspace actions available in the dashboard. Keep it in this application and use the existing domain validation, ownership checks, and transactional behavior.
+
+- Use `https://app.trakio.org/api/v1` as the stable API base URL.
+- Authenticate with revocable, high-entropy bearer API keys. Store only token hashes; show the raw token once. Keys belong to one user and carry explicit scopes.
+- Enforce account ownership and plan access on every request. Never expose password hashes, verification tokens, billing-provider secrets, or traffic-source credentials.
+- Cover campaign setup and status, offers, traffic-source configuration, custom conversion rules, conversion and click reporting, overview/campaign metrics, delivery health and manual retry, and account timezone.
+- Keep signup, login, subscription checkout, invoice administration, and provider webhooks inside the app. The API does not bypass subscription status or campaign limits.
+- Return stable JSON errors with request IDs. Paginate record lists, bound filters and request sizes, and document idempotency for conversion intake.
+- Include API key creation, listing, and revocation in the private profile. Audit key lifecycle and API-triggered mutations without recording token values.
+- Publish a customer guide with authentication examples, endpoint/method tables, request and response shapes, scopes, and AI-agent usage guidance.
 
 Define formulas in one shared module and display them consistently:
 
