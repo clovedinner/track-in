@@ -47,7 +47,7 @@ Example request body:
 
 Use `status: "draft"` to save privately. Use `status: "published"` when Hermes should publish. A successful write returns a commit SHA and `deployment: "queued"`; the public page appears after GitHub Actions finishes deploying. A published article URL is `https://trakio.org/articles/<slug>`.
 
-The API validates article frontmatter and body, caps requests at 100 KB, and only allows URL-safe slugs under `content/articles/`. It has no delete operation and cannot modify app code. Keep Hermes' prompt explicit: research current queries, avoid duplicating existing articles, verify product claims against current docs, and only use published status when ready to publish.
+The API validates article frontmatter and body, caps requests at 100 KB, and only allows URL-safe slugs under `content/articles/`. It has no delete operation and cannot modify app code. The page template renders the frontmatter title as the only H1; article Markdown should start with its introduction and use H2 headings for sections. Keep Hermes' prompt explicit: research current queries, avoid duplicating existing articles, verify product claims against current docs, and only use published status when ready to publish.
 
 ## Hermes connection
 

@@ -22,6 +22,38 @@ const articleDirectory = join(process.cwd(), "content", "articles");
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const markdown = new MarkdownIt({ html: false, linkify: false, typographer: false });
 
+type ArticleRenderEnvironment = { headingIds: Map<string, number> };
+
+function headingSlug(value: string): string {
+  return value
+    .normalize("NFKD")
+    .toLowerCase()
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "") || "section";
+}
+
+markdown.renderer.rules.heading_open = (tokens, index, options, environment, renderer) => {
+  const heading = tokens[index + 1];
+  if (!heading || heading.type !== "inline") return renderer.renderToken(tokens, index, options);
+
+  const baseSlug = headingSlug(heading.content);
+  const renderEnvironment = environment as ArticleRenderEnvironment;
+  const occurrence = renderEnvironment.headingIds.get(baseSlug) ?? 0;
+  renderEnvironment.headingIds.set(baseSlug, occurrence + 1);
+
+  const headingToken = tokens[index];
+  headingToken.attrSet("id", occurrence === 0 ? baseSlug : `${baseSlug}-${occurrence + 1}`);
+  headingToken.attrSet("tabindex", "-1");
+  if (baseSlug === "on-this-page") headingToken.attrSet("class", "article-toc-heading");
+  return renderer.renderToken(tokens, index, options);
+};
+
+markdown.renderer.rules.table_open = (tokens, index, options, environment, renderer) =>
+  `<div class="article-table-scroll" role="region" aria-label="Scrollable article table" tabindex="0">\n${renderer.renderToken(tokens, index, options)}`;
+markdown.renderer.rules.table_close = (tokens, index, options, environment, renderer) =>
+  `${renderer.renderToken(tokens, index, options)}</div>\n`;
+
 function requiredText(data: Record<string, unknown>, key: string, slug: string): string {
   const value = data[key];
   if (typeof value !== "string" || value.trim().length === 0) {
@@ -92,7 +124,8 @@ export function getPublishedArticle(slug: string): Article | undefined {
 }
 
 export function renderArticleMarkdown(content: string): string {
-  return markdown.render(content);
+  const environment: ArticleRenderEnvironment = { headingIds: new Map() };
+  return markdown.render(content, environment);
 }
 
 export function articleDate(date: string): Date {
