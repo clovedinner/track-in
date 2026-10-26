@@ -280,7 +280,7 @@ export type OutboundPostbackGroupByOutputType = {
   _max: OutboundPostbackMaxAggregateOutputType | null
 }
 
-type GetOutboundPostbackGroupByPayload<T extends OutboundPostbackGroupByArgs> = Prisma.PrismaPromise<
+export type GetOutboundPostbackGroupByPayload<T extends OutboundPostbackGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<OutboundPostbackGroupByOutputType, T['by']> &
       {
@@ -1803,6 +1803,11 @@ export type OutboundPostbackFindManyArgs<ExtArgs extends runtime.Types.Extension
    * Skip the first `n` OutboundPostbacks.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of OutboundPostbacks.
+   */
   distinct?: Prisma.OutboundPostbackScalarFieldEnum | Prisma.OutboundPostbackScalarFieldEnum[]
 }
 

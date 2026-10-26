@@ -196,7 +196,7 @@ export type ClickGroupByOutputType = {
   _max: ClickMaxAggregateOutputType | null
 }
 
-type GetClickGroupByPayload<T extends ClickGroupByArgs> = Prisma.PrismaPromise<
+export type GetClickGroupByPayload<T extends ClickGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<ClickGroupByOutputType, T['by']> &
       {
@@ -1623,6 +1623,11 @@ export type ClickFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Skip the first `n` Clicks.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Clicks.
+   */
   distinct?: Prisma.ClickScalarFieldEnum | Prisma.ClickScalarFieldEnum[]
 }
 

@@ -237,7 +237,7 @@ export type EmailOutboxGroupByOutputType = {
   _max: EmailOutboxMaxAggregateOutputType | null
 }
 
-type GetEmailOutboxGroupByPayload<T extends EmailOutboxGroupByArgs> = Prisma.PrismaPromise<
+export type GetEmailOutboxGroupByPayload<T extends EmailOutboxGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<EmailOutboxGroupByOutputType, T['by']> &
       {
@@ -1196,6 +1196,11 @@ export type EmailOutboxFindManyArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Skip the first `n` EmailOutboxes.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of EmailOutboxes.
+   */
   distinct?: Prisma.EmailOutboxScalarFieldEnum | Prisma.EmailOutboxScalarFieldEnum[]
 }
 

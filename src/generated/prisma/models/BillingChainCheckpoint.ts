@@ -144,7 +144,7 @@ export type BillingChainCheckpointGroupByOutputType = {
   _max: BillingChainCheckpointMaxAggregateOutputType | null
 }
 
-type GetBillingChainCheckpointGroupByPayload<T extends BillingChainCheckpointGroupByArgs> = Prisma.PrismaPromise<
+export type GetBillingChainCheckpointGroupByPayload<T extends BillingChainCheckpointGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<BillingChainCheckpointGroupByOutputType, T['by']> &
       {
@@ -898,6 +898,11 @@ export type BillingChainCheckpointFindManyArgs<ExtArgs extends runtime.Types.Ext
    * Skip the first `n` BillingChainCheckpoints.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of BillingChainCheckpoints.
+   */
   distinct?: Prisma.BillingChainCheckpointScalarFieldEnum | Prisma.BillingChainCheckpointScalarFieldEnum[]
 }
 

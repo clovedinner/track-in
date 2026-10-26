@@ -185,7 +185,7 @@ export type TrafficSourceGroupByOutputType = {
   _max: TrafficSourceMaxAggregateOutputType | null
 }
 
-type GetTrafficSourceGroupByPayload<T extends TrafficSourceGroupByArgs> = Prisma.PrismaPromise<
+export type GetTrafficSourceGroupByPayload<T extends TrafficSourceGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<TrafficSourceGroupByOutputType, T['by']> &
       {
@@ -1669,6 +1669,11 @@ export type TrafficSourceFindManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * Skip the first `n` TrafficSources.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of TrafficSources.
+   */
   distinct?: Prisma.TrafficSourceScalarFieldEnum | Prisma.TrafficSourceScalarFieldEnum[]
 }
 

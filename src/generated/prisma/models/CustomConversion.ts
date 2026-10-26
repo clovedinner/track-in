@@ -189,7 +189,7 @@ export type CustomConversionGroupByOutputType = {
   _max: CustomConversionMaxAggregateOutputType | null
 }
 
-type GetCustomConversionGroupByPayload<T extends CustomConversionGroupByArgs> = Prisma.PrismaPromise<
+export type GetCustomConversionGroupByPayload<T extends CustomConversionGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<CustomConversionGroupByOutputType, T['by']> &
       {
@@ -1306,6 +1306,11 @@ export type CustomConversionFindManyArgs<ExtArgs extends runtime.Types.Extension
    * Skip the first `n` CustomConversions.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of CustomConversions.
+   */
   distinct?: Prisma.CustomConversionScalarFieldEnum | Prisma.CustomConversionScalarFieldEnum[]
 }
 

@@ -238,6 +238,15 @@ Define formulas in one shared module and display them consistently:
 
 Do not add vanity charts, arbitrary report exports, cohort analysis, or metrics with unclear definitions. Every metric must trace to a persisted source record.
 
+## Internal article publishing (owner-approved addition)
+
+The public marketing site uses Git-backed Markdown articles. Hermes may manage them through a separate authenticated internal API, without repository or VPS access.
+
+- Limit writes to validated Markdown files under `content/articles/`.
+- Keep the publishing bearer secret and GitHub write token in production environment variables; give Hermes only the dedicated bearer secret.
+- GitHub commits to the configured article branch trigger the existing deployment workflow. Publishing is complete only after that deployment succeeds.
+- Do not reuse customer API keys or customer API scopes for this internal publishing integration.
+
 ## Security and privacy requirements
 
 - Require HTTPS in production. Enable secure cookies and standard security headers for private routes.

@@ -186,7 +186,7 @@ export type BillingEventGroupByOutputType = {
   _max: BillingEventMaxAggregateOutputType | null
 }
 
-type GetBillingEventGroupByPayload<T extends BillingEventGroupByArgs> = Prisma.PrismaPromise<
+export type GetBillingEventGroupByPayload<T extends BillingEventGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<BillingEventGroupByOutputType, T['by']> &
       {
@@ -1268,6 +1268,11 @@ export type BillingEventFindManyArgs<ExtArgs extends runtime.Types.Extensions.In
    * Skip the first `n` BillingEvents.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of BillingEvents.
+   */
   distinct?: Prisma.BillingEventScalarFieldEnum | Prisma.BillingEventScalarFieldEnum[]
 }
 

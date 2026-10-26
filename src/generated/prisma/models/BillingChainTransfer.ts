@@ -213,7 +213,7 @@ export type BillingChainTransferGroupByOutputType = {
   _max: BillingChainTransferMaxAggregateOutputType | null
 }
 
-type GetBillingChainTransferGroupByPayload<T extends BillingChainTransferGroupByArgs> = Prisma.PrismaPromise<
+export type GetBillingChainTransferGroupByPayload<T extends BillingChainTransferGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<BillingChainTransferGroupByOutputType, T['by']> &
       {
@@ -1271,6 +1271,11 @@ export type BillingChainTransferFindManyArgs<ExtArgs extends runtime.Types.Exten
    * Skip the first `n` BillingChainTransfers.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of BillingChainTransfers.
+   */
   distinct?: Prisma.BillingChainTransferScalarFieldEnum | Prisma.BillingChainTransferScalarFieldEnum[]
 }
 
