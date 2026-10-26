@@ -4,7 +4,7 @@ description: "Compare five conversion tracking platforms by setup, tracking appr
 category: "Tracking platforms"
 author: "Trakio team"
 publishedAt: '2026-10-26'
-status: draft
+status: published
 ---
 
 # Conversion Tracking Platforms Compared: Voluum, RedTrack, BeMob, Keitaro, and Trakio
