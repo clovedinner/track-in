@@ -35,7 +35,6 @@ export function PublicSiteFooter() {
               {link.label}
             </Link>
           ))}
-          <Link href="/articles">Articles</Link>
           <a href={`${publicAppUrl}/auth/sign-in`}>Sign in</a>
         </nav>
       </div>

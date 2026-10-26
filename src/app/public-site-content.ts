@@ -6,5 +6,6 @@ export const publicLinks = [
   { href: "/features", label: "Features" },
   { href: "/pricing", label: "Pricing" },
   { href: "/docs", label: "Documentation" },
+  { href: "/articles", label: "Articles" },
   { href: "/about", label: "About us" },
 ];
