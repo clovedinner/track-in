@@ -4,7 +4,7 @@ description: "Learn how conversion tracking connects ad clicks to signups, leads
 category: "Conversion tracking"
 author: "Trakio team"
 publishedAt: '2026-10-27'
-status: draft
+status: published
 ---
 
 Conversion tracking is the process of recording an important action—such as a signup, lead, or purchase—and connecting it to the ad visit that led to it. It helps advertisers understand what happens after a click, rather than judging a campaign only by visits.
