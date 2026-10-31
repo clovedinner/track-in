@@ -4,7 +4,7 @@ description: "Learn how to preserve click IDs, send backend conversion events se
 category: "Conversion tracking"
 author: "Trakio team"
 publishedAt: '2026-10-28'
-status: draft
+status: published
 ---
 
 Server-to-server (S2S) conversion tracking sends an event from a website or partner backend to a tracking system, rather than relying only on a browser event at the moment of conversion. It is useful when the system that confirms a registration, payment, or qualified lead can report that outcome directly. S2S does not fix missing identifiers or incorrect event data: the click ID still has to survive from the ad visit to the conversion.
