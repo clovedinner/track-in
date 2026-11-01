@@ -18,7 +18,10 @@ export const metadata: Metadata = {
   title: "Trakio",
   description: "Self-hosted conversion tracking.",
   icons: {
-    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    icon: [
+      { url: "/favicon.png", type: "image/png", sizes: "192x192" },
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
   },
 };
 

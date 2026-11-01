@@ -4,9 +4,21 @@ import Link from "next/link";
 import { PublicCTA, PublicSiteShell } from "@/app/public-site-shell";
 
 export const metadata: Metadata = {
-  title: "Trakio | Simple ad tracking that works",
+  title: "Ad Tracking & Conversion Tracking Software | Trakio",
   description:
-    "Connect paid traffic to real conversions. Trakio keeps campaign tracking, attribution, postbacks, and reporting focused on the work you actually do.",
+    "Track ad clicks and conversions with Trakio. Attribute registrations, purchases, and deposits to campaigns, send postbacks, and review campaign performance.",
+  openGraph: {
+    type: "website",
+    url: "https://trakio.org",
+    siteName: "Trakio",
+    title: "Ad Tracking & Conversion Tracking Software | Trakio",
+    description: "Track ad clicks, attribute conversions to campaigns, and send conversion postbacks with Trakio.",
+  },
+  twitter: {
+    card: "summary",
+    title: "Ad Tracking & Conversion Tracking Software | Trakio",
+    description: "Track ad clicks, attribute conversions to campaigns, and send conversion postbacks with Trakio.",
+  },
   alternates: { canonical: "https://trakio.org" },
   verification: { google: "obVQKKtMBP4VD1iMNQDyzwFZOrIVivavfi_RkATWzsU" }
 };
@@ -18,9 +30,9 @@ export default function Home() {
         <div>
           <p className="public-kicker">Ad tracking, with a clear purpose</p>
           <h1>
-            Simple tracking.
+            Ad tracking.
             <br />
-            <span className="public-blue-text">Useful answers.</span>
+            <span className="public-blue-text">Conversion tracking.</span>
           </h1>
           <p className="public-lead">
             See which ads bring conversions. Trakio connects your campaign
