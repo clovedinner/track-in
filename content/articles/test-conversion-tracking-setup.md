@@ -4,7 +4,7 @@ description: "Follow a practical end-to-end checklist to verify click IDs, conve
 category: "Conversion tracking"
 author: "Trakio team"
 publishedAt: '2026-10-29'
-status: draft
+status: published
 ---
 
 Testing conversion tracking before you launch helps catch broken click-ID handoffs, incorrect event definitions, and failed postbacks while traffic is still controlled. A useful test follows the same path as a real visitor—from the campaign link to the destination, through the conversion event, and back to the reporting systems.
