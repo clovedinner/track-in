@@ -4,7 +4,7 @@ description: "Diagnose missing or unattributed conversions by tracing the click 
 category: "Conversion tracking"
 author: "Trakio team"
 publishedAt: '2026-10-30'
-status: draft
+status: published
 ---
 
 Missing conversions are frustrating, but the symptom usually points to a specific part of the tracking chain. A conversion can fail to arrive, arrive without attribution, be recorded under an unexpected event, or be present in the tracker while the ad platform never receives its postback. Diagnose those cases separately instead of changing campaign settings at random.
