@@ -4,7 +4,7 @@ description: "Understand how Google Tag Manager fits into conversion tracking, w
 category: "Conversion tracking"
 author: "Trakio team"
 publishedAt: '2026-11-03'
-status: draft
+status: published
 ---
 
 Google Tag Manager (GTM) can help you deploy and manage browser-based conversion tracking without editing every page for each tag change. It does not create the business event, preserve every identifier automatically, or prove that a conversion reached an ad platform. Those responsibilities still depend on your site, configuration, and testing.
