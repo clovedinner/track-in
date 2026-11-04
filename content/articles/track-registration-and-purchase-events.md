@@ -4,7 +4,7 @@ description: "Define registration and purchase events, preserve ad click IDs, pr
 category: "Conversion tracking"
 author: "Trakio team"
 publishedAt: '2026-11-04'
-status: draft
+status: published
 ---
 
 Tracking registrations and purchases as separate events shows where a visitor moves from creating an account to becoming a customer. The key is to define each event by a real outcome, keep the original ad click ID attached, and report the events consistently without counting one action twice.
