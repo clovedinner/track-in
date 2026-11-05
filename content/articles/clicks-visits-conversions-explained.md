@@ -4,7 +4,7 @@ description: "Learn how clicks, visits, and conversions differ, why their totals
 category: "Conversion tracking"
 author: "Trakio team"
 publishedAt: '2026-11-05'
-status: draft
+status: published
 ---
 
 Clicks, visits, and conversions describe different steps in an advertising funnel. A click is an interaction with an ad or tracked link; a visit is an arrival recorded by your tracking or analytics system; a conversion is a defined outcome such as a registration or purchase. These numbers are related, but they are not interchangeable and should not be expected to match exactly.
