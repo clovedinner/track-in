@@ -30,12 +30,25 @@ export async function PATCH(request: Request, context: Context): Promise<NextRes
     if (Object.keys(data).length === 0) {
       return apiErrorResponse(new ApiError("invalid_request", 400, "Provide at least one editable campaign field."), correlationId);
     }
-    const campaign = await prisma.campaign.findUnique({ where: { id: campaignId, ownerId: user.id }, select: { destinationUrl: true, trafficSource: { select: { enabled: true } } } });
-    if (!campaign) return apiErrorResponse(new ApiError("not_found", 404, "Campaign not found."), correlationId);
-    if (status === CampaignStatus.active && (!(settings.destinationUrl ?? campaign.destinationUrl).startsWith("https://") || campaign.trafficSource?.enabled !== true)) {
-      return apiErrorResponse(new ApiError("invalid_request", 400, "Campaign needs an HTTPS destination and an enabled traffic source before activation."), correlationId);
-    }
     const updated = await prisma.$transaction(async (transaction) => {
+      const campaign = await transaction.campaign.findUnique({ where: { id: campaignId, ownerId: user.id }, select: { destinationUrl: true, trafficSource: { select: { enabled: true } } } });
+      if (!campaign) throw new ApiError("not_found", 404, "Campaign not found.");
+
+      let sourceEnabled = campaign.trafficSource?.enabled === true;
+      if (settings.trafficSourceId) {
+        const source = await transaction.trafficSource.findUnique({ where: { id: settings.trafficSourceId, ownerId: user.id }, select: { enabled: true } });
+        if (!source?.enabled) throw new ApiError("not_found", 404, "Traffic source not found or disabled.");
+        sourceEnabled = true;
+      }
+      if (settings.offerId) {
+        const offer = await transaction.offer.findUnique({ where: { id: settings.offerId, ownerId: user.id }, select: { offerUrl: true } });
+        if (!offer) throw new ApiError("not_found", 404, "Offer not found.");
+        if (!offer.offerUrl?.startsWith("https://")) throw new ApiError("invalid_request", 400, "Selected offer does not have an HTTPS offer URL.");
+        data.destinationUrl = offer.offerUrl;
+      }
+      if (status === CampaignStatus.active && (!(data.destinationUrl ?? campaign.destinationUrl).startsWith("https://") || !sourceEnabled)) {
+        throw new ApiError("invalid_request", 400, "Campaign needs an HTTPS destination and an enabled traffic source before activation.");
+      }
       const updated = await transaction.campaign.update({ where: { id: campaignId, ownerId: user.id }, data, select: { id: true, status: true } });
       await transaction.auditEntry.create({ data: {
         action: "campaign.updated",
@@ -49,6 +62,7 @@ export async function PATCH(request: Request, context: Context): Promise<NextRes
     });
     return NextResponse.json({ campaign: updated }, { headers: { "x-request-id": correlationId } });
   } catch (error) {
+    if (error instanceof ApiError) return apiErrorResponse(error, correlationId);
     if (error instanceof CampaignInputError) {
       return apiErrorResponse(new ApiError("invalid_request", 400, error.message), correlationId);
     }

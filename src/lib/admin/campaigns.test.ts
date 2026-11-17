@@ -3,6 +3,17 @@ import { describe, expect, it } from "vitest";
 import { CampaignInputError, parseCampaignSettingsPatch, parseCreateCampaignInput } from "./campaigns";
 
 describe("parseCampaignSettingsPatch", () => {
+  it("accepts the campaign form's relationship and routing changes", () => {
+    const settings = {
+      trafficSourceId: "123e4567-e89b-42d3-a456-426614174000",
+      offerId: "123e4567-e89b-42d3-a456-426614174001",
+      trackingMode: "direct",
+    };
+    expect(parseCampaignSettingsPatch(settings)).toEqual(settings);
+    expect(() => parseCampaignSettingsPatch({ ...settings, offerId: "" })).toThrow(CampaignInputError);
+    expect(() => parseCampaignSettingsPatch({ ...settings, trackingMode: "invalid" })).toThrow(CampaignInputError);
+  });
+
   it("allows a name-only update and ignores fields outside campaign settings", () => {
     expect(parseCampaignSettingsPatch({ name: "  Summer sale  ", slug: "new-slug", ownerId: "other" }))
       .toEqual({ name: "Summer sale" });

@@ -138,7 +138,19 @@ export function parseCreateCampaignInput(body: unknown): CreateCampaignInput {
 }
 
 export function parseCampaignSettingsPatch(input: Record<string, unknown>) {
+  const { trackingMode } = input;
+  if (trackingMode !== undefined && trackingMode !== CampaignTrackingMode.redirect && trackingMode !== CampaignTrackingMode.direct) {
+    throw new CampaignInputError("trackingMode", "trackingMode must be redirect or direct.");
+  }
+  for (const field of ["trafficSourceId", "offerId"] as const) {
+    if (input[field] !== undefined && !uuidPattern.test(requireString(input[field], field, 36))) {
+      throw new CampaignInputError(field, `${field} must be a valid UUID.`);
+    }
+  }
   return {
+    ...(trackingMode !== undefined ? { trackingMode } : {}),
+    ...(typeof input.trafficSourceId === "string" ? { trafficSourceId: input.trafficSourceId.trim() } : {}),
+    ...(typeof input.offerId === "string" ? { offerId: input.offerId.trim() } : {}),
     ...(input.name !== undefined ? { name: requireString(input.name, "name", 200) } : {}),
     ...(input.destinationUrl !== undefined ? { destinationUrl: parseDestinationUrl(input.destinationUrl) } : {}),
     ...(input.allowedTrackingParameters !== undefined
