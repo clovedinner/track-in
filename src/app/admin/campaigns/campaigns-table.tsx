@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 
 import type { CampaignListRow } from "@/lib/admin/campaign-views";
 import type { CustomConversionColumn } from "@/lib/admin/custom-conversion-metrics";
@@ -20,6 +20,8 @@ export default function CampaignsTable({ rows, timezone, customConversions }: { 
   const router = useRouter();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [drawer, setDrawer] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
   const [duplicating, setDuplicating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const selected = rows.find((row) => row.id === selectedId) ?? null;
@@ -29,6 +31,45 @@ export default function CampaignsTable({ rows, timezone, customConversions }: { 
     setError(null);
   }
 
+  async function saveCampaign(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!selected || saving) return;
+
+    const form = new FormData(event.currentTarget);
+    const name = String(form.get("name")).trim();
+    const destinationUrl = String(form.get("destinationUrl")).trim();
+    const previousParameters = Array.isArray(selected.allowedTrackingParameters) ? selected.allowedTrackingParameters : [];
+    const allowedTrackingParameters = String(form.get("allowedTrackingParameters")).split(",").map((value) => value.trim()).filter(Boolean);
+    const changes = {
+      ...(name !== selected.name ? { name } : {}),
+      ...(destinationUrl !== selected.destinationUrl ? { destinationUrl } : {}),
+      ...(JSON.stringify(allowedTrackingParameters) !== JSON.stringify(previousParameters) ? { allowedTrackingParameters } : {}),
+    };
+    if (Object.keys(changes).length === 0) {
+      setDrawer(false);
+      return;
+    }
+
+    setSaving(true);
+    setEditError(null);
+    try {
+      const response = await fetch(`/api/admin/campaigns/${selected.id}`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json", accept: "application/json" },
+        body: JSON.stringify(changes),
+      });
+      if (!response.ok) {
+        const body = await response.json().catch(() => null) as { error?: { message?: string } } | null;
+        throw new Error(body?.error?.message ?? "Unable to save campaign.");
+      }
+      setDrawer(false);
+      router.refresh();
+    } catch (saveError) {
+      setEditError(saveError instanceof Error ? saveError.message : "Unable to save campaign.");
+    } finally {
+      setSaving(false);
+    }
+  }
   async function duplicate() {
     if (!selected) return;
     setDuplicating(true);
@@ -65,7 +106,7 @@ export default function CampaignsTable({ rows, timezone, customConversions }: { 
     <div className="mt-7 flex flex-wrap items-center justify-between gap-3 border-y-2 border-[#121212] bg-white px-4 py-3" aria-label="Campaign actions">
       <p className="text-sm text-[#3e4855]">{selected ? <><strong className="text-[#121212]">Selected:</strong> {selected.name}</> : "Select a campaign to inspect or manage it."}</p>
       <div className="flex flex-wrap gap-2">
-        <button type="button" disabled={!selected} onClick={() => { if (selected) { setError(null); setDrawer(true); } }} className="border-2 border-[#121212] bg-white px-4 py-2 text-sm font-semibold hover:bg-[#F0C020] disabled:cursor-not-allowed disabled:opacity-40">Edit</button>
+        <button type="button" disabled={!selected} onClick={() => { if (selected) { setEditError(null); setDrawer(true); } }} className="border-2 border-[#121212] bg-white px-4 py-2 text-sm font-semibold hover:bg-[#F0C020] disabled:cursor-not-allowed disabled:opacity-40">Edit</button>
         <button type="button" disabled={!selected || duplicating} onClick={duplicate} className="border-2 border-[#121212] bg-white px-4 py-2 text-sm font-semibold hover:bg-[#F0C020] disabled:cursor-not-allowed disabled:opacity-40">{duplicating ? "Duplicating…" : "Duplicate"}</button>
       </div>
     </div>
@@ -93,18 +134,41 @@ export default function CampaignsTable({ rows, timezone, customConversions }: { 
       </table>
       {rows.length === 0 ? <div className="border-t-2 border-[#121212] px-6 py-10"><h2 className="text-lg font-semibold">No campaigns match these filters.</h2><p className="mt-2 text-sm text-[#121212]">Create a campaign or clear the search and status filters.</p></div> : null}
     </section>
-    {drawer && selected ? <section className="fixed inset-0 z-30 bg-[#121212]/35" role="dialog" aria-modal="true" aria-labelledby="campaign-action-title">
-      <button type="button" className="absolute inset-0 h-full w-full cursor-default" aria-label="Close campaign panel" onClick={() => setDrawer(false)} />
-      <aside className="absolute right-0 top-0 h-full w-full max-w-[560px] overflow-y-auto border-l-2 border-[#121212] bg-white shadow-2xl">
-        <header className="flex items-start justify-between border-b-2 border-[#121212] px-6 py-5"><div><p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#D02020]">Campaign workspace</p><h2 id="campaign-action-title" className="mt-2 text-2xl font-semibold tracking-[-0.03em]">{selected.name}</h2></div><button type="button" onClick={() => setDrawer(false)} aria-label="Close campaign panel" className="text-2xl leading-none text-[#1040C0] hover:text-[#121212]">×</button></header>
-        <div className="space-y-6 px-6 py-7">
-          <div className="grid grid-cols-2 gap-px border-2 border-[#121212] bg-[#121212]"><div className="bg-[#F0F0F0] p-3"><p className="text-[10px] font-bold uppercase tracking-[0.12em]">Status</p><p className="mt-1 font-semibold capitalize">{selected.status}</p></div><div className="bg-[#F0F0F0] p-3"><p className="text-[10px] font-bold uppercase tracking-[0.12em]">Routing</p><p className="mt-1 font-semibold capitalize">{selected.trackingMode}</p></div><div className="bg-[#F0F0F0] p-3"><p className="text-[10px] font-bold uppercase tracking-[0.12em]">Visits</p><p className="mt-1 font-mono font-semibold">{selected.clicks.toLocaleString()}</p></div><div className="bg-[#F0F0F0] p-3"><p className="text-[10px] font-bold uppercase tracking-[0.12em]">Conversions</p><p className="mt-1 font-mono font-semibold">{selected.conversions.toLocaleString()}</p></div></div>
-          <div><p className="text-xs font-bold uppercase tracking-[0.12em]">Destination</p><p className="mt-2 break-all border-2 border-[#121212] bg-[#F0F0F0] p-3 font-mono text-xs leading-5">{selected.destinationUrl}</p></div>
-          <div><p className="text-xs font-bold uppercase tracking-[0.12em]">Configuration</p><dl className="mt-2 divide-y-2 divide-[#121212] border-2 border-[#121212] text-sm"><div className="flex justify-between gap-4 p-3"><dt>Traffic source</dt><dd className="font-semibold">{selected.trafficSourceName ?? "Not connected"}</dd></div><div className="flex justify-between gap-4 p-3"><dt>Currency</dt><dd className="font-mono font-semibold">{selected.defaultCurrency}</dd></div><div className="flex justify-between gap-4 p-3"><dt>Created</dt><dd>{new Intl.DateTimeFormat("en", { dateStyle: "medium", timeZone: timezone }).format(selected.createdAt)} {timezone}</dd></div></dl></div>
-          <p className="border-2 border-[#121212] bg-[#F0C020] px-4 py-3 text-sm leading-6">Use campaign setup to update tracking instructions, test the click handoff, and finish the destination configuration.</p>
-        </div>
-        <footer className="sticky bottom-0 flex flex-wrap justify-end gap-3 border-t-2 border-[#121212] bg-white px-6 py-4"><Link href={`/admin/campaigns/${selected.id}/setup`} className="border-2 border-[#121212] px-4 py-2.5 text-sm font-semibold hover:bg-[#F0C020]">Open setup</Link><Link href={`/admin/campaigns/${selected.id}`} className="bg-[#1040C0] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#D02020]">View details</Link></footer>
-      </aside>
-    </section> : null}
+    {drawer && selected ? (
+      <dialog
+        key={selected.id}
+        ref={(element) => { if (element && !element.open) element.showModal(); }}
+        onCancel={(event) => { event.preventDefault(); if (!saving) setDrawer(false); }}
+        aria-labelledby="campaign-action-title"
+        className="fixed inset-y-0 right-0 left-auto m-0 h-full max-h-none w-full max-w-[560px] overflow-y-auto border-l-2 border-[#121212] bg-white text-[#121212] shadow-2xl backdrop:bg-[#121212]/35"
+      >
+        <form onSubmit={saveCampaign}>
+          <header className="border-b-2 border-[#121212] px-6 py-5">
+            <h2 id="campaign-action-title" className="text-2xl font-semibold">Edit campaign</h2>
+            <p className="mt-1 break-all text-sm text-[#3e4855]">{selected.slug}</p>
+          </header>
+          <fieldset disabled={saving} className="space-y-5 px-6 py-7">
+            <label className="block text-sm font-semibold">
+              Campaign name
+              <input required name="name" maxLength={200} defaultValue={selected.name} className="mt-2 block w-full border-2 border-[#121212] px-3 py-2" />
+            </label>
+            <label className="block text-sm font-semibold">
+              Destination URL
+              <input required type="url" name="destinationUrl" maxLength={2048} defaultValue={selected.destinationUrl} className="mt-2 block w-full border-2 border-[#121212] px-3 py-2" />
+            </label>
+            <label className="block text-sm font-semibold">
+              Allowed tracking parameters
+              <input name="allowedTrackingParameters" maxLength={1318} defaultValue={Array.isArray(selected.allowedTrackingParameters) ? selected.allowedTrackingParameters.join(", ") : ""} aria-describedby="campaign-parameters-help" className="mt-2 block w-full border-2 border-[#121212] px-3 py-2" />
+            </label>
+            <p id="campaign-parameters-help" className="text-sm text-[#3e4855]">Separate names with commas. Traffic source mappings take priority when configured.</p>
+            {editError && <p role="alert" className="border-l-2 border-[#D02020] pl-3 text-sm text-[#D02020]">{editError}</p>}
+          </fieldset>
+          <footer className="flex flex-wrap justify-end gap-3 border-t-2 border-[#121212] px-6 py-4">
+            <button type="button" disabled={saving} onClick={() => setDrawer(false)} className="border-2 border-[#121212] px-4 py-2.5 text-sm font-semibold hover:bg-[#F0C020] disabled:opacity-50">Cancel</button>
+            <button type="submit" disabled={saving} className="bg-[#1040C0] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#1239a2] disabled:opacity-50">{saving ? "Saving…" : "Save changes"}</button>
+          </footer>
+        </form>
+      </dialog>
+    ) : null}
   </>;
 }

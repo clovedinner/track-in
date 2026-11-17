@@ -136,3 +136,13 @@ export function parseCreateCampaignInput(body: unknown): CreateCampaignInput {
     allowedTrackingParameters: parseAllowedTrackingParameters(input.allowedTrackingParameters ?? []),
   };
 }
+
+export function parseCampaignSettingsPatch(input: Record<string, unknown>) {
+  return {
+    ...(input.name !== undefined ? { name: requireString(input.name, "name", 200) } : {}),
+    ...(input.destinationUrl !== undefined ? { destinationUrl: parseDestinationUrl(input.destinationUrl) } : {}),
+    ...(input.allowedTrackingParameters !== undefined
+      ? { allowedTrackingParameters: parseAllowedTrackingParameters(input.allowedTrackingParameters) }
+      : {}),
+  };
+}

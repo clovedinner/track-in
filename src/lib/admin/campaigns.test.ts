@@ -1,6 +1,22 @@
 import { describe, expect, it } from "vitest";
 
-import { CampaignInputError, parseCreateCampaignInput } from "./campaigns";
+import { CampaignInputError, parseCampaignSettingsPatch, parseCreateCampaignInput } from "./campaigns";
+
+describe("parseCampaignSettingsPatch", () => {
+  it("allows a name-only update and ignores fields outside campaign settings", () => {
+    expect(parseCampaignSettingsPatch({ name: "  Summer sale  ", slug: "new-slug", ownerId: "other" }))
+      .toEqual({ name: "Summer sale" });
+  });
+
+  it("allows clearing the parameter list", () => {
+    expect(parseCampaignSettingsPatch({ allowedTrackingParameters: [] })).toEqual({ allowedTrackingParameters: [] });
+  });
+
+  it("rejects insecure destinations and reserved parameters", () => {
+    expect(() => parseCampaignSettingsPatch({ destinationUrl: "http://example.com/" })).toThrow(CampaignInputError);
+    expect(() => parseCampaignSettingsPatch({ allowedTrackingParameters: ["cid"] })).toThrow(CampaignInputError);
+  });
+});
 
 const validCampaign = {
   slug: "spring-sale",
