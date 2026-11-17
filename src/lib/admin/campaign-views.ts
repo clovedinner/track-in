@@ -103,35 +103,63 @@ function bigintToNumber(value: bigint): number {
 }
 
 export async function getCampaignList(filters: CampaignListFilters = {}): Promise<CampaignListRow[]> {
-  const customConversions: CustomConversionColumn[] = filters.ownerId
-    ? await prisma.customConversion.findMany({ where: { ownerId: filters.ownerId, includeInConversions: true }, select: { id: true, name: true, eventValues: true, includeInConversions: true } })
-    : [];
-  const campaignRows = await prisma.campaign.findMany({
-    where: {
-      ...(filters.ownerId ? { ownerId: filters.ownerId } : {}),
-      ...(filters.status ? { status: filters.status } : {}),
-      ...(filters.search ? { OR: [{ name: { contains: filters.search, mode: "insensitive" } }, { slug: { contains: filters.search, mode: "insensitive" } }] } : {}),
-    },
-    orderBy: filters.sort === "name" ? { name: filters.direction ?? "desc" } : { createdAt: filters.direction ?? "desc" },
-    select: {
-      id: true,
-      slug: true,
-      name: true,
-      status: true,
-      trackingMode: true,
-      destinationUrl: true,
-      trafficSourceId: true,
-      offerId: true,
-      defaultCurrency: true,
-      allowedTrackingParameters: true,
-      createdAt: true,
-      trafficSource: { select: { name: true } },
-      clicks: { select: { conversions: { select: { valueMinor: true, eventType: true } } } },
-    },
-  });
+  return (await getCampaignListView(filters)).rows;
+}
+
+export async function getCampaignListView(filters: CampaignListFilters) {
+  const [campaignRows, customConversions] = await Promise.all([
+    prisma.campaign.findMany({
+      where: {
+        ...(filters.ownerId ? { ownerId: filters.ownerId } : {}),
+        ...(filters.status ? { status: filters.status } : {}),
+        ...(filters.search ? { OR: [{ name: { contains: filters.search, mode: "insensitive" } }, { slug: { contains: filters.search, mode: "insensitive" } }] } : {}),
+      },
+      orderBy: filters.sort === "name" ? { name: filters.direction ?? "desc" } : { createdAt: filters.direction ?? "desc" },
+      select: {
+        id: true,
+        slug: true,
+        name: true,
+        status: true,
+        trackingMode: true,
+        destinationUrl: true,
+        trafficSourceId: true,
+        offerId: true,
+        defaultCurrency: true,
+        allowedTrackingParameters: true,
+        createdAt: true,
+        trafficSource: { select: { name: true } },
+        _count: { select: { clicks: true } },
+      },
+    }),
+    filters.ownerId
+      ? prisma.customConversion.findMany({ where: { ownerId: filters.ownerId, includeInConversions: true }, select: { id: true, name: true, eventValues: true, includeInConversions: true } })
+      : Promise.resolve([] as CustomConversionColumn[]),
+  ]);
+
+  if (campaignRows.length === 0) return { rows: [], customConversions };
+
+  type ConversionTotal = { campaignId: string; eventType: string; count: bigint; revenueMinor: string };
+  const totals = await prisma.$queryRaw<ConversionTotal[]>`
+    SELECT clicks.campaign_id AS "campaignId", conversions.event_type AS "eventType",
+           COUNT(*) AS count, SUM(conversions.value_minor)::text AS "revenueMinor"
+    FROM conversions
+    JOIN clicks ON clicks.id = conversions.click_record_id
+    WHERE clicks.campaign_id IN (${Prisma.join(campaignRows.map(({ id }) => Prisma.sql`${id}::uuid`))})
+    GROUP BY clicks.campaign_id, conversions.event_type
+  `;
+  const totalsByCampaign = new Map<string, ConversionTotal[]>();
+  for (const total of totals) {
+    const campaignTotals = totalsByCampaign.get(total.campaignId);
+    if (campaignTotals) campaignTotals.push(total);
+    else totalsByCampaign.set(total.campaignId, [total]);
+  }
+  const columns = includedCustomConversionColumns(customConversions);
 
   const rows = campaignRows.map((campaign) => {
-    const conversions = campaign.clicks.flatMap((click) => click.conversions);
+    const conversions = (totalsByCampaign.get(campaign.id) ?? []).map((total) => ({
+      ...total,
+      count: bigintToNumber(total.count),
+    }));
     return {
       id: campaign.id,
       slug: campaign.slug,
@@ -145,12 +173,12 @@ export async function getCampaignList(filters: CampaignListFilters = {}): Promis
       allowedTrackingParameters: campaign.allowedTrackingParameters,
       trafficSourceName: campaign.trafficSource?.name ?? null,
       createdAt: campaign.createdAt,
-      clicks: campaign.clicks.length,
-      conversions: conversions.length,
-      revenueMinor: conversions.reduce((total, conversion) => total + bigintToNumber(conversion.valueMinor), 0),
-      registrations: conversions.filter((conversion) => conversion.eventType.toLowerCase() === "registration").length,
-      ftds: conversions.filter((conversion) => ["ftd", "first_deposit", "first-deposit"].includes(conversion.eventType.toLowerCase())).length,
-      customConversionCounts: getCustomConversionCounts(conversions, includedCustomConversionColumns(customConversions)),
+      clicks: campaign._count.clicks,
+      conversions: conversions.reduce((total, conversion) => total + conversion.count, 0),
+      revenueMinor: bigintToNumber(conversions.reduce((total, conversion) => total + BigInt(conversion.revenueMinor), BigInt(0))),
+      registrations: conversions.reduce((total, conversion) => total + (conversion.eventType.toLowerCase() === "registration" ? conversion.count : 0), 0),
+      ftds: conversions.reduce((total, conversion) => total + (["ftd", "first_deposit", "first-deposit"].includes(conversion.eventType.toLowerCase()) ? conversion.count : 0), 0),
+      customConversionCounts: getCustomConversionCounts(conversions, columns),
     } satisfies CampaignListRow;
   });
 
@@ -159,7 +187,7 @@ export async function getCampaignList(filters: CampaignListFilters = {}): Promis
     const field = filters.sort;
     rows.sort((left, right) => (left[field] - right[field]) * multiplier);
   }
-  return rows;
+  return { rows, customConversions };
 }
 
 function detailDateFilters(params: URLSearchParams, timezone: string): DashboardFilters {

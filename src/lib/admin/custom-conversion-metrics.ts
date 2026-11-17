@@ -5,7 +5,7 @@ export type CustomConversionColumn = {
   includeInConversions: boolean;
 };
 
-export type EventTypeRecord = { eventType: string };
+export type EventTypeRecord = { eventType: string; count?: number };
 
 export function normalizeEventType(value: string): string {
   return value.trim().toLocaleLowerCase("en-US");
@@ -20,7 +20,7 @@ export function getCustomConversionCounts(
     if (!definition.includeInConversions) continue;
     const eventValues = new Set(definition.eventValues.map(normalizeEventType).filter(Boolean));
     counts[definition.id] = conversions.reduce(
-      (count, conversion) => count + (eventValues.has(normalizeEventType(conversion.eventType)) ? 1 : 0),
+      (count, conversion) => count + (eventValues.has(normalizeEventType(conversion.eventType)) ? (conversion.count ?? 1) : 0),
       0,
     );
   }
